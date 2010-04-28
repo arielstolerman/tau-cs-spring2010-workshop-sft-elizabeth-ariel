@@ -9,7 +9,10 @@
  * 
  */
 
-package SFT;
+package Function;
+
+import SFT.Complex;
+import SFT.FunctionException;
 
 /**
  * @author Elizabeth Firman and Ariel Stolerman
@@ -19,7 +22,7 @@ package SFT;
 public abstract class Function {
 	
 	// The value describing the group Z_N, the domain of the function
-	private long N;
+	protected long N;
 	// The infinity norm and Euclidean norm of the function
 	private Double infNorm;
 	private Double eucNorm;
