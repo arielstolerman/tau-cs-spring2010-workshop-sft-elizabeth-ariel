@@ -12,6 +12,18 @@
 package SFT;
 
 @SuppressWarnings("serial")
+/**
+ * @author Elizabeth Firman and Ariel Stolerman
+ * This Exceptions are thrown by class SFT on illegal parameters.
+ */
 public class SFTException extends Exception{
-
+	
+	/**
+	 * Constructs a SFTException instance with the given message.
+	 * @param message
+	 * 			The detail message for the exception.
+	 */
+	public SFTException(String message){
+		super(message);
+	}
 }

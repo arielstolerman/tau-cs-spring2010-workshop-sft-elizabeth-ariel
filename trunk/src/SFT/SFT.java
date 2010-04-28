@@ -145,7 +145,10 @@ public class SFT {
 	 */
 	public static Set<Long> getSignificatElements(long N, double delta, double tau, Function func,
 			double fInfNorm, double fEuclideanNorm, float deltaCoeff, float randSetsCoeff) throws SFTException{
-		return null;
+		// check inputs (will throw SFTException on input error)
+		SFTUtils.checkParameters(N, delta, tau, fInfNorm, fEuclideanNorm, deltaCoeff, randSetsCoeff);
+		// run the SFT algorithm
+		return runMainSFTAlgorithm(N,delta,tau,func,fInfNorm,fEuclideanNorm,deltaCoeff,randSetsCoeff);
 	}
 	
 	/* ***********************************************************************
@@ -162,7 +165,7 @@ public class SFT {
 	 * @return			a short list L in Z_N of the tau-significant Fourier coefficients
 	 * 					of f with probability at least 1-deltha_t
 	 */
-	public static void runMainSFTAlgorithm(long N, double delta_t, double tau, Function func,
+	public static Set<Long> runMainSFTAlgorithm(long N, double delta_t, double tau, Function func,
 			double fInfNorm, double fEuclideanNorm, float deltaCoeff, float randSetsCoeff) throws SFTException{
 		Debug.log("SFT -> runMainSFTAlgorithm - main algorithm started");
 		
@@ -180,6 +183,7 @@ public class SFT {
 		Set<Long> Q = new HashSet<Long>();
 		Set<Long> A = sets[0];
 		
+		long qCalcCounter = 0;
 		for (int i=1; i<sets.length; i++){
 			Set<Long> Bl = sets[i];
 			for(long e_a: A){
@@ -187,6 +191,9 @@ public class SFT {
 					long elem = SFTUtils.subModulo(e_a, e_b, N); // subtraction modulo N
 					if (!Q.contains(elem)) //TODO check that actually works
 						Q.add(elem);
+					qCalcCounter++;
+					if (qCalcCounter % 10000 == 0)
+						Debug.log("\tCalculating Q, already checked "+qCalcCounter+" couples of a in A, b in Bi");
 				}
 			}
 		}
@@ -219,6 +226,7 @@ public class SFT {
 		Debug.log("\tfinished calculating L, the list of significant Fourier coefficients for f: "+LValues);
 		
 		Debug.log("SFT -> runMainSFTAlgorithmCont  - main algorithm completed");
+		return L;
 	}
 	
 	/**
