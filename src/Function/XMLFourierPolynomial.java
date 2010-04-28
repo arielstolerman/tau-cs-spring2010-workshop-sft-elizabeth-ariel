@@ -47,6 +47,7 @@ public class XMLFourierPolynomial extends Function {
 	public XMLFourierPolynomial(File XMLInputFile, long N) throws FunctionException{
 		super(N);
 		parser = new XMLParser(XMLInputFile, polynomials, N); // will set terms according to the XML input
+		polynomials = parser.polynomials;
 		if (polynomials == null || polynomials.isEmpty())
 			throw new FunctionException("The XML must contain at least one polynomial.");
 		isRandom = parser.runId.equalsIgnoreCase("random");
