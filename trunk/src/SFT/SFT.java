@@ -12,6 +12,7 @@
 package SFT;
 
 import java.util.*;
+import Function.*;
 
 
 /**

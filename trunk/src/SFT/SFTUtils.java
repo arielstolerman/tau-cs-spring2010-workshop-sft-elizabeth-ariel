@@ -83,7 +83,7 @@ public class SFTUtils {
 	 * @param y		input for the chi function
 	 * @return		chi_(floor[(a+b)/2]) (y)
 	 */
-	protected static Complex chi(long N, long v, long y){
+	public static Complex chi(long N, long v, long y){
 		// chi_v (y) = e^(i2pi * v/N * y) = cos(2pi * v/N * y) + i*sin(2pi * v/N * y)
 		double arg = 2 * Math.PI * (((double)v)/((double)N)) * ((double)y);
 		double re = Math.cos(arg);
