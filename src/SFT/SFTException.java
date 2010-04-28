@@ -11,6 +11,7 @@
 
 package SFT;
 
+@SuppressWarnings("serial")
 public class SFTException extends Exception{
 
 }
