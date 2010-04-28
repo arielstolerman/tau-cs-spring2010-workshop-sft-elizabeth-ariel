@@ -18,9 +18,9 @@ import java.util.Set;
 public class SFTUtils {
 
 	
-	/* *********************************
-	 * General calculations
-	 ***********************************/
+	/* *****************************************
+	 * General calculations and parameters check
+	 *******************************************/
 	
 	/**
 	 * @param	all parameters needed to calculate delta
@@ -29,6 +29,39 @@ public class SFTUtils {
 	protected static double calcDelta(double delta_t,float coeff, double fEucNorm, double tau, long N){
 		return delta_t/( coeff * Math.pow(Math.pow(fEucNorm,2)/tau,1.5) *
 				(Math.log(N)/Math.log(2)) );
+	}
+	
+	/**
+	 * parameters check
+	 * @param N
+	 * @param delta
+	 * @param tau
+	 * @param fInfNorm
+	 * @param fEuclideanNorm
+	 * @param deltaCoeff
+	 * @param randSetsCoeff
+	 * @throws SFTException
+	 */
+	protected static void checkParameters(long N, double delta, double tau,	double fInfNorm,
+			double fEuclideanNorm, float deltaCoeff, float randSetsCoeff) throws SFTException{
+		if (N <= 0){
+			throw new SFTException("N must be positive."); 
+		}
+		if (delta <= 0 || delta >= 1){
+			throw new SFTException("delta must be in (0,1).");
+		}
+		if (tau <= 0){
+			throw new SFTException("tau must be positive.");
+		}
+		if (fInfNorm < 0){
+			throw new SFTException("The infinity norm of the function must be positive.");
+		}
+		if (fEuclideanNorm < 0){
+			throw new SFTException("The Euclidean norm of the function must be positive.");
+		}
+		if (deltaCoeff <= 0 || randSetsCoeff <= 0){
+			throw new SFTException("The coefficients must be positive.");
+		}
 	}
 	
 	/* *********************************
