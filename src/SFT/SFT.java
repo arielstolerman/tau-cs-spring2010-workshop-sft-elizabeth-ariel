@@ -190,7 +190,7 @@ public class SFT {
 			for(long e_a: A){
 				for(long e_b: Bl){
 					long elem = SFTUtils.subModulo(e_a, e_b, N); // subtraction modulo N
-					if (!Q.contains(elem)) //TODO check that actually works
+					if (!Q.contains(elem))
 						Q.add(elem);
 					qCalcCounter++;
 					if (qCalcCounter % 10000 == 0)
@@ -242,7 +242,7 @@ public class SFT {
 	 * TODO change documentation
 	 */
 	@SuppressWarnings("unchecked")
-	protected static Set<Long>[] runMainSFTAlgorithmDividedPart1(long N, double delta_t, double tau,
+	public static Set<Long>[] runMainSFTAlgorithmDividedPart1(long N, double delta_t, double tau,
 			double fInfNorm, double fEuclideanNorm, float deltaCoeff, float randSetsCoeff) throws SFTException{
 		Debug.log("SFT -> runMainSFTAlgorithmDividedPart1 - main algorithm part 1/2 started");
 		
@@ -266,7 +266,7 @@ public class SFT {
 			for(long e_a: A){
 				for(long e_b: Bl){
 					long elem = SFTUtils.subModulo(e_a, e_b, N); // subtraction modulo N
-					if (!Q.contains(elem)) //TODO check that actually works
+					if (!Q.contains(elem))
 						Q.add(elem);
 					qCalcCounter++;
 					if (qCalcCounter % 10000 == 0)
@@ -310,7 +310,7 @@ public class SFT {
 	 * 					of f with probability at least 1-deltha_t
 	 * TODO change documentation
 	 */
-	protected static Set<Long> runMainSFTAlgorithmDividedPart2(long N, double tau, Set<Long>[] sets,
+	public static Set<Long> runMainSFTAlgorithmDividedPart2(long N, double tau, Set<Long>[] sets,
 			Map<Long,Complex> query) throws SFTException{
 		Debug.log("SFT -> runMainSFTAlgorithmDividedPart2 - main algorithm part 2/2 started");
 		
