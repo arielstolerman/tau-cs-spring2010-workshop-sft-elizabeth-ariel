@@ -2,9 +2,10 @@ package SFT;
 
 import java.io.File;
 import java.util.Set;
-
 import Function.Function;
 import Function.XMLFourierPolynomial;
+
+import matlabcontrol.*;
 
 /*
  * Main for debugging
@@ -18,7 +19,7 @@ public class Main {
 	 */
 	public static void main(String[] args) {
 		File xmlInput = new File("d:\\tmp\\test.xml");
-		long N = Long.valueOf("10000000000"); 
+		long N = Long.valueOf("10000000000");		
 		
 		try{
 			// get polynomial
@@ -35,5 +36,11 @@ public class Main {
 		} catch (SFTException se){
 			Debug.log(">>> SFTException thrown: "+se.getMessage());
 		}
+		
+		/*
+		 * matlab control test 
+		 */
+		
+		
 	}
 }
