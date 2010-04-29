@@ -5,8 +5,6 @@ import java.util.Set;
 import Function.Function;
 import Function.XMLFourierPolynomial;
 
-import matlabcontrol.*;
-
 /*
  * Main for debugging
  */
