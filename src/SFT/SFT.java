@@ -244,7 +244,7 @@ public class SFT {
 	@SuppressWarnings("unchecked")
 	protected static Set<Long>[] runMainSFTAlgorithmDividedPart1(long N, double delta_t, double tau,
 			double fInfNorm, double fEuclideanNorm, float deltaCoeff, float randSetsCoeff) throws SFTException{
-		Debug.log("SFT -> runMainSFTAlgorithm - main algorithm started");
+		Debug.log("SFT -> runMainSFTAlgorithmDividedPart1 - main algorithm part 1/2 started");
 		
 		/* run generateQueries (algorithm 3.5) on:
 		 * N, gamma = tau/36, ||f||_infinity and delta = delta_t/O((||f||_2^2/tau)^1.5*log_2(N))
@@ -294,6 +294,8 @@ public class SFT {
 			setsExtended[i] = sets[i];
 		}
 		setsExtended[i] = Q;
+		
+		Debug.log("SFT -> runMainSFTAlgorithmDividedPart1 - main algorithm part 1/2 completed");
 		return setsExtended;
 	}
 
@@ -310,8 +312,7 @@ public class SFT {
 	 */
 	protected static Set<Long> runMainSFTAlgorithmDividedPart2(long N, double tau, Set<Long>[] sets,
 			Map<Long,Complex> query) throws SFTException{
-		
-		Debug.log("\tCreated query");
+		Debug.log("SFT -> runMainSFTAlgorithmDividedPart2 - main algorithm part 2/2 started");
 		
 		// run getFixedQueriesSFT and return its output, L
 		Set<Long> L = getFixedQueriesSFT(N,tau,sets,query);
@@ -322,7 +323,7 @@ public class SFT {
 		}
 		Debug.log("\tfinished calculating L, the list of significant Fourier coefficients for f: "+LValues);
 		
-		Debug.log("SFT -> runMainSFTAlgorithmCont  - main algorithm completed");
+		Debug.log("SFT -> runMainSFTAlgorithmDividedPart2 - main algorithm part 2/2 completed");
 		return L;
 	}
 	
