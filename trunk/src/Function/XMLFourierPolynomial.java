@@ -30,7 +30,7 @@ import SFT.*;
  */
 public class XMLFourierPolynomial extends Function {
 	
-	private Map<String,Polynomial> polynomials = null;
+	private Map<String,FourierPolynomial> polynomials = null;
 	private XMLParser parser;
 	private boolean isRandom;
 	private long maxAlpha = -1;
@@ -111,98 +111,6 @@ public class XMLFourierPolynomial extends Function {
 	 *******************************/
 	
 	/**
-	 * Private class Polynomial is used to describe Fourier polynomials over Z_N by elements and their
-	 * complex coefficients.
-	 */
-	private class Polynomial{
-		private Map<Long,Complex> terms;
-		private String id;
-		
-		/**
-		 * default constructor
-		 * @param id
-		 */
-		public Polynomial(String id){
-			this.id = id;
-			terms = new HashMap<Long,Complex>();
-		}
-		
-		// getters
-		
-		/**
-		 * @param alpha		the element for which the coefficient is fetched
-		 * @return			the coefficient or null if doesn't exist
-		 */
-		public Complex getCoeff(long alpha){
-			for(long elem: terms.keySet()){
-				if (elem == alpha)
-					return terms.get(elem); // found it, return the coeff
-			}
-			return null;
-		}
-		
-		/**
-		 * @return			the id of the polynomial
-		 */
-		public String getId() {
-			return id;
-		}
-		
-		/**
-		 * get the string representation of the polynomial
-		 */
-		public String toString(){
-			String str = "";
-			
-			for (long elem: terms.keySet()){
-				Complex coeff = terms.get(elem);
-				str += "("+coeff.toString()+")*chi_("+elem+")[x] + ";
-			}
-			str = str.substring(0,str.length()-3);
-			
-			return str;
-		}
-		
-		// setters
-		
-		/**
-		 * adds the term to the polynomial
-		 * if already exist, adds the coefficients
-		 * @param alpha		the element
-		 * @param re		real part
-		 * @param im		imaginary part
-		 */
-		public void addUpdateTerm(long alpha, double re, double im){
-			Complex coeff = this.getCoeff(alpha);
-			if (coeff == null){
-				// create new entry
-				coeff = new Complex(re,im);
-				terms.put(alpha,coeff);
-			} else {
-				// add to existing coefficient
-				coeff.addComplex(re, im);
-			}
-		}
-		
-		// calculations
-		
-		/**
-		 * @param x:	input for the polynomial p
-		 * @return:		the complex value of p(x) which is SUM_(alpha in Z_N) [coeff_alpha * chi_alpha(x)]
-		 */
-		public Complex getValue(long N, long x){
-			Complex ans = new Complex(0,0);
-			
-			for(long alpha: terms.keySet()){
-				Complex coeff = terms.get(alpha);
-				ans.addComplex(Complex.mulComplex(coeff,SFTUtils.chi(N,alpha, x)));
-			}
-			
-			return ans;
-		}
-	}
-	
-	/**
 	 * Enum to indicate the current scope of the XML file
 	 */
 	private enum Tag{
@@ -230,9 +138,9 @@ public class XMLFourierPolynomial extends Function {
 		// XMLFourierFunction inputs
 		private long maxAlpha = -1;
 		private long N;
-		private Map<String,Polynomial> polynomials;
+		private Map<String,FourierPolynomial> polynomials;
 		
-		public XMLParser(File XMLInputFile, Map<String,Polynomial> polynomials, long N) throws FunctionException{
+		public XMLParser(File XMLInputFile, Map<String,FourierPolynomial> polynomials, long N) throws FunctionException{
 			this.polynomials = polynomials;
 			this.N = N;
 			parseDocument(XMLInputFile);
@@ -287,7 +195,7 @@ public class XMLFourierPolynomial extends Function {
 				}
 				
 				// initialize polynomials map
-				polynomials = new HashMap<String,Polynomial>();
+				polynomials = new HashMap<String,FourierPolynomial>();
 				// set current tag
 				currTag = Tag.FUNCTIONS;
 				
@@ -304,7 +212,7 @@ public class XMLFourierPolynomial extends Function {
 				}
 				// if this function is the one we're looking for, or we're in random mode, get it
 				if (runId.equalsIgnoreCase("random") || runId.equals(funcId)){
-					Polynomial poly = new Polynomial(funcId);
+					FourierPolynomial poly = new FourierPolynomial(funcId);
 					// add to the polynomials map
 					polynomials.put(funcId, poly);
 					// set the current function that is parsed to this one
@@ -365,7 +273,7 @@ public class XMLFourierPolynomial extends Function {
 			}
 			else if(qName.equalsIgnoreCase("term")){
 				// add a new term to the current polynomial (only if needed)
-				Polynomial p = polynomials.get(funcId);
+				FourierPolynomial p = polynomials.get(funcId);
 				if (p != null) p.addUpdateTerm(alpha, recoeff, imcoeff);
 				
 				// update the maximum element seen so far
