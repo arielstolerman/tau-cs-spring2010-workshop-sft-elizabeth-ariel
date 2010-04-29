@@ -166,7 +166,7 @@ public class SFT {
 	 * @return			a short list L in Z_N of the tau-significant Fourier coefficients
 	 * 					of f with probability at least 1-deltha_t
 	 */
-	public static Set<Long> runMainSFTAlgorithm(long N, double delta_t, double tau, Function func,
+	protected static Set<Long> runMainSFTAlgorithm(long N, double delta_t, double tau, Function func,
 			double fInfNorm, double fEuclideanNorm, float deltaCoeff, float randSetsCoeff) throws SFTException{
 		Debug.log("SFT -> runMainSFTAlgorithm - main algorithm started");
 		
@@ -231,6 +231,102 @@ public class SFT {
 	}
 	
 	/**
+	 * Main SFT procedure DIVIDED, PART 1/2 (3.4)
+	 * The main SFT is departed into two parts, where part one builds a set of elements to be
+	 * f-valued, and part two continues its calculations using these query results
+	 * @param N:		an integer value describing the group Z_N
+	 * @param tau:		threshold on the weight of the Fourier coefficients we seek
+	 * @param deltha_t:	confidence parameter
+	 * @return			a short list L in Z_N of the tau-significant Fourier coefficients
+	 * 					of f with probability at least 1-deltha_t
+	 * TODO change documentation
+	 */
+	@SuppressWarnings("unchecked")
+	protected static Set<Long>[] runMainSFTAlgorithmDividedPart1(long N, double delta_t, double tau,
+			double fInfNorm, double fEuclideanNorm, float deltaCoeff, float randSetsCoeff) throws SFTException{
+		Debug.log("SFT -> runMainSFTAlgorithm - main algorithm started");
+		
+		/* run generateQueries (algorithm 3.5) on:
+		 * N, gamma = tau/36, ||f||_infinity and delta = delta_t/O((||f||_2^2/tau)^1.5*log_2(N))
+		 */
+		double gamma = tau/36;
+		double delta = SFTUtils.calcDelta(delta_t,deltaCoeff,fEuclideanNorm,tau,N);
+		Debug.log("\tgamma is: "+gamma+", delta is: "+delta+", fInfNorm is: "+fInfNorm);
+		
+		Set<Long>[] sets = generateQueries(N, gamma, fInfNorm, delta, randSetsCoeff);
+		Debug.log("\tgenerated sets A,B1,..,Bl");
+		
+		// Build set Q
+		Set<Long> Q = new HashSet<Long>();
+		Set<Long> A = sets[0];
+		
+		long qCalcCounter = 0;
+		for (int i=1; i<sets.length; i++){
+			Set<Long> Bl = sets[i];
+			for(long e_a: A){
+				for(long e_b: Bl){
+					long elem = SFTUtils.subModulo(e_a, e_b, N); // subtraction modulo N
+					if (!Q.contains(elem)) //TODO check that actually works
+						Q.add(elem);
+					qCalcCounter++;
+					if (qCalcCounter % 10000 == 0)
+						Debug.log("\tCalculating Q, already checked "+qCalcCounter+" couples of a in A, b in Bi");
+				}
+			}
+		}
+		
+		String QValues = "";
+		int rowCount = 0;
+		for (Iterator<Long> j = Q.iterator(); j.hasNext();){
+			rowCount++;
+			QValues += j.next();
+			QValues += (rowCount % 20 == 0)? "\n\t":" ";
+		}
+		String Qsize = Q.size()+"";
+		Debug.log("\tcreated Q = {x - y | x in A, y in union(B_i), i=1,...,log(N)} of size "+Qsize+":\n\t"+QValues);
+		
+		// return Set<Long> array with A,B1,...,Bl,Q
+		// A,B1,...,Bl are for the rest of the calculation
+		// Q holds the elements in the domain to query the function for
+		Set<Long>[] setsExtended = new HashSet[sets.length+1];
+		int i=0;
+		for(; i<sets.length; i++){
+			setsExtended[i] = sets[i];
+		}
+		setsExtended[i] = Q;
+		return setsExtended;
+	}
+
+	/**
+	 * Main SFT procedure DIVIDED, PART 2/2 (3.4)
+	 * The main SFT is departed into two parts, where part one builds a set of elements to be
+	 * f-valued, and part two continues its calculations using these query results
+	 * @param N:		an integer value describing the group Z_N
+	 * @param tau:		threshold on the weight of the Fourier coefficients we seek
+	 * @param deltha_t:	confidence parameter
+	 * @return			a short list L in Z_N of the tau-significant Fourier coefficients
+	 * 					of f with probability at least 1-deltha_t
+	 * TODO change documentation
+	 */
+	protected static Set<Long> runMainSFTAlgorithmDividedPart2(long N, double tau, Set<Long>[] sets,
+			Map<Long,Complex> query) throws SFTException{
+		
+		Debug.log("\tCreated query");
+		
+		// run getFixedQueriesSFT and return its output, L
+		Set<Long> L = getFixedQueriesSFT(N,tau,sets,query);
+		
+		String LValues = "";
+		for (long e: L){
+			LValues += String.valueOf(e)+" ";
+		}
+		Debug.log("\tfinished calculating L, the list of significant Fourier coefficients for f: "+LValues);
+		
+		Debug.log("SFT -> runMainSFTAlgorithmCont  - main algorithm completed");
+		return L;
+	}
+	
+	/**
 	 * Generate Queries algorithm (3.5)
 	 * @param N:		an integer value describing the group Z_N
 	 * @param gamma:	a value in R+
@@ -240,7 +336,7 @@ public class SFT {
 	 * 					create the set of x's to ask their f-value
 	 */
 	@SuppressWarnings("unchecked")
-	public static Set<Long>[] generateQueries(long N, double gamma, double fInfNorm, double delta, float randSetsCoeff){
+	protected static Set<Long>[] generateQueries(long N, double gamma, double fInfNorm, double delta, float randSetsCoeff){
 		Debug.log("SFT -> generateQueries started");
 		
 		// compute m_A and m_B
@@ -305,7 +401,7 @@ public class SFT {
 	 * @return:				a short list L in Z_N of the tau-significant Fourier coefficients
 	 * 						of f with probability at least 1-deltha_t
 	 */
-	public static Set<Long> getFixedQueriesSFT(long N, double tau, Set<Long>[] querySets, Map<Long,Complex> query){
+	protected static Set<Long> getFixedQueriesSFT(long N, double tau, Set<Long>[] querySets, Map<Long,Complex> query){
 		Debug.log("SFT -> getFixedQueriesSFT started");
 		
 		// initialize candidate (candidate_0)
@@ -366,7 +462,7 @@ public class SFT {
 	 * @param query:	
 	 * @return:			decides whether to keep or discard the interval {a,b} 
 	 */
-	public static boolean distinguish(long N, long[] interval, double tau, Set<Long> A, Set<Long> B,
+	protected static boolean distinguish(long N, long[] interval, double tau, Set<Long> A, Set<Long> B,
 			Map<Long,Complex> query){
 		Debug.log("SFT -> distinguish started");
 		
