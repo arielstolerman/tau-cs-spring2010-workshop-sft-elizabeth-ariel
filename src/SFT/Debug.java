@@ -21,7 +21,7 @@ public class Debug {
 	private static final String LOG_FILE = "LCT_log.txt";
 	private static BufferedWriter outputFile = null;
 	private static BufferedWriter queryOutputFile = null;
-	public static final boolean DEBUG_MODE = true;
+	public static boolean DEBUG_MODE = true;
 
 	//Time
 	private static final String DATE_FORMAT = "HH:mm:ss";
@@ -95,6 +95,16 @@ public class Debug {
 			outputFile.close();
 			queryOutputFile.close();
 		} catch (IOException e) {}      
+	}
+
+
+	public static boolean isDEBUG_MODE() {
+		return DEBUG_MODE;
+	}
+
+
+	public static void setDEBUG_MODE(boolean dEBUGMODE) {
+		DEBUG_MODE = dEBUGMODE;
 	}
 }
 

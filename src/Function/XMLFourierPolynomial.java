@@ -66,7 +66,7 @@ public class XMLFourierPolynomial extends Function {
 	 */
 	public Complex getValue(long elem){
 		String randIndex = (int)Math.ceil(Math.random()*polynomials.size())+"";
-		return polynomials.get(randIndex).getValue(this.N, elem);
+		return polynomials.get(randIndex).getValue(elem);
 	}
 	
 	/*
@@ -212,11 +212,15 @@ public class XMLFourierPolynomial extends Function {
 				}
 				// if this function is the one we're looking for, or we're in random mode, get it
 				if (runId.equalsIgnoreCase("random") || runId.equals(funcId)){
-					FourierPolynomial poly = new FourierPolynomial(funcId);
-					// add to the polynomials map
-					polynomials.put(funcId, poly);
-					// set the current function that is parsed to this one
-					this.funcId = funcId;
+					try{
+						FourierPolynomial poly = new FourierPolynomial(N,funcId);
+						// add to the polynomials map
+						polynomials.put(funcId, poly);
+						// set the current function that is parsed to this one
+						this.funcId = funcId;
+					}catch(FunctionException fe){
+						//TODO handle exception
+					}
 				}
 				// set current tag
 				currTag = Tag.FUNCTION;

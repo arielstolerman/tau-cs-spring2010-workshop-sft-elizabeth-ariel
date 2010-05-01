@@ -4,13 +4,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 import SFT.Complex;
+import SFT.FunctionException;
 import SFT.SFTUtils;
 
 /**
  * Private class Polynomial is used to describe Fourier polynomials over Z_N by elements and their
  * complex coefficients.
  */
-public class FourierPolynomial{
+public class FourierPolynomial extends Function{
 	private Map<Long,Complex> terms;
 	private String id;
 	
@@ -18,7 +19,8 @@ public class FourierPolynomial{
 	 * default constructor
 	 * @param id
 	 */
-	public FourierPolynomial(String id){
+	public FourierPolynomial(long N, String id) throws FunctionException{
+		super(N);
 		this.id = id;
 		terms = new HashMap<Long,Complex>();
 	}
@@ -86,12 +88,12 @@ public class FourierPolynomial{
 	 * @param x:	input for the polynomial p
 	 * @return:		the complex value of p(x) which is SUM_(alpha in Z_N) [coeff_alpha * chi_alpha(x)]
 	 */
-	public Complex getValue(long N, long x){
+	public Complex getValue(long x){
 		Complex ans = new Complex(0,0);
 		
 		for(long alpha: terms.keySet()){
 			Complex coeff = terms.get(alpha);
-			ans.addComplex(Complex.mulComplex(coeff,SFTUtils.chi(N,alpha, x)));
+			ans.addComplex(Complex.mulComplex(coeff,SFTUtils.chi(this.N,alpha, x)));
 		}
 		
 		return ans;
