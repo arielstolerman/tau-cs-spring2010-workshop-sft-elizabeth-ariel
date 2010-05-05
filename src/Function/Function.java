@@ -16,13 +16,13 @@ import SFT.FunctionException;
 
 /**
  * @author Elizabeth Firman and Ariel Stolerman
- * This abstract class is used for describing functions over Z_N -> C. The SFT class uses a Function object
- * for query access to the investigated function.
+ * This abstract class is used for describing functions over G -> C where G is Z_N1 x ... x Z_Nk.
+ * The SFT class uses a Function object for query access to the investigated function.
  */
 public abstract class Function {
 	
 	// The value describing the group Z_N, the domain of the function
-	protected long N;
+	protected long[] G;
 	// The infinity norm and Euclidean norm of the function
 	private Double infNorm;
 	private Double eucNorm;
@@ -38,12 +38,14 @@ public abstract class Function {
 	 * @throws FunctionException
 	 * 			If the given N is less than or equals to 0.
 	 */
-	public Function(long N) throws FunctionException{
-		if (N <= 0){
-			FunctionException fe = new FunctionException("N must be positive.");
-			throw fe;
+	public Function(long[] G) throws FunctionException{
+		for (int i=0; i<G.length; i++){
+			if (G[i] <= 0){
+				FunctionException fe = new FunctionException("all Ns must be positive.");
+				throw fe;
+			}
 		}
-		this.N = N;
+		this.G = G;
 		this.infNorm = null;
 		this.eucNorm = null;
 	}
@@ -59,7 +61,7 @@ public abstract class Function {
 	 * @return
 	 * 			The value of the function for the input element in Z_N.
 	 */
-	public abstract Complex getValue(long elem);
+	public abstract Complex getValue(long[] elem);
 	
 	
 	/*
@@ -67,17 +69,19 @@ public abstract class Function {
 	 */
 	
 	/**
-	 * Returns the infinity norm of this function over Z_N.
+	 * Returns the infinity norm of this function over G.
 	 * The implementation given in the abstract class is the naive implementation.
 	 * @return
-	 * 			The infinity norm of this function over Z_N.
+	 * 			The infinity norm of this function over G.
 	 */
+	//TODO
 	public double calcInfinityNorm(){
 		if (infNorm == null){
 			double ans = 0;
 			
-			for(long i=0; i<N; i++){
-				Complex val = getValue(i);
+			
+			for (int i=0; i<G.length; i++){
+				Complex val = null;
 				double tmp = Math.pow(val.getRe(),2) + Math.pow(val.getIm(),2);
 				if (tmp > ans) ans = tmp;
 			}
@@ -93,13 +97,14 @@ public abstract class Function {
 	 * @return
 	 * 			The Euclidean norm of this function over Z_N.
 	 */
+	//TODO
 	public double calcEuclideanNorm(){
 		if (eucNorm == null){
 			double ans = 0;
 			
-			for(long i=0; i<N; i++){
-				Complex val = getValue(i);
-				ans += (Math.pow(val.getRe(),2) + Math.pow(val.getIm(),2))/((double)N);
+			for(long i=0; i<G.length; i++){
+				Complex val = null;
+				ans += (Math.pow(val.getRe(),2) + Math.pow(val.getIm(),2))/((double)G.length);
 			}
 			
 			eucNorm = Math.sqrt(ans);
@@ -116,8 +121,8 @@ public abstract class Function {
 	 * @return
 	 * 			The value of N, describing Z_N the domain of the function.
 	 */
-	public long getN(){
-		return N;
+	public long[] getG(){
+		return G;
 	}
 	
 	/*
@@ -131,13 +136,20 @@ public abstract class Function {
 	 * @throws FunctionException
 	 * 			If the given N is less than or equals to 0.
 	 */
-	public void setN(long N) throws FunctionException{
-		if (N <= 0){
-			FunctionException fe = new FunctionException("N must be positive.");
-			throw fe;
+	public void setG(long[] G) throws FunctionException{
+		for (int i=0; i<G.length; i++){
+			if (G[i] <= 0){
+				FunctionException fe = new FunctionException("all Ns must be positive.");
+				throw fe;
+			}
 		}
-		if (N != this.N){
-			this.N = N;
+		boolean change = true;
+		for (int i=0; i<G.length; i++){
+			if (G[i] == this.G[i])
+				change = change && false;
+		}
+		if (change){
+			this.G = G;
 			this.infNorm = null;
 			this.eucNorm = null;
 		}

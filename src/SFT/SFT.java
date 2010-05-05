@@ -153,75 +153,81 @@ public class SFT {
 	}
 	
 	/* ***********************************************************************
-	 * The SFT algorithms 3.4 - 3.7 implementation (as described in the paper)
+	 * The SFT algorithms 3.9 - 3.12 implementation (as described in the paper)
 	 *************************************************************************/
 	
 	/**
-	 * Main SFT procedure (3.4)
+	 * Main SFT procedure (3.9)
 	 * The main SFT is departed into two parts, where part one builds a set of elements to be
 	 * f-valued, and part two continues its calculations using these query results
-	 * @param N:		an integer value describing the group Z_N
-	 * @param tau:		threshold on the weight of the Fourier coefficients we seek
-	 * @param deltha_t:	confidence parameter
-	 * @return			a short list L in Z_N of the tau-significant Fourier coefficients
-	 * 					of f with probability at least 1-deltha_t
+	 * @param G			an integer array describing the group Z_N1 X ... X Z_Nk
+	 * @param tau		threshold on the weight of the Fourier coefficients we seek
+	 * @param delta_t	confidence parameter
+	 * @return			a short list L in G of the tau-significant Fourier coefficients
+	 * 					of f with probability at least 1-delta_t
 	 */
-	protected static Set<Long> runMainSFTAlgorithm(long N, double delta_t, double tau, Function func,
+	protected static Set<long[]> runMainSFTAlgorithm(long[] G, double delta_t, double tau, Function func,
 			double fInfNorm, double fEuclideanNorm, float deltaCoeff, float randSetsCoeff) throws SFTException{
 		Debug.log("SFT -> runMainSFTAlgorithm - main algorithm started");
 		
-		/* run generateQueries (algorithm 3.5) on:
-		 * N, gamma = tau/36, ||f||_infinity and delta = delta_t/O((||f||_2^2/tau)^1.5*log_2(N))
+		/* run generateQueries (algorithm 3.10) on:
+		 * G, gamma = tau/36, ||f||_infinity and delta = delta_t/O((||f||_2^2/tau)^1.5*log_2|G|)
 		 */
 		double gamma = tau/36;
-		double delta = SFTUtils.calcDelta(delta_t,deltaCoeff,fEuclideanNorm,tau,N);
+		long sizeOfG = 0;
+		int k = G.length;
+		for (int i=0; i<k; i++) sizeOfG += G[i];
+		double delta = SFTUtils.calcDelta(delta_t,deltaCoeff,fEuclideanNorm,tau,sizeOfG);
 		Debug.log("\tgamma is: "+gamma+", delta is: "+delta+", fInfNorm is: "+fInfNorm);
 		
-		Set<Long>[] sets = generateQueries(N, gamma, fInfNorm, delta, randSetsCoeff);
+		Set<long[]>[][] sets = generateQueries(G, gamma, fInfNorm, delta, randSetsCoeff);
 		Debug.log("\tgenerated sets A,B1,..,Bl");
 		
 		// Build set Q
-		Set<Long> Q = new HashSet<Long>();
-		Set<Long> A = sets[0];
+		Set<long[]> Q = new HashSet<long[]>();
+		Set<long[]> A = sets[0][0];
 		
 		long qCalcCounter = 0;
-		for (int i=1; i<sets.length; i++){
-			Set<Long> Bl = sets[i];
-			for(long e_a: A){
-				for(long e_b: Bl){
-					long elem = SFTUtils.subModulo(e_a, e_b, N); // subtraction modulo N
-					if (!Q.contains(elem))
-						Q.add(elem);
-					qCalcCounter++;
-					if (qCalcCounter % 10000 == 0)
-						Debug.log("\tCalculating Q, already checked "+qCalcCounter+" couples of a in A, b in Bi");
+		for (int t=1; t<=k; t++){
+			Set<long[]>[] tSets = sets[t];
+			for (int l=0; l<tSets.length; l++){
+				Set<long[]> Btl = tSets[l];
+				for(long[] e_a: A){
+					for(long[] e_b: Btl){
+						long[] elem = SFTUtils.subVectorModulo(e_a, e_b, G[t-1],k); // vector subtraction modulo Nt
+						if (!SFTUtils.contains(Q,elem))
+							Q.add(elem);
+						qCalcCounter++;
+						if (qCalcCounter % 10000 == 0)
+							Debug.log("\tCalculating Q, already checked "+qCalcCounter+" couples of a in A, b in Btl");
+					}
 				}
 			}
 		}
 		
 		String QValues = "";
 		int rowCount = 0;
-		for (Iterator<Long> j = Q.iterator(); j.hasNext();){
+		for (Iterator<long[]> j = Q.iterator(); j.hasNext();){
 			rowCount++;
-			QValues += j.next();
+			QValues += SFTUtils.printVector(j.next());
 			QValues += (rowCount % 20 == 0)? "\n\t":" ";
 		}
 		String Qsize = Q.size()+"";
-		Debug.log("\tcreated Q = {x - y | x in A, y in union(B_i), i=1,...,log(N)} of size "+Qsize+":\n\t"+QValues);
+		Debug.log("\tcreated Q = {x - y | x in A, y in union(B_t_l), t=1,...,k, l=1,...,log(Nt)} of size "+Qsize+":\n\t"+QValues);
 		
 		// create query
-		Map<Long,Complex> query = new HashMap<Long,Complex>();
-		for(long elem: Q){
-			query.put(elem, func.getValue(elem));
+		Map<String,Complex> query = new HashMap<String,Complex>();
+		for(long[] elem: Q){
+			query.put(SFTUtils.printVector(elem), func.getValue(elem));
 		}
 		
 		Debug.log("\tCreated query");
 		
 		// run getFixedQueriesSFT and return its output, L
-		Set<Long> L = getFixedQueriesSFT(N,tau,sets,query);
+		Set<long[]> L = getFixedQueriesSFT(N,tau,sets,query);
 		
 		String LValues = "";
-		for (long e: L){
+		for (long[] e: L){
 			LValues += String.valueOf(e)+" ";
 		}
 		Debug.log("\tfinished calculating L, the list of significant Fourier coefficients for f: "+LValues);

@@ -23,6 +23,20 @@ public class SFTUtils {
 	 *******************************************/
 	
 	/**
+	 * @param elem	vector to print in format (x1,...,xk)
+	 * @return		string representation of the vector
+	 */
+	protected static String printVector(long[] elem){
+		String ans = "(";
+		int k = elem.length;
+		for (int i=0; i<k; i++){
+			ans += elem[i]+",";
+		}
+		ans = ans.substring(0, ans.length()-1)+")";
+		return ans;
+	}
+	
+	/**
 	 * @param	all parameters needed to calculate delta
 	 * @return	delta
 	 */
@@ -103,21 +117,45 @@ public class SFTUtils {
 	}
 	
 	/**
-	 * subtraction modulo N
+	 * vector subtraction modulo N
 	 * @param a
 	 * @param b
 	 * @param N
+	 * @param k
+	 * 			vector length
 	 * @return
 	 */
-	protected static long subModulo(long a, long b, long N){
-		long ans = a - b;
-		if (ans < 0) ans += N;
+	protected static long[] subVectorModulo(long[] a, long[] b, long N, int k){
+		long[] ans = new long[k];
+		for (int i=0; i<k; i++){
+			long tmp = a[i] - b[i];
+			if (tmp < 0) tmp += N;
+			ans[i] = tmp;
+		}
 		return ans;
 	}
 	
 	/* *********************************
 	 * Random subsets generation
 	 ***********************************/
+	
+	/**
+	 * @param Q		a set of vectors
+	 * @param elem	a vector
+	 * @return		true iff Q contains elem
+	 */
+	protected static boolean contains(Set<long[]> Q, long[] elem){
+		int k = elem.length;
+		int i;
+		for (long[] e: Q){
+			for (i=0; i<k; i++){
+				if (elem[i] != e[i])
+					break;
+			}
+			if (i == k) return true;
+		}
+		return false;
+	}
 	
 	/**
 	 * @param m_A	the size of the set
