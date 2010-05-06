@@ -26,7 +26,7 @@ public class SFTUtils {
 	 * @param elem	vector to print in format (x1,...,xk)
 	 * @return		string representation of the vector
 	 */
-	protected static String printVector(long[] elem){
+	public static String printVector(long[] elem){
 		String ans = "(";
 		int k = elem.length;
 		for (int i=0; i<k; i++){
@@ -34,6 +34,21 @@ public class SFTUtils {
 		}
 		ans = ans.substring(0, ans.length()-1)+")";
 		return ans;
+	}
+	
+	/**
+	 * @param vector	the string representation of a vector, as created by printVector
+	 * @return			the long array representing the vector
+	 */
+	public static long[] getVectorFromString(String vector){
+		// remove "(", ")"
+		vector = vector.substring(1,vector.length()-1);
+		String[] elems = vector.split(",");
+		long[] res = new long[elems.length];
+		for(int i=0; i<res.length; i++){
+			res[i] = Long.parseLong(elems[i]);
+		}
+		return res;
 	}
 	
 	/**
@@ -91,11 +106,27 @@ public class SFTUtils {
 	}
 	
 	/**
-	 * calculate Chi
+	 * calculate Chi over G
+	 * @param G		vector of values describing G, i.e. Cartesian multiplication of Z_Ni
+	 * @param v		the vector of elements in G defining the chi function
+	 * @param y		input vector for the chi function
+	 * @return		chi_(v)[y] = chi_(alpha_1,...,alpha_k)[y_1,...,y_k]
+	 */
+	public static Complex chi(long[] G, long[] v, long[] y){
+		Complex ans = new Complex(1,1);
+		int k = G.length;
+		for(int i=0; i<k; i++){
+			ans = Complex.mulComplex(ans, chi(G[i],v[i],y[i]));
+		}
+		return ans;
+	}
+	
+	/**
+	 * calculate Chi over Z_N
 	 * @param N		describing Z_N
-	 * @param v		floor( (a+b)/2 )
+	 * @param v		the element in Z_N defining the chi function
 	 * @param y		input for the chi function
-	 * @return		chi_(floor[(a+b)/2]) (y)
+	 * @return		chi_(v)[y]
 	 */
 	public static Complex chi(long N, long v, long y){
 		// chi_v (y) = e^(i2pi * v/N * y) = cos(2pi * v/N * y) + i*sin(2pi * v/N * y)
