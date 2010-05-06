@@ -1,11 +1,18 @@
+/*
+ * 
+ * Workshop Learning & Coding Theory Project - The SFT Algorithm
+ * TAU, Spring Semester 2010
+ * Elizabeth Firman and Ariel Stolerman
+ * 
+ * Filename: FourierPolynomial.java
+ * Description: Code for class FourierPolynomial, implementation of the abstract class Function for Fourier polynomials
+ * 
+ */
+
 package Function;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import SFT.Complex;
-import SFT.FunctionException;
-import SFT.SFTUtils;
+import java.util.*;
+import SFT.*;
 
 /**
  * Private class Polynomial is used to describe Fourier polynomials over Z_N by elements and their
