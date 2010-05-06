@@ -24,9 +24,47 @@ import SFT.*;
 /**
  * @author Elizabeth Firman and Ariel Stolerman
  * This class is an implementation of the abstract class Function used by class SFT, which defines a Function
- * object by a given XML file that contains description of functions over Z_N -> C by elements in Z_N and their
- * coefficients.
- * TODO: add XML input specification.
+ * object by a given XML file that contains description of functions over G -> C , where G is the Cartesian product
+ * of Z_Ni. The representation is kept by storing elements in G and their function-coefficients.
+ * <p>
+ * The XML format should be as following:
+ * <ul>
+ * 		<li>
+ * 			<b>&lt;functions&gt;</b>: the opening tag, must have a <b>runid</b> attribute with the value
+ * 			<i>random</i> for the function to be chosen randomly from a list of functions each time an element's
+ * 			&fnof;-value is calculated, or <i>an integer id of a function</i> in the list of functions ahead.<br>
+ * 			examples: <b>&lt;functions runid="random"&gt;, &lt;functions runid="2"&gt;</b>
+ * 		</li>
+ * 		<li>
+ * 			<b>&lt;function&gt;</b>: the opening tag of a function description. Must have an <b>id</b> attribute
+ * 			with some positive integer value (1, 2, ...).<br>
+ * 			example: <b>&lt;function id="3"&gt;</b>
+ * 		</li>
+ * 		<li>
+ * 			<b>&lt;term&gt;</b>: opening tag of a term (representing (a + bi)&sdot;&chi;<sub>&alpha;1,...,&alpha;k</sub>(x<sub>1</sub>,...,x<sub>1</sub>k)).
+ * 			Has no attributes.
+ *  	</li>
+ * 		<li>
+ * 			<b>&lt;reCoeff&gt;</b>: opening tag of the real coefficient of the term (a in the example above). The
+ * 			text in it should be some double.<br>
+ * 			example: <b>&lt;reCoeff&gt;19.58&lt;/reCoeff&gt;</b>
+ * 		</li>
+ * 		<li>
+ * 			<b>&lt;imCoeff&gt;</b>: opening tag of the imaginary coefficient of the term (b in the example above). The
+ * 			text in it should be some double.
+ * 		</li>
+ * 		<li>
+ * 			<b>&lt;alpha&gt;</b>: opening tag of the element of the term (the vector of &alpha;s in the example above).
+ * 			The element in G, that is vector in Z_N1 x ... x Z_Nk, is represented by <i>coord</i> tags inside it.<br>
+ * 		</li>
+ * 		<li>
+ * 			<b>&lt;coord&gt;</b>: opening tag of a coordinate in the element of the current term. Must have a <b>index</b> attribute
+ * 			with an integer value in 0,...,k-1. The text in it should be some element in Z_Ni, corresponding to the index attribute.
+ * 			All indices should have a value.
+ * 		</li>
+ * </ul>
+ * <p>
+ * TODO add link to example
  */
 public class XMLFourierPolynomial extends Function {
 	
