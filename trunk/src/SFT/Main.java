@@ -20,8 +20,8 @@ public class Main {
 	 */
 	public static void main(String[] args) {
 		
-		File xmlInput = new File("d:\\tmp\\test.xml");
-		long[] G = new long[]{Long.valueOf("10000000000")};		
+		File xmlInput = new File("d:\\tmp\\test2.xml");
+		long[] G = new long[]{Long.valueOf("10000")};
 		
 		try{
 			// get polynomial
@@ -32,12 +32,23 @@ public class Main {
 			for (FourierPolynomial p: ((XMLFourierPolynomial)poly).getPolynomials().values()){
 				System.out.println(">> "+p.toString());
 			}
+			System.out.println("infinity norm: "+poly.calcInfinityNorm());
+			System.out.println("Euclidean norm: "+poly.calcEuclideanNorm());
 			
 			long[] x = {2};
 			System.out.println("value at 2: "+poly.getValue(x));
 			
+			Set<long[]> L = SFT.runMainSFTAlgorithm(G, 0.01, 200, poly, 28.41, 20.0, (float)1, (float)0.0001);
+			String res = "";
+			for(long[] e: L){
+				res += SFTUtils.printVector(e)+" ";
+			}
+			System.out.println("\nSFT: "+res+"\n\nDone!");
+			
 		} catch (FunctionException fe){
 			Debug.log(">>> FunctionException thrown: "+fe.getMessage());
+		} catch (SFTException se){
+			Debug.log(">>> SFTException thrown: "+se.getMessage());
 		}
 		
 		/* **********************************************************

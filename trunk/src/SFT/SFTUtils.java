@@ -71,10 +71,15 @@ public class SFTUtils {
 	 * @param randSetsCoeff
 	 * @throws SFTException
 	 */
-	protected static void checkParameters(long N, double delta, double tau,	double fInfNorm,
+	protected static void checkParameters(long[] G, double delta, double tau, double fInfNorm,
 			double fEuclideanNorm, float deltaCoeff, float randSetsCoeff) throws SFTException{
-		if (N <= 0){
-			throw new SFTException("N must be positive."); 
+		if (G == null || G.length < 1){
+			throw new SFTException("G must be bigger than 0.");
+		}
+		for (int i=0; i<G.length; i++){
+			if (G[i] <= 0){
+				throw new SFTException("all Ns must be positive. G["+i+"] is "+G[i]); 
+			}
 		}
 		if (delta <= 0 || delta >= 1){
 			throw new SFTException("delta must be in (0,1).");
@@ -107,15 +112,15 @@ public class SFTUtils {
 	
 	/**
 	 * calculate Chi over G
+	 * @param t		the size of the vector to look at for the calculation
 	 * @param G		vector of values describing G, i.e. Cartesian multiplication of Z_Ni
 	 * @param v		the vector of elements in G defining the chi function
 	 * @param y		input vector for the chi function
 	 * @return		chi_(v)[y] = chi_(alpha_1,...,alpha_k)[y_1,...,y_k]
 	 */
-	public static Complex chi(long[] G, long[] v, long[] y){
+	public static Complex chi(int t, long[] G, long[] v, long[] y){
 		Complex ans = new Complex(1,1);
-		int k = G.length;
-		for(int i=0; i<k; i++){
+		for(int i=0; i<t; i++){
 			ans = Complex.mulComplex(ans, chi(G[i],v[i],y[i]));
 		}
 		return ans;
