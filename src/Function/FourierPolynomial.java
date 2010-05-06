@@ -12,31 +12,28 @@ import SFT.SFTUtils;
  * complex coefficients.
  */
 public class FourierPolynomial extends Function{
-	private Map<Long,Complex> terms;
+	private Map<String,Complex> terms; // the string representation of the long-vector
 	private String id;
 	
 	/**
 	 * default constructor
 	 * @param id
 	 */
-	public FourierPolynomial(long N, String id) throws FunctionException{
-		super(N);
+	public FourierPolynomial(long[] G, String id) throws FunctionException{
+		super(G);
 		this.id = id;
-		terms = new HashMap<Long,Complex>();
+		terms = new HashMap<String,Complex>();
 	}
 	
 	// getters
 	
 	/**
-	 * @param alpha		the element for which the coefficient is fetched
+	 * @param alpha		the element (vector) for which the coefficient is fetched
 	 * @return			the coefficient or null if doesn't exist
 	 */
-	public Complex getCoeff(long alpha){
-		for(long elem: terms.keySet()){
-			if (elem == alpha)
-				return terms.get(elem); // found it, return the coeff
-		}
-		return null;
+	public Complex getCoeff(long[] alpha){
+		String vector = SFTUtils.printVector(alpha);
+		return terms.get(vector);
 	}
 	
 	/**
@@ -52,11 +49,11 @@ public class FourierPolynomial extends Function{
 	public String toString(){
 		String str = "";
 		
-		for (long elem: terms.keySet()){
+		for (String elem: terms.keySet()){
 			Complex coeff = terms.get(elem);
-			str += "("+coeff.toString()+")*chi_("+elem+")[x] + ";
+			str += "("+coeff.toString()+")*chi_"+elem+"[X] + ";
 		}
-		str = str.substring(0,str.length()-3);
+		str = str.substring(0,str.length()-3)+", X in G";
 		
 		return str;
 	}
@@ -70,12 +67,12 @@ public class FourierPolynomial extends Function{
 	 * @param re		real part
 	 * @param im		imaginary part
 	 */
-	public void addUpdateTerm(long alpha, double re, double im){
+	public void addUpdateTerm(long[] alpha, double re, double im){
 		Complex coeff = this.getCoeff(alpha);
 		if (coeff == null){
 			// create new entry
 			coeff = new Complex(re,im);
-			terms.put(alpha,coeff);
+			terms.put(SFTUtils.printVector(alpha),coeff);
 		} else {
 			// add to existing coefficient
 			coeff.addComplex(re, im);
@@ -86,14 +83,15 @@ public class FourierPolynomial extends Function{
 	
 	/**
 	 * @param x:	input for the polynomial p
-	 * @return:		the complex value of p(x) which is SUM_(alpha in Z_N) [coeff_alpha * chi_alpha(x)]
+	 * @return:		the complex value of p(x) which is SUM_(alpha vector in G) [coeff_alpha * chi_alpha-vector(x)]
 	 */
-	public Complex getValue(long x){
+	public Complex getValue(long[] x){
 		Complex ans = new Complex(0,0);
 		
-		for(long alpha: terms.keySet()){
+		for(String alpha: terms.keySet()){
+			long[] alphaVector = SFTUtils.getVectorFromString(alpha);
 			Complex coeff = terms.get(alpha);
-			ans.addComplex(Complex.mulComplex(coeff,SFTUtils.chi(this.N,alpha, x)));
+			ans.addComplex(Complex.mulComplex(coeff,SFTUtils.chi(this.G,alphaVector,x)));
 		}
 		
 		return ans;

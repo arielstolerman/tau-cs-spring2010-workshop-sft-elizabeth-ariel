@@ -33,20 +33,22 @@ public class XMLFourierPolynomial extends Function {
 	private Map<String,FourierPolynomial> polynomials = null;
 	private XMLParser parser;
 	private boolean isRandom;
-	private long maxAlpha = -1;
+	private long[] maxAlpha;
 	
 	/**
 	 * Constructs a XMLFunction object from an input XML file as described in the class documentation.
 	 * @param XMLInputFile
 	 * 				The input XML file.
-	 * @param N
-	 * 				The value describing Z_N.
+	 * @param G
+	 * 				The vector of values describing G, i.e. Cartesian product of Z_Ni.
 	 * @throws FunctionException
 	 * 				If an XML parsing error occurred, I/O exception or invalid input.
 	 */
-	public XMLFourierPolynomial(File XMLInputFile, long N) throws FunctionException{
-		super(N);
-		parser = new XMLParser(XMLInputFile, polynomials, N); // will set terms according to the XML input
+	public XMLFourierPolynomial(File XMLInputFile, long[] G) throws FunctionException{
+		super(G);
+		maxAlpha = new long[G.length];
+		for (int i=0; i<G.length; i++) maxAlpha[i] = -1;
+		parser = new XMLParser(XMLInputFile, polynomials, G); // will set terms according to the XML input
 		polynomials = parser.polynomials;
 		if (polynomials == null || polynomials.isEmpty())
 			throw new FunctionException("The XML must contain at least one polynomial.");
@@ -55,16 +57,16 @@ public class XMLFourierPolynomial extends Function {
 	}
 
 	/**
-	 * Returns the value of the function for the input element in Z_N.
+	 * Returns the value of the function for the input element in G.
 	 * If the Function is defined as random, a polynomial will randomly be selected from the list
 	 * of Fourier polynomials and its value for the input element will be returned. Otherwise, the sole
 	 * polynomial defined in the input XML file's value for the input element will be returned.
 	 * @param elem
 	 * 			The element whose this function's value is calculated.
 	 * @return
-	 * 			The value of the function for the input element in Z_N.
+	 * 			The value of the function for the input element in G.
 	 */
-	public Complex getValue(long elem){
+	public Complex getValue(long[] elem){
 		String randIndex = (int)Math.ceil(Math.random()*polynomials.size())+"";
 		return polynomials.get(randIndex).getValue(elem);
 	}
@@ -91,19 +93,27 @@ public class XMLFourierPolynomial extends Function {
 	
 	@Override
 	/**
-	 * Sets N to a new value.
-	 * @param N
-	 * 			The value describing the group Z_N, the domain of the function
+	 * Sets G to a new vector of values.
+	 * @param G
+	 * 			The vector of values describing G, i.e. Cartesian product of Z_Ni, the domain of the function
 	 * @throws FunctionException
-	 * 			If the given N is less than or equals to 0 or less than or equals to the largest
+	 * 			If one of the given values is less than or equals to 0 or less than or equals to the largest
 	 * 			element whose term is specified in one or more of the input polynomials.
 	 */
-	public void setN(long N) throws FunctionException{
-		if (maxAlpha >= N){
-			throw new FunctionException("The input polynomials contain elements greater than or equal to the given N. " +
-					"Cannot change N.");
+	public void setG(long[] G) throws FunctionException{
+		if (G.length != this.G.length)
+			throw new FunctionException("the given G is of wrong length.");
+		
+		// check the maxAlpha condition
+		int k = G.length;
+		for (int i=0; i<k; i++){
+			if (maxAlpha[i] >= G[i])
+				throw new
+				FunctionException("The input polynomials contain elements greater than or equal to one of the given values. " +
+				"Cannot change G.");
 		}
-		super.setN(N);
+		// call super that will check the greater than 0 condition
+		super.setG(G);
 	}
 	
 	/* *****************************
@@ -114,7 +124,7 @@ public class XMLFourierPolynomial extends Function {
 	 * Enum to indicate the current scope of the XML file
 	 */
 	private enum Tag{
-		FUNCTIONS,FUNCTION,TERM,ALPHA,RECOEFF,IMCOEFF,END;
+		FUNCTIONS,FUNCTION,TERM,ALPHA,COORD,RECOEFF,IMCOEFF,END;
 	}
 	
 	/**
@@ -123,7 +133,6 @@ public class XMLFourierPolynomial extends Function {
 	 * 'getValue()' method.
 	 */
 	private class XMLParser extends DefaultHandler{
-		
 		/*
 		 * members
 		 */
@@ -133,16 +142,23 @@ public class XMLFourierPolynomial extends Function {
 		private String runId;
 		private String funcId = null;
 		private double recoeff, imcoeff;
-		private long alpha;
+		private long[] alpha = null;
+		private long coord = -1;
+		private int coordIndex = -1;
 		
 		// XMLFourierFunction inputs
-		private long maxAlpha = -1;
-		private long N;
+		private long[] maxAlpha;
+		private long[] G;
 		private Map<String,FourierPolynomial> polynomials;
 		
-		public XMLParser(File XMLInputFile, Map<String,FourierPolynomial> polynomials, long N) throws FunctionException{
+		public XMLParser(File XMLInputFile, Map<String,FourierPolynomial> polynomials, long[] G) throws FunctionException{
 			this.polynomials = polynomials;
-			this.N = N;
+			this.G = G;
+			int k = G.length;
+			maxAlpha = new long[k];
+			for (int i=0; i<k; i++){
+				maxAlpha[i] = -1;
+			}
 			parseDocument(XMLInputFile);
 		}
 		
@@ -213,13 +229,13 @@ public class XMLFourierPolynomial extends Function {
 				// if this function is the one we're looking for, or we're in random mode, get it
 				if (runId.equalsIgnoreCase("random") || runId.equals(funcId)){
 					try{
-						FourierPolynomial poly = new FourierPolynomial(N,funcId);
+						FourierPolynomial poly = new FourierPolynomial(G,funcId);
 						// add to the polynomials map
 						polynomials.put(funcId, poly);
 						// set the current function that is parsed to this one
 						this.funcId = funcId;
 					}catch(FunctionException fe){
-						//TODO handle exception
+						throw new SAXException("a function exception had occurred during parsing for function with id "+funcId);
 					}
 				}
 				// set current tag
@@ -237,8 +253,27 @@ public class XMLFourierPolynomial extends Function {
 			else if(qName.equalsIgnoreCase("alpha")){
 				// set current tag
 				currTag = Tag.ALPHA;
+				// initialize alpha
+				alpha = new long[G.length];
 				
 				Debug.log("\t\t\t<alpha>");
+			}
+			else if(qName.equalsIgnoreCase("coord")){
+				// set current tag
+				currTag = Tag.COORD;
+				
+				// set coordIndex
+				String ind = attributes.getValue(0);
+				// check if valid, else throw exception
+				try{
+					coordIndex = Integer.parseInt(ind);
+					if (coordIndex < 0 || coordIndex >= G.length)
+						throw new SAXException("coord opening tag has invalid index, must be between 0 and "+G.length);
+				} catch (NumberFormatException nfe){
+					throw new SAXException("coord opening tag has invalid index (not an integer): "+ind);
+				}
+				
+				Debug.log("\t\t\t\t<coord index=\""+coordIndex+"\">");
 			}
 			else if(qName.equalsIgnoreCase("reCoeff")){
 				// set current tag
@@ -262,6 +297,7 @@ public class XMLFourierPolynomial extends Function {
 		 * handlers for end tags
 		 */
 		public void endElement(String uri, String localName,String qName) throws SAXException {
+			int k = G.length;
 			if(qName.equalsIgnoreCase("functions")) {
 				// set current tag
 				currTag = Tag.END;
@@ -280,8 +316,10 @@ public class XMLFourierPolynomial extends Function {
 				FourierPolynomial p = polynomials.get(funcId);
 				if (p != null) p.addUpdateTerm(alpha, recoeff, imcoeff);
 				
-				// update the maximum element seen so far
-				if (alpha > maxAlpha) maxAlpha = alpha;
+				// update the maximum elements for each N in G seen so far
+				for (int i=0; i<k; i++){
+					if (alpha[i] > maxAlpha[i]) maxAlpha[i] = alpha[i];
+				}
 				
 				// set current tag
 				currTag = Tag.FUNCTION;
@@ -292,7 +330,21 @@ public class XMLFourierPolynomial extends Function {
 				// set current tag
 				currTag = Tag.TERM;
 				
+				// check that all coordinates were entered
+				for (int i=0; i<k; i++){
+					if (alpha[i] == -1) throw new SAXException("one of the elements for function "+funcId+" is missing value "+
+							"for index "+i);
+				}
+				
 				Debug.log("\t\t\t</alpha>");
+			}
+			else if(qName.equalsIgnoreCase("coord")){
+				// set current tag
+				currTag = Tag.ALPHA;
+				// insert the coordinate into alpha (may override value)
+				alpha[coordIndex] = coord;
+				
+				Debug.log("\t\t\t\t</coord>");
 			}
 			else if(qName.equalsIgnoreCase("reCoeff")){
 				// set current tag
@@ -329,14 +381,17 @@ public class XMLFourierPolynomial extends Function {
 				// do nothing
 				break;
 			case ALPHA:
+				// do nothing
+				break;
+			case COORD:
 				try{
 					Long value = Long.parseLong(str);
-					alpha = value;
-					Debug.log("\t\t\t\t"+str);
-					if (alpha < 0 || alpha >= N)
-						throw new SAXException("alpha not in range [0,1,...,N-1]: "+alpha);
+					coord = value;
+					Debug.log("\t\t\t\t\t"+str);
+					if (coord < 0 || coord >= G[coordIndex])
+						throw new SAXException("coordinate in index "+coordIndex+" not in range [0,1,...,G["+coordIndex+"]-1]: "+coord);
 				} catch (NumberFormatException nfe){
-					throw new SAXException("alpha must be a number in range [0,1,...,N-1]: "+alpha);
+					throw new SAXException("coordinate must be a number in range [0,1,...,G["+coordIndex+"]-1]: "+coord);
 				}
 				break;
 			case RECOEFF:
