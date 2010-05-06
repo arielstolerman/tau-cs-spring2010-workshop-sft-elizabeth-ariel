@@ -1,14 +1,3 @@
-/**
- * 
- * Workshop Learning & Coding Theory Exercise
- * TAU, Spring Semester 2010
- * Elizabeth Firman and Ariel Stolerman
- * 
- * Filename: Debug.java
- * Description: code for debugging utility
- * 
- */
-
 package SFT;
 
 import java.io.BufferedWriter;
