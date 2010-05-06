@@ -2,6 +2,7 @@ package SFT;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import Function.*;
@@ -18,24 +19,25 @@ public class Main {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		/*
+		
 		File xmlInput = new File("d:\\tmp\\test.xml");
-		long N = Long.valueOf("10000000000");		
+		long[] G = new long[]{Long.valueOf("10000000000")};		
 		
 		try{
 			// get polynomial
-			Function poly = new XMLFourierPolynomial(xmlInput, N);
+			Function poly = new XMLFourierPolynomial(xmlInput, G);
 			// calculate the function and output values
-			Set<Long> res = SFT.getSignificatElements(N, 0.1, 200.0, poly, 28.41, 20.0, (float)1.0, (float)0.0001);
-			System.out.println("The significat elements are:");
-			for (long e: res){
-				System.out.println(e+" ");
+			// print the function
+			System.out.println("list of polynomials:");
+			for (FourierPolynomial p: ((XMLFourierPolynomial)poly).getPolynomials().values()){
+				System.out.println(">> "+p.toString());
 			}
+			
+			long[] x = {2};
+			System.out.println("value at 2: "+poly.getValue(x));
 			
 		} catch (FunctionException fe){
 			Debug.log(">>> FunctionException thrown: "+fe.getMessage());
-		} catch (SFTException se){
-			Debug.log(">>> SFTException thrown: "+se.getMessage());
 		}
 		
 		/* **********************************************************
@@ -43,7 +45,7 @@ public class Main {
 		 * - run the algorithm to create the approximated function f'
 		 * - check the error percentage of f'-f
 		 ************************************************************/
-		
+		/*
 		// testing constants and variables
 		int NUM_OF_POLYS = 1;
 		double NON_ZEROS_PERCENTAGE = 0.01;
@@ -130,6 +132,7 @@ public class Main {
 			}
 			System.out.println(">>> The error percentage is: "+((double)errCount)/((double)N_TEST));
 		}
+		*/
 	}
 	
 	private static double getRand(double F_VALUES_BOUND){
