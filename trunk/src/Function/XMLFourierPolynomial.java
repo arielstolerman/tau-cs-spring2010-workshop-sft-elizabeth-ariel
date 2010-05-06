@@ -417,5 +417,9 @@ public class XMLFourierPolynomial extends Function {
 			}
 		}
 	}
+
+	public Map<String, FourierPolynomial> getPolynomials() {
+		return polynomials;
+	}
 	
 }
