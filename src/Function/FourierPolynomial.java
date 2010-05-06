@@ -98,7 +98,7 @@ public class FourierPolynomial extends Function{
 		for(String alpha: terms.keySet()){
 			long[] alphaVector = SFTUtils.getVectorFromString(alpha);
 			Complex coeff = terms.get(alpha);
-			ans.addComplex(Complex.mulComplex(coeff,SFTUtils.chi(this.G,alphaVector,x)));
+			ans.addComplex(Complex.mulComplex(coeff,SFTUtils.chi(G.length,this.G,alphaVector,x)));
 		}
 		
 		return ans;
