@@ -5,7 +5,7 @@
  * Elizabeth Firman and Ariel Stolerman
  * 
  * Filename: Complex.java
- * Description: Code for class Complex, implementation of complexed numbers
+ * Description: Code for class Complex, implementation of complex numbers
  * 
  */
 
@@ -42,18 +42,18 @@ public class Complex {
 	// getters
 	
 	/**
-	 * Returns the real coordinate of the complexed number.
+	 * Returns the real coordinate of the complex number.
 	 * @return
-	 * 			The real coordinate of the complexed number.
+	 * 			The real coordinate of the complex number.
 	 */
 	public double getRe(){
 		return this.real;
 	}
 	
 	/**
-	 * Returns the imaginary coordinate of the complexed number.
+	 * Returns the imaginary coordinate of the complex number.
 	 * @return
-	 * 			The imaginary coordinate of the complexed number.
+	 * 			The imaginary coordinate of the complex number.
 	 */
 	public double getIm(){
 		return this.imaginary;
@@ -84,11 +84,21 @@ public class Complex {
 	}
 	
 	/**
-	 * Calculates and returns the Euclidean norm of the complexed number
+	 * Calculates and returns the Euclidean norm of the complex number
 	 * @return
-	 * 			The Euclidean norm of the complexed number
+	 * 			The Euclidean norm of the complex number
 	 */
+	//TODO IS THIS CORRECT? SHOULD IT RETURN THE SQUARE OF (X^2 + Y^2) ???
 	public double getEuclideanNorm(){
+		return Math.sqrt(getNormSquare());
+	}
+	
+	/**
+	 * Calculates and returns the Euclidean norm square of the complex number
+	 * @return
+	 * 			The Euclidean norm square of the complex number
+	 */
+	public double getNormSquare(){
 		return Math.pow(real, 2)+Math.pow(imaginary, 2);
 	}
 	
@@ -121,7 +131,7 @@ public class Complex {
 	/**
 	 * Adds the given complex number to this one.
 	 * @param complex
-	 * 				The complexed number to be added.
+	 * 				The complex number to be added.
 	 */
 	public void addComplex(Complex complex){
 		this.addComplex(complex.getRe(), complex.getIm());
@@ -130,13 +140,13 @@ public class Complex {
 	// static mathematical functions
 	
 	/**
-	 * Returns the multiplication of the two given complexed numbers.
+	 * Returns the multiplication of the two given complex numbers.
 	 * @param complex1
-	 * 					The first complexed number for the multiplication.
+	 * 					The first complex number for the multiplication.
 	 * @param complex2
-	 * 					The second complexed number for the multiplication.
+	 * 					The second complex number for the multiplication.
 	 * @return
-	 * 					The multiplication of the two given complexed numbers.
+	 * 					The multiplication of the two given complex numbers.
 	 */
 	public static Complex mulComplex(Complex complex1, Complex complex2){
 		// (a + bi)(c + di) = (ac - bd) + (bc + ad)i
