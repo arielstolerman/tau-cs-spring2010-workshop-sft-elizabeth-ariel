@@ -181,7 +181,7 @@ public class SFT {
 		Debug.log("\tgamma is: "+gamma+", delta is: "+delta+", fInfNorm is: "+fInfNorm);
 		
 		Set<long[]>[][] sets = generateQueries(G, gamma, fInfNorm, delta, randSetsCoeff);
-		Debug.log("\tgenerated sets A,B1,..,Bl");
+		Debug.log("\tgenerated sets A,B1,..,BNt for t in {1,...,k} ");
 		
 		// Build set Q
 		Set<long[]> Q = new HashSet<long[]>();
@@ -209,7 +209,7 @@ public class SFT {
 		int rowCount = 0;
 		for (Iterator<long[]> j = Q.iterator(); j.hasNext();){
 			rowCount++;
-			QValues += SFTUtils.printVector(j.next());
+			QValues += SFTUtils.vectorToString(j.next());
 			QValues += (rowCount % 20 == 0)? "\n\t":" ";
 		}
 		String Qsize = Q.size()+"";
@@ -218,17 +218,17 @@ public class SFT {
 		// create query
 		Map<String,Complex> query = new HashMap<String,Complex>();
 		for(long[] elem: Q){
-			query.put(SFTUtils.printVector(elem), func.getValue(elem));
+			query.put(SFTUtils.vectorToString(elem), func.getValue(elem));
 		}
 		
 		Debug.log("\tCreated query");
 		
 		// run getFixedQueriesSFT and return its output, L
-		Set<long[]> L = getFixedQueriesSFT(N,tau,sets,query);
+		Set<long[]> L = getFixedQueriesSFT(G,tau,sets,query);
 		
 		String LValues = "";
 		for (long[] e: L){
-			LValues += String.valueOf(e)+" ";
+			LValues += SFTUtils.vectorToString(e)+"\n";
 		}
 		Debug.log("\tfinished calculating L, the list of significant Fourier coefficients for f: "+LValues);
 		
@@ -334,16 +334,16 @@ public class SFT {
 	}
 	
 	/**
-	 * Generate Queries algorithm (3.5)
-	 * @param N:		an integer value describing the group Z_N
+	 * Generate Queries algorithm (3.10)
+	 * @param G:		an integer array describing the group Z_N1 X ... X Z_Nk
 	 * @param gamma:	a value in R+
 	 * @param fInfNorm:	||f||_(infinity)
 	 * @param deltha:	confidence parameter
-	 * @return:			sets of elements in Z_N from which the main procedure will
+	 * @return:			sets of elements in G from which the main procedure will
 	 * 					create the set of x's to ask their f-value
 	 */
 	@SuppressWarnings("unchecked")
-	protected static Set<Long>[] generateQueries(long N, double gamma, double fInfNorm, double delta, float randSetsCoeff){
+	protected static Set<long[]>[][] generateQueries(long[] G, double gamma, double fInfNorm, double delta, float randSetsCoeff){
 		Debug.log("SFT -> generateQueries started");
 		
 		// compute m_A and m_B
@@ -365,35 +365,41 @@ public class SFT {
 		
 		Debug.log("\tm_A is: "+m_A+", m_B is: "+m_B);
 		
-		// generate A,B1,...,Bl
-		int logN = SFTUtils.calcLogN(N);
-		Set<Long>[] res = new HashSet[logN+1];
+		// generate A,B_1,...,B_Ntl for each t in {1,...,k} and l in {1,...,logN_t}
 		
-		// generate random subset A partial to Z_N with m_A elements
-		res[0] = SFTUtils.generateRandomSubsetA(m_A, N);
+		int[] logG = SFTUtils.calcLogG(G);
+		Set<long[]>[][] res = new HashSet[G.length+1][];
+		
+		// generate random subset A partial to G with m_A elements
+		res[0][0] = SFTUtils.generateRandomSubsetA(m_A, G);
 		
 		String AValues = "";
-		for (Iterator<Long> j = res[0].iterator(); j.hasNext(); ){
-			AValues += j.next()+" ";
+		for (Iterator<long[]> j = res[0][0].iterator(); j.hasNext(); ){
+			AValues += SFTUtils.vectorToString(j.next())+"\n";
 		}
-		Debug.log("\tA: "+AValues);
+		Debug.log("\tA: \n"+AValues+"End of A");
 
-		// generate logN random subsets B_l partial to {0,...,2^(l-1)-1} with min{m_B,2^(l-1)} elements
-		// return an array of A,B1,...,Bl
-		for(int l=1; l<=logN; l++){
-			res[l] = SFTUtils.generateRandomSubsetBl(m_B,N,l);
-		}
-		
-		Debug.log("\tB's:");
-		for (int i=1; i<=logN; i++){
-			String BlValues = "size: "+res[i].size()+"; elements: ";
-			for (Iterator<Long> j = res[i].iterator(); j.hasNext(); ){
-				BlValues += j.next()+" ";
+		// generate for each t in {1,...,k} logN_t random subsets B_tl partial to 
+		// Z_N1 X ... X Z_Nt-1 X {0,...,2^(l-1)-1} X {0} X ... X {0}
+		// and if k=1, then partial to {0,...,2^(l-1)-1} with min{m_B,2^(l-1)} elements
+		// return an array of A and B1,...,BlogN_t for each t in {1,...,k}
+		for (int t=1; t<=G.length; t++)
+			for(int l=0; l<logG[t]; l++)
+				res[t][l] = SFTUtils.generateRandomSubsetBtl(m_B,G,l,t);
+				
+		Debug.log("\tB's:\n");
+		int t,l;
+		for (t=1; t<=G.length; t++){
+			for(l=0; l<logG[t]; l++){
+				String BtlValues = "size: "+res[t][l].size()+"; elements: ";
+				for (Iterator<long[]> j = res[t][l].iterator(); j.hasNext(); )
+					BtlValues += SFTUtils.vectorToString(j.next())+"\n";
+				Debug.log("\tB_"+t+"_"+(l+1)+" : "+BtlValues);
 			}
-			Debug.log("\tB["+i+"]: "+BlValues);
 		}
+		Debug.log("\tEnd of B's");
 		
-		Debug.log("\tcreated A and B1,...,Bl");
+		Debug.log("\tcreated A and and B1,...,BlogN_t for each t in {1,...,k}");
 		Debug.log("SFT -> generateQueries completed");
 		
 		return res;
