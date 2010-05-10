@@ -26,7 +26,7 @@ public class SFTUtils {
 	 * @param elem	vector to print in format (x1,...,xk)
 	 * @return		string representation of the vector
 	 */
-	public static String printVector(long[] elem){
+	public static String vectorToString(long[] elem){
 		String ans = "(";
 		int k = elem.length;
 		for (int i=0; i<k; i++){
@@ -101,6 +101,18 @@ public class SFTUtils {
 	/* *********************************
 	 * Mathematical functions
 	 ***********************************/
+	
+	/**
+	 * @param G		an integer array describing the group Z_N1 X ... X Z_Nk
+	 * @return		an integer array of log_2(Ni), rounded up, for i in {1,...,k}
+	 */
+	protected static int[] calcLogG(long[] G){
+		int[] res= new int[G.length];
+		for (int i=0; i<G.length; i++){
+			res[i]=(int)Math.ceil(Math.log(G[i])/Math.log(2));
+		}
+		return res;
+	}
 	
 	/**
 	 * @param N		describing Z_N
@@ -195,66 +207,81 @@ public class SFTUtils {
 	
 	/**
 	 * @param m_A	the size of the set
-	 * @param N		describing Z_N
-	 * @return		a set of elements in Z_N, uniformly randomly selected
+	 * @param G		an integer array describing the group Z_N1 X ... X Z_Nk
+	 * @return		a set of elements in G, uniformly randomly selected
 	 */
-	protected static Set<Long> generateRandomSubsetA(long m_A, long N){
-		return generateRandomSubset(m_A,N);
+	protected static Set<long[]> generateRandomSubsetA(long m_A, long[] G){
+		return generateRandomSubset(m_A,G,0,G.length+1);
 	}
 	
 	/**
 	 * @param m_B	potential size of the set
-	 * @param N		describing Z_N
+	 * @param G		an integer array describing the group Z_N1 X ... X Z_Nk 
 	 * @param l		a value between 1 and log(N)
-	 * @return		a set of elements in {0,...,2^(l-1)-1}
+	 * @param t		a value between 1 and k
+	 * @return		a set of size m_B, of uniformly randomly selected vectors 
+	 * 				over Z_N1 X ... X Z_Nt-1 X {0,...,2^(l-1)-1} X {0} X ... X {0} 
+	 * 				(with >= k-t zero coordinates)
 	 */
-	protected static Set<Long> generateRandomSubsetBl(long m_B, long N, int l){
-		Set<Long> res;
+	protected static Set<long[]> generateRandomSubsetBtl(long m_B, long[] G, int l, int t){
+		Set<long[]> res = new HashSet<long[]>();
 		
-		// if 2^(l-1) < m_B, no need to randomly choose elements for be, take all 0,...,2^(l-1)-1
-		long pow = (long)Math.pow(2, l-1);
-		if (pow <= m_B){
-			res = new HashSet<Long>();
-			// take all elements in {0,...,2^(l-1)-1} to B_l
-			for (long i=0; i<pow; i++){
-				res.add(i);
+		// compatibility with G= Z_N
+		if(G.length==1){
+			long pow = (long)Math.pow(2, l-1);
+			// if 2^(l-1) < m_B, no need to randomly choose elements for B, take all 0,...,2^(l-1)-1
+			if (pow <= m_B){
+				long[] e= new long[1] ;
+				// take all elements in {0,...,2^(l-1)-1} to B_l
+				for (long i=0; i<pow; i++){
+					e[0]=i;
+					res.add(e);
+				}
 			}
+			else
+				// otherwise, choose randomly m_B elements from 0,...,2^(l-1)-1
+				res = generateRandomSubset(m_B,G,l,t);		
+			return res;
 		}
-		// otherwise, choose randomly m_B elements from 0,...,2^(l-1)-1
-		else {
-			res = generateRandomSubset(m_B,pow);
-		}
-		
-		return res;
+			
+		return generateRandomSubset(m_B,G,l,t);
 	}
 	
 	/**
-	 * @param sizeOfSet	the size of the needed set of elements
-	 * @param randBarrier	the barrier for the range of the randomly selected elements
-	 * @return				a set of uniformly randomly selected elements in range (0,1,...,randBarrier-1)
-	 * 						of size sizeOfSet 
+	 * @param sizeOfSet		the size of the needed set of elements
+	 * @param G				an integer array describing the group Z_N1 X ... X Z_Nk
+	 * @param l				a value between 1 and log(Nt)a value between 1 and log(N)
+	 * @param t				a value between 1 and k
+	 * @return				a set of size sizeOfSet, of uniformly randomly selected vectors 
+	 * 						over Z_N1 X ... X Z_Nt-1 X {0,...,2^(l-1)-1} X {0} X ... X {0} 
+	 * 						(with >= k-t zero coordinates)
+	 * 						note that when t=k+1 and l=0, we get a set of vectors over 
+	 * 						Z_N1 X ... X Z_Nk
 	 */
-	protected static Set<Long> generateRandomSubset(long sizeOfSet, long randBarrier){
-		Set<Long> res = new HashSet<Long>();
-		// assuming sizeOfSet < randBarrier
-		
+	protected static Set<long[]> generateRandomSubset(long sizeOfSet, long[] G, long l, int t){
+		Set<long[]> res = new HashSet<long[]>();
+		long pow;
+		int j;
 		Random rand = new Random();
 		for(long i=0; i<sizeOfSet; i++){
 			boolean doAgain;
-			long e;
+			long[] e= new long[G.length];
 			do{
-				e = (long)Math.floor(rand.nextDouble()*randBarrier);
-				for (long elem: res){
-					if (elem == e){
-						doAgain = true;
-						break;
-					}
+				for(j=0; j<t-1; j++)
+					e[j] = (long)Math.floor(rand.nextDouble()*G[j]);
+				if(l>0){
+					pow = (long)Math.pow(2, l-1);
+					e[j]= (long)Math.floor(rand.nextDouble()*pow);
+				for(int k=j+1; k<G.length; k++)
+					e[k] = 0;	
 				}
-				doAgain = false;
+				if(contains(res, e))
+					doAgain = true;
+				else
+					doAgain = false;
 			} while (doAgain);
 			res.add(e);
-		}
-		
+		}	
 		return res;
 	}
 }
