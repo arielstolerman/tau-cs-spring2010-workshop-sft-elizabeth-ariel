@@ -147,9 +147,10 @@ public class SFT {
 	public static Set<Long> getSignificatElements(long N, double delta, double tau, Function func,
 			double fInfNorm, double fEuclideanNorm, float deltaCoeff, float randSetsCoeff) throws SFTException{
 		// check inputs (will throw SFTException on input error)
-		SFTUtils.checkParameters(N, delta, tau, fInfNorm, fEuclideanNorm, deltaCoeff, randSetsCoeff);
+		//SFTUtils.checkParameters(N, delta, tau, fInfNorm, fEuclideanNorm, deltaCoeff, randSetsCoeff);
 		// run the SFT algorithm
-		return runMainSFTAlgorithm(N,delta,tau,func,fInfNorm,fEuclideanNorm,deltaCoeff,randSetsCoeff);
+		//TODO
+		return null;
 	}
 	
 	/* ***********************************************************************
@@ -246,15 +247,15 @@ public class SFT {
 	 * @return			a short list L in Z_N of the tau-significant Fourier coefficients
 	 * 					of f with probability at least 1-deltha_t
 	 * TODO change documentation
-	 */
+	 *//*
 	@SuppressWarnings("unchecked")
 	public static Set<Long>[] runMainSFTAlgorithmDividedPart1(long N, double delta_t, double tau,
 			double fInfNorm, double fEuclideanNorm, float deltaCoeff, float randSetsCoeff) throws SFTException{
 		Debug.log("SFT -> runMainSFTAlgorithmDividedPart1 - main algorithm part 1/2 started");
 		
-		/* run generateQueries (algorithm 3.5) on:
-		 * N, gamma = tau/36, ||f||_infinity and delta = delta_t/O((||f||_2^2/tau)^1.5*log_2(N))
-		 */
+		// run generateQueries (algorithm 3.5) on:
+		// N, gamma = tau/36, ||f||_infinity and delta = delta_t/O((||f||_2^2/tau)^1.5*log_2(N))
+		 
 		double gamma = tau/36;
 		double delta = SFTUtils.calcDelta(delta_t,deltaCoeff,fEuclideanNorm,tau,N);
 		Debug.log("\tgamma is: "+gamma+", delta is: "+delta+", fInfNorm is: "+fInfNorm);
@@ -315,7 +316,7 @@ public class SFT {
 	 * @return			a short list L in Z_N of the tau-significant Fourier coefficients
 	 * 					of f with probability at least 1-deltha_t
 	 * TODO change documentation
-	 */
+	 */ /*
 	public static Set<Long> runMainSFTAlgorithmDividedPart2(long N, double tau, Set<Long>[] sets,
 			Map<Long,Complex> query) throws SFTException{
 		Debug.log("SFT -> runMainSFTAlgorithmDividedPart2 - main algorithm part 2/2 started");
@@ -332,7 +333,8 @@ public class SFT {
 		Debug.log("SFT -> runMainSFTAlgorithmDividedPart2 - main algorithm part 2/2 completed");
 		return L;
 	}
-	
+	*/
+		
 	/**
 	 * Generate Queries algorithm (3.10)
 	 * @param G:		an integer array describing the group Z_N1 X ... X Z_Nk
@@ -406,88 +408,140 @@ public class SFT {
 	}
 	
 	/**
-	 * Fixed Queries SFT algorithm (3.6)
-	 * @param N:			an integer value describing the group Z_N
+	 * Fixed Queries SFT algorithm (3.11)
+	 * @param G:			a vector of values describing the G
 	 * @param tau:			threshold on the weight of the Fourier coefficients we seek
 	 * @param querySets:	the output of the generateQueries function
 	 * @param query:		a set {q,f(q)}
-	 * @return:				a short list L in Z_N of the tau-significant Fourier coefficients
+	 * @return:				a short list L of vectors in G of the tau-significant Fourier coefficients
 	 * 						of f with probability at least 1-deltha_t
 	 */
-	protected static Set<Long> getFixedQueriesSFT(long N, double tau, Set<Long>[] querySets, Map<Long,Complex> query){
+	protected static Set<long[]> getFixedQueriesSFT(long[] G, double tau, Set<long[]>[][] querySets, Map<String,Complex> query){
 		Debug.log("SFT -> getFixedQueriesSFT started");
 		
-		// initialize candidate (candidate_0)
-		long[] initInterval = {0,N}; //TODO: possibly should be N-1, since N is not a candidate!
-		Candidate candidate = new Candidate(initInterval);
+		int k = G.length;
+		Set<long[]> A = querySets[0][0];
+		Set<long[]> prefixes = new HashSet<long[]>();
+		long[] firstPrefixVec = new long[]{-1}; // first vector for running the first iteration once
+		prefixes.add(firstPrefixVec);
 		
-		// run iterations over l = 0,...,log_2(N)-1
-		int logN = SFTUtils.calcLogN(N);
-		Set<Long> A = querySets[0];
-		
-		for(int l=0; l<logN; l++){
-			Candidate tmpCandidate = new Candidate();
-			for (long[] interval: candidate.getSet()){
-				// create two sub intervals
-				long a = interval[0];
-				long b = interval[1];
+		// run iterations over t = 1,...,k
+		for(int t=1; t<=k; t++){
+			
+			Set<long[]> tmpPrefixes = new HashSet<long[]>();
+			long N = G[t-1];
+			
+			for (long[] prefixVector: prefixes){
+				// check if this is the first iteration, that is t == 1. if so, mark the prefix vector as
+				// "the empty string", which will be null.
+				if (t == 1) prefixVector = null;
 				
-				long middle = (long)Math.floor((a+b)/2);
-				long[] subInterval1 = {a, middle};
-				long[] subInterval2 = {middle+1, b};
+				// initialize candidate (candidate_0)
+				long[] initInterval = {0,N}; //TODO: possibly should be N-1, since N is not a candidate!
+				Candidate candidate = new Candidate(initInterval);
+
+				// run iterations over l = 0,...,log_2(N)-1
+				int logN = SFTUtils.calcLogN(N);
+
+				for(int l=0; l<logN; l++){
+					Candidate tmpCandidate = new Candidate();
+					for (long[] interval: candidate.getSet()){
+						// create two sub intervals
+						long a = interval[0];
+						long b = interval[1];
+
+						long middle = (long)Math.floor((a+b)/2);
+						long[] subInterval1 = {a, middle};
+						long[] subInterval2 = {middle+1, b};
+
+						// check that the intervals size difference is no greater that 1
+						assert(Math.abs((subInterval1[1]-subInterval1[0]) -	(subInterval2[1]-subInterval2[0])) <= 1);
+
+						// for each sub interval check if it is "heavy"
+						Set<long[]> B_lplus1 = querySets[t][l];
+						if (distinguish(prefixVector, k, G, N, subInterval1, tau, A, B_lplus1, query))
+							tmpCandidate.addInterval(subInterval1);
+						if (distinguish(prefixVector, k, G, N, subInterval2, tau, A, B_lplus1, query))
+							tmpCandidate.addInterval(subInterval2);
+					}
+					candidate = tmpCandidate; // update candidate_i to candidate_(i+1)
+				}
 				
-				// check that the intervals size difference is no greater that 1
-				assert(Math.abs((subInterval1[1]-subInterval1[0]) -	(subInterval2[1]-subInterval2[0])) <= 1);
-				
-				// for each sub interval check if it is "heavy"
-				Set<Long> B_lplus1 = querySets[l+1];
-				if (distinguish(N, subInterval1, tau, A, B_lplus1, query))
-					tmpCandidate.addInterval(subInterval1);
-				if (distinguish(N, subInterval2, tau, A, B_lplus1, query))
-					tmpCandidate.addInterval(subInterval2);
+				// build Lt_prefix for this prefixVector and add it to the prefixes set of the current t
+				Set<long[]> Lt_prefix = new HashSet<long[]>();
+				// first time
+				if (prefixVector == null){
+					for (long[] interval: candidate.getSet()){
+						if (interval[0] == interval[1]){
+							long[] elem = new long[]{interval[0]};
+							Lt_prefix.add(elem);
+						}
+					}
+				}
+				// not first time
+				else {
+					for (long[] interval: candidate.getSet()){
+						if (interval[0] == interval[1]){
+							long[] elem = new long[t];
+							// fill first t-1 places with the prefix and last place with the candidate
+							int i = 0;
+							for (;i<t-1;i++) elem[i] = prefixVector[i];
+							elem[i] = interval[0];
+							Lt_prefix.add(elem);
+						}
+					}
+				}
+				// add all to t's prefix
+				tmpPrefixes.addAll(Lt_prefix);
 			}
-			candidate = tmpCandidate; // update candidate_i to candidate_(i+1)
+			
+			// update prefixes and move to the next t
+			prefixes = tmpPrefixes;
 		}
 		
 		Debug.log("\tcandidate iterations finished");
 		
-		// build L and return it
-		Set<Long> L = new HashSet<Long>();
-		for (long[] interval: candidate.getSet()){
-			if (interval[0] == interval[1]){
-				long elem = interval[0];
-				L.add(elem);
-			}
-		}
-		
 		Debug.log("\tDone creating L");
 		Debug.log("SFT -> getFixedQueriesSFT completed");
 		
-		return L;
+		return prefixes;
 	}
 	
 	/**
-	 * Distinguishing algorithm (3.7)
-	 * @param interval:	the interval to be checked for "heaviness"
-	 * @param tau:		threshold
-	 * @param A:		
-	 * @param B:		
-	 * @param query:	
-	 * @return:			decides whether to keep or discard the interval {a,b} 
+	 * Distinguishing algorithm (3.12)
+	 * @param prefixVector
+	 * 			current prefix vector for the distinguish calculation.
+	 * 			If this is the first iteration, that is t == 1, will be null.
+	 * @param k
+	 * 			the size of G
+	 * @param N
+	 * 			the size of Z_Nt for the current t
+	 * @param interval
+	 * 			the interval to be checked for "heaviness"
+	 * @param tau
+	 * 			threshold
+	 * @param A		
+	 * @param B
+	 * @param query
+	 * @return			decides whether to keep or discard the interval {a,b} 
 	 */
-	protected static boolean distinguish(long N, long[] interval, double tau, Set<Long> A, Set<Long> B,
-			Map<Long,Complex> query){
+	protected static boolean distinguish(long[] prefixVector, int k, long[] G, long N, long[] interval, double tau, Set<long[]> A,
+			Set<long[]> B, Map<String,Complex> query){
 		Debug.log("SFT -> distinguish started");
 		
 		double est = 0;
 		long v = (long)-Math.floor((interval[0]+interval[1])/2);
+		int tIndex = (prefixVector == null)?0:prefixVector.length-1;
 		
 		// calculate est(a,b)
-		for (long x: A){
+		for (long[] x: A){
 			double tmpBSum = 0;
-			for (long y: B){
-				long x_sub_y = SFTUtils.subModulo(x, y, N);
-				tmpBSum += SFTUtils.innerProduct(SFTUtils.chi(N,v,y),query.get(x_sub_y));
+			for (long[] y: B){
+				String x_sub_y = SFTUtils.vectorToString(SFTUtils.subVectorModulo(x, y, N, k));
+				Complex chiValue = SFTUtils.chi(N,v,y[tIndex]);
+				if (prefixVector != null)
+					chiValue = Complex.mulComplex(chiValue, SFTUtils.chi(tIndex-1,G,prefixVector,y));
+				tmpBSum += SFTUtils.innerProduct(chiValue,query.get(x_sub_y));
 			}
 			tmpBSum /= B.size();
 			tmpBSum *= tmpBSum;

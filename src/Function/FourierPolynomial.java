@@ -39,7 +39,7 @@ public class FourierPolynomial extends Function{
 	 * @return			the coefficient or null if doesn't exist
 	 */
 	public Complex getCoeff(long[] alpha){
-		String vector = SFTUtils.printVector(alpha);
+		String vector = SFTUtils.vectorToString(alpha);
 		return terms.get(vector);
 	}
 	
@@ -79,7 +79,7 @@ public class FourierPolynomial extends Function{
 		if (coeff == null){
 			// create new entry
 			coeff = new Complex(re,im);
-			terms.put(SFTUtils.printVector(alpha),coeff);
+			terms.put(SFTUtils.vectorToString(alpha),coeff);
 		} else {
 			// add to existing coefficient
 			coeff.addComplex(re, im);

@@ -41,7 +41,7 @@ public class Main {
 			Set<long[]> L = SFT.runMainSFTAlgorithm(G, 0.1, 200, poly, (double)28.41, (double)20.0, (float)1, (float)0.0001);
 			String res = "";
 			for(long[] e: L){
-				res += SFTUtils.printVector(e)+" ";
+				res += SFTUtils.vectorToString(e)+" ";
 			}
 			System.out.println("\nSFT: "+res+"\n\nDone!");
 			
