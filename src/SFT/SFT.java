@@ -222,7 +222,7 @@ public class SFT {
 			query.put(SFTUtils.vectorToString(elem), func.getValue(elem));
 		}
 		
-		Debug.log("\tCreated query");
+		Debug.log("\tCreated query of size "+query.size());
 		
 		// run getFixedQueriesSFT and return its output, L
 		Set<long[]> L = getFixedQueriesSFT(G,tau,sets,query);
@@ -352,12 +352,12 @@ public class SFT {
 
 						// check that the intervals size difference is no greater that 1
 						assert(Math.abs((subInterval1[1]-subInterval1[0]) -	(subInterval2[1]-subInterval2[0])) <= 1);
-
+						
 						// for each sub interval check if it is "heavy"
-						Set<long[]> B_lplus1 = querySets[t][l];
-						if (distinguish(prefixVector, k, G, N, subInterval1, tau, A, B_lplus1, query))
+						Set<long[]> B_t_lplus1 = querySets[t][l];
+						if (distinguish(prefixVector, k, G, N, subInterval1, tau, A, B_t_lplus1, query))
 							tmpCandidate.addInterval(subInterval1);
-						if (distinguish(prefixVector, k, G, N, subInterval2, tau, A, B_lplus1, query))
+						if (distinguish(prefixVector, k, G, N, subInterval2, tau, A, B_t_lplus1, query))
 							tmpCandidate.addInterval(subInterval2);
 					}
 					candidate = tmpCandidate; // update candidate_i to candidate_(i+1)
@@ -421,9 +421,9 @@ public class SFT {
 	 * @param query
 	 * @return			decides whether to keep or discard the interval {a,b} 
 	 */
-	protected static boolean distinguish(long[] prefixVector, int k, long[] G, long N, long[] interval, double tau, Set<long[]> A,
-			Set<long[]> B, Map<String,Complex> query){
-		Debug.log("SFT -> distinguish started");
+	protected static boolean distinguish(long[] prefixVector, int k, long[] G, long N, long[] interval, double tau,
+			Set<long[]> A, Set<long[]> B, Map<String,Complex> query){
+		//Debug.log("SFT -> distinguish started");
 		
 		double est = 0;
 		long v = (long)-Math.floor((interval[0]+interval[1])/2);
@@ -437,21 +437,19 @@ public class SFT {
 				Complex chiValue = SFTUtils.chi(N,v,y[tIndex]);
 				if (prefixVector != null)
 					chiValue = Complex.mulComplex(chiValue, SFTUtils.chi(tIndex-1,G,prefixVector,y));
-				tmpBSum += SFTUtils.innerProduct(chiValue,query.get(x_sub_y));
+				tmpBSum += SFTUtils.innerProduct(chiValue,query.get(x_sub_y))/((double)B.size());
 			}
-			tmpBSum /= B.size();
 			tmpBSum *= tmpBSum;
+			tmpBSum /= (double)A.size();
 			est += tmpBSum;
 		}
 		
-		est /= A.size();
-		
-		Debug.log("\tcalculated est: "+est);
+		//Debug.log("\tcalculated est: "+est);
 		
 		// compare to threshold and return result
 		double threshold = 5*tau/36;
 		
-		Debug.log("SFT -> distinguish completed");
+		//Debug.log("SFT -> distinguish completed");
 		
 		return est >= threshold;
 	}
