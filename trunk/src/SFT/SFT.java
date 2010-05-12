@@ -470,7 +470,7 @@ public class SFT {
 	 * @return			a short list L in G of the tau-significant Fourier coefficients
 	 * 					of f with probability at least 1-delta_t
 	 */
-	public static Set<long[]> runMatlabSFTPart1Internal(long[] G, double delta_t, double tau, Function func,
+	public static Set<long[]>[][] runMatlabSFTPart1Internal(long[] G, double delta_t, double tau, Function func,
 			double fInfNorm, double fEuclideanNorm, float deltaCoeff, float randSetsCoeff) throws SFTException{
 		Debug.log("SFT -> runMatlabSFTPart1Internal - main algorithm part 1 started");
 		
@@ -520,7 +520,19 @@ public class SFT {
 		Debug.log("\tcreated Q = {x - y | x in A, y in union(B_t_l), t=1,...,k, l=1,...,log(Nt)} of size "+Qsize+":\n\t"+QValues);
 		
 		Debug.log("SFT -> runMatlabSFTPart1Internal - main algorithm part 1 completed");
-		return Q;
+		
+		// put Q as the last set in sets and return A, all B's and Q
+		Set<long[]>[][] res = new HashSet[sets.length+1][];
+		int i;
+		for(i=0; i<sets.length; i++){
+			res[i] = new HashSet[sets[i].length];
+			for(int j=0; j<sets[i].length; j++){
+				res[i][j] = sets[i][j];
+			}
+		}
+		res[i] = new HashSet[1];
+		res[i][1] = Q;
+		return res;
 	}
 	
 	/**
