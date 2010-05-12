@@ -277,12 +277,13 @@ public class SFT {
 		// Z_N1 X ... X Z_Nt-1 X {0,...,2^(l-1)-1} X {0} X ... X {0}
 		// and if k=1, then partial to {0,...,2^(l-1)-1} with min{m_B,2^(l-1)} elements
 		// return an array of A and B1,...,BlogN_t for each t in {1,...,k}
-		System.out.println(G.length+" "+res.length);
 		for (int t=1; t<=G.length; t++) res[t] = new HashSet[logG[t-1]];
 		for (int t=1; t<=G.length; t++)
-			for(int l=1; l<=logG[t-1]; l++)
+			for(int l=1; l<=logG[t-1]; l++){
+				Debug.log("\tgenerating for t="+t+", l="+l);
 				res[t][l-1] = SFTUtils.generateRandomSubsetBtl(m_B,G,t,l);
-				
+			}
+		
 		Debug.log("\tB's:\n");
 		int t,l;
 		for (t=1; t<=G.length; t++){
@@ -437,6 +438,7 @@ public class SFT {
 				Complex chiValue = SFTUtils.chi(N,v,y[tIndex]);
 				if (prefixVector != null)
 					chiValue = Complex.mulComplex(chiValue, SFTUtils.chi(tIndex-1,G,prefixVector,y));
+				System.out.println(">>>>>>>>> chiValue: "+chiValue+", query(x-y): "+query.get(x_sub_y));
 				tmpBSum += SFTUtils.innerProduct(chiValue,query.get(x_sub_y));
 			}
 			tmpBSum /= B.size();
@@ -473,7 +475,6 @@ public class SFT {
 	public static Set<long[]>[][] runMatlabSFTPart1Internal(long[] G, double delta_t, double tau,
 			double fInfNorm, double fEuclideanNorm, float deltaCoeff, float randSetsCoeff) throws SFTException{
 		Debug.log("SFT -> runMatlabSFTPart1Internal - main algorithm part 1 started");
-		
 		/* run generateQueries (algorithm 3.10) on:
 		 * G, gamma = tau/36, ||f||_infinity and delta = delta_t/O((||f||_2^2/tau)^1.5*log_2|G|)
 		 */
@@ -531,8 +532,15 @@ public class SFT {
 			}
 		}
 		res[i] = new HashSet[1];
-		res[i][1] = Q;
+		res[i][0] = Q;
 		return res;
+	}
+	
+	public static Set<long[]>[][] runMatlabSFTPart1Internal(Long[] G, double delta_t, double tau,
+			double fInfNorm, double fEuclideanNorm, float deltaCoeff, float randSetsCoeff) throws SFTException{
+		long[] g = new long[G.length];
+		for(int i=0; i<G.length; i++) g[i] = G[i];
+		return runMatlabSFTPart1Internal(g, delta_t, tau, fInfNorm, fEuclideanNorm, deltaCoeff, randSetsCoeff);
 	}
 	
 	/**
@@ -560,6 +568,13 @@ public class SFT {
 		
 		Debug.log("SFT -> runMatlabSFTPart1Internal - main algorithm part 2 completed");
 		return L;
+	}
+	
+	public static Set<long[]> runMatlabSFTPart2Internal(Long[] G, double tau, Set<long[]>[][] sets,
+			Map<String,Complex> query) throws SFTException{
+		long[] g = new long[G.length];
+		for(int i=0; i<G.length; i++) g[i] = G[i];
+		return runMatlabSFTPart2Internal(g, tau, sets, query);
 	}
 	
 }

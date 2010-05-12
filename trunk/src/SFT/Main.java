@@ -19,8 +19,8 @@ public class Main {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		File xmlInput = new File("d:\\tmp\\test.xml");
-		long[] G = new long[]{Long.valueOf("10000000000")};
+		File xmlInput = new File("d:\\tmp\\test3.xml");
+		long[] G = new long[]{Long.valueOf("10000000000"),Long.valueOf("10000000000")};
 		
 		try{
 			// get polynomial
