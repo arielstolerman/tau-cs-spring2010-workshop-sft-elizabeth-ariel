@@ -19,7 +19,6 @@ public class Main {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		
 		File xmlInput = new File("d:\\tmp\\test.xml");
 		long[] G = new long[]{Long.valueOf("10000000000")};
 		
@@ -32,13 +31,10 @@ public class Main {
 			for (FourierPolynomial p: ((XMLFourierPolynomial)poly).getPolynomials().values()){
 				System.out.println(">> "+p.toString());
 			}
-			/*System.out.println("infinity norm: "+poly.calcInfinityNorm());
-			System.out.println("Euclidean norm: "+poly.calcEuclideanNorm());*/
+			//System.out.println("infinity norm: "+poly.calcInfinityNorm());
+			//System.out.println("Euclidean norm: "+poly.calcEuclideanNorm());
 			
-			long[] x = {2};
-			System.out.println("value at 2: "+poly.getValue(x));
-			
-			Set<long[]> L = SFT.runMainSFTAlgorithm(G, 0.1, 200, poly, (double)28.41, (double)20.0, (float)1, (float)0.0001);
+			Set<long[]> L = SFT.runMainSFTAlgorithm(G, 0.05, 180, poly, (double)28.41, (double)20.0, (float)1, (float)0.0001);
 			String res = "";
 			for(long[] e: L){
 				res += SFTUtils.vectorToString(e)+" ";

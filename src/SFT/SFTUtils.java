@@ -211,7 +211,7 @@ public class SFTUtils {
 	 * @return		a set of elements in G, uniformly randomly selected
 	 */
 	protected static Set<long[]> generateRandomSubsetA(long m_A, long[] G){
-		return generateRandomSubset(m_A,G,0,G.length+1);
+		return generateRandomSubset(m_A,G,G.length+1,0);
 	}
 	
 	/**
@@ -223,7 +223,7 @@ public class SFTUtils {
 	 * 				over Z_N1 X ... X Z_Nt-1 X {0,...,2^(l-1)-1} X {0} X ... X {0} 
 	 * 				(with >= k-t zero coordinates)
 	 */
-	protected static Set<long[]> generateRandomSubsetBtl(long m_B, long[] G, int l, int t){
+	protected static Set<long[]> generateRandomSubsetBtl(long m_B, long[] G, int t, int l){
 		Set<long[]> res = new HashSet<long[]>();
 		
 		// compatibility with G= Z_N
@@ -231,20 +231,14 @@ public class SFTUtils {
 			long pow = (long)Math.pow(2, l-1);
 			// if 2^(l-1) < m_B, no need to randomly choose elements for B, take all 0,...,2^(l-1)-1
 			if (pow <= m_B){
-				long[] e= new long[1] ;
-				// take all elements in {0,...,2^(l-1)-1} to B_l
+				// take all elements in {0,...,2^(l-1)-1} to B_tl
 				for (long i=0; i<pow; i++){
-					e[0]=i;
-					res.add(e);
+					res.add(new long[]{i});
 				}
+				return res;
 			}
-			else
-				// otherwise, choose randomly m_B elements from 0,...,2^(l-1)-1
-				res = generateRandomSubset(m_B,G,l,t);		
-			return res;
 		}
-			
-		return generateRandomSubset(m_B,G,l,t);
+		return generateRandomSubset(m_B,G,t,l);
 	}
 	
 	/**
@@ -258,7 +252,7 @@ public class SFTUtils {
 	 * 						note that when t=k+1 and l=0, we get a set of vectors over 
 	 * 						Z_N1 X ... X Z_Nk
 	 */
-	protected static Set<long[]> generateRandomSubset(long sizeOfSet, long[] G, long l, int t){
+	protected static Set<long[]> generateRandomSubset(long sizeOfSet, long[] G, int t, long l){
 		Set<long[]> res = new HashSet<long[]>();
 		long pow;
 		int j;
@@ -273,7 +267,7 @@ public class SFTUtils {
 					pow = (long)Math.pow(2, l-1);
 					e[j]= (long)Math.floor(rand.nextDouble()*pow);
 				for(int k=j+1; k<G.length; k++)
-					e[k] = 0;	
+					e[k] = 0;
 				}
 				if(contains(res, e))
 					doAgain = true;
