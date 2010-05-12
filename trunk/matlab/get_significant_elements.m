@@ -4,7 +4,7 @@
 % func - the function for query access by the algorithm
 % TODO: add description
 
-function[L]=get_significant_elements(N,delta_t,tau,func,fInfNorm,fEuclideanNorm,deltaCoeff,randSetsCoeff);
+function[L]=get_significant_elements(G,delta_t,tau,func,fInfNorm,fEuclideanNorm,deltaCoeff,randSetsCoeff);
 import SFT.*;
 %import Function.*;
 %import java.io.File;
