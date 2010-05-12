@@ -20,7 +20,9 @@ public class Main {
 	 */
 	public static void main(String[] args) {
 		File xmlInput = new File("d:\\tmp\\test3.xml");
+		//File xmlInput = new File("d:\\tmp\\test.xml");
 		long[] G = new long[]{Long.valueOf("10000000000"),Long.valueOf("10000000000")};
+		//long[] G = new long[]{Long.valueOf("10000000000")};
 		
 		try{
 			// get polynomial
@@ -34,7 +36,7 @@ public class Main {
 			//System.out.println("infinity norm: "+poly.calcInfinityNorm());
 			//System.out.println("Euclidean norm: "+poly.calcEuclideanNorm());
 			
-			Set<long[]> L = SFT.runMainSFTAlgorithm(G, 0.05, 180, poly, (double)28.41, (double)20.0, (float)1, (float)0.00001);
+			Set<long[]> L = SFT.runMainSFTAlgorithm(G, 0.05, 210, poly, (double)28.41, (double)20.0, (float)1, (float)0.0001);
 			String res = "";
 			for(long[] e: L){
 				res += SFTUtils.vectorToString(e)+" ";
