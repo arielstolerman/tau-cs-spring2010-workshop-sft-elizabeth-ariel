@@ -10,20 +10,26 @@ import SFT.*;
 %import java.io.File;
 %xmlFile = File('test.xml');
 %xmlFunc = XMLFourierPolynomial(xmlFile,N);
-
+Garr= javaArray('java.lang.long',length(G));
 sft = SFT.SFT();
-sets = sft.runMainSFTAlgorithmDividedPart1(N,delta_t,tau,fInfNorm,fEuclideanNorm,deltaCoeff,randSetsCoeff);
+sets = sft.runMatlabSFTPart1Internal(Garr,delta_t,tau,fInfNorm,fEuclideanNorm,deltaCoeff,randSetsCoeff);
 
-q=sets(sets.length).toArray;
+tmp=sets(sets.length);
+q= tmp(1).toArray;
+
 query=javaObject('java.util.HashMap');
 
 for i=1:q.length;
-  x=q(i);
-  xLong=javaObject('java.lang.Long',x);
-  y=func(x,N);
+  xLong=q(i);
+%  xLong=javaObject('java.lang.Long',x);
+    x= zeros(1, xLong.length);
+    for j=1:xLong.length;
+        x(j)=xLong(j);
+    end
+  y=func(x,G);
   yComplex = Complex(real(y),imag(y));
   %yComplex=xmlFunc.getValue(x);
   query.put(xLong,yComplex);
 end
 
-L=sft.runMainSFTAlgorithmDividedPart2(N,tau,sets,query);
+L=sft.runMainSFTAlgorithmDividedPart2(Garr,tau,sets,query);

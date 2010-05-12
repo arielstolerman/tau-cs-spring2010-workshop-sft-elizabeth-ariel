@@ -1,7 +1,7 @@
-N=10^10
+G = 10^10
 delta_t=0.1
-tau=200
-f=@(x,N)test(x,N)
+tau=180
+f=@(x,G)test(x,G)
 fInfNorm=28.41
 fEuclideanNorm=20
 deltaCoeff=1
