@@ -280,7 +280,6 @@ public class SFT {
 		for (int t=1; t<=G.length; t++) res[t] = new HashSet[logG[t-1]];
 		for (int t=1; t<=G.length; t++)
 			for(int l=1; l<=logG[t-1]; l++){
-				Debug.log("\tgenerating for t="+t+", l="+l);
 				res[t][l-1] = SFTUtils.generateRandomSubsetBtl(m_B,G,t,l);
 			}
 		
@@ -438,7 +437,6 @@ public class SFT {
 				Complex chiValue = SFTUtils.chi(N,v,y[tIndex]);
 				if (prefixVector != null)
 					chiValue = Complex.mulComplex(chiValue, SFTUtils.chi(tIndex-1,G,prefixVector,y));
-				System.out.println(">>>>>>>>> chiValue: "+chiValue+", query(x-y): "+query.get(x_sub_y));
 				tmpBSum += SFTUtils.innerProduct(chiValue,query.get(x_sub_y));
 			}
 			tmpBSum /= B.size();

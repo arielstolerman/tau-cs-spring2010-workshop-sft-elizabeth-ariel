@@ -227,13 +227,16 @@ public class SFTUtils {
 		Set<long[]> res = new HashSet<long[]>();
 		
 		// compatibility with G= Z_N
-		if(G.length==1){
+		if(t==1){
 			long pow = (long)Math.pow(2, l-1);
 			// if 2^(l-1) < m_B, no need to randomly choose elements for B, take all 0,...,2^(l-1)-1
 			if (pow <= m_B){
 				// take all elements in {0,...,2^(l-1)-1} to B_tl
 				for (long i=0; i<pow; i++){
-					res.add(new long[]{i});
+					long[] elem = new long[G.length];
+					elem[0] = i;
+					for (int j=1; j<G.length; j++) elem[j]=0;
+					res.add(elem);
 				}
 				return res;
 			}

@@ -34,7 +34,7 @@ public class Main {
 			//System.out.println("infinity norm: "+poly.calcInfinityNorm());
 			//System.out.println("Euclidean norm: "+poly.calcEuclideanNorm());
 			
-			Set<long[]> L = SFT.runMainSFTAlgorithm(G, 0.05, 180, poly, (double)28.41, (double)20.0, (float)1, (float)0.0001);
+			Set<long[]> L = SFT.runMainSFTAlgorithm(G, 0.05, 180, poly, (double)28.41, (double)20.0, (float)1, (float)0.00001);
 			String res = "";
 			for(long[] e: L){
 				res += SFTUtils.vectorToString(e)+" ";
