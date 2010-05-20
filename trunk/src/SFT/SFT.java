@@ -326,6 +326,13 @@ public class SFT {
 			
 			Set<long[]> tmpPrefixes = new HashSet<long[]>();
 			long N = G[t-1];
+			// run iterations over l = 0,...,log_2(N)-1
+			int logN = SFTUtils.calcLogN(N);
+			
+			Debug.log("\t\t>>> Prefix vectors for stage t = "+t+":");
+			String prefixVectorsString = "";
+			for (long[] prefixVector: prefixes) prefixVectorsString += SFTUtils.vectorToString(prefixVector)+" ";
+			Debug.log("\t\t>>> "+prefixVectorsString);
 			
 			for (long[] prefixVector: prefixes){
 				// check if this is the first iteration, that is t == 1. if so, mark the prefix vector as
@@ -335,9 +342,6 @@ public class SFT {
 				// initialize candidate (candidate_0)
 				long[] initInterval = {0,N}; //TODO: possibly should be N-1, since N is not a candidate!
 				Candidate candidate = new Candidate(initInterval);
-
-				// run iterations over l = 0,...,log_2(N)-1
-				int logN = SFTUtils.calcLogN(N);
 
 				for(int l=0; l<logN; l++){
 					Candidate tmpCandidate = new Candidate();
@@ -355,8 +359,12 @@ public class SFT {
 						
 						// for each sub interval check if it is "heavy"
 						Set<long[]> B_t_lplus1 = querySets[t][l];
+						String vec = (prefixVector == null) ? "empty string" : SFTUtils.vectorToString(prefixVector); 
+						Debug.log("\tcalling distinguish for prefix "+vec+", t="+t+", l="+(l+1)+":");
+						Debug.log("\tsub-interval ["+a+","+middle+"]:");
 						if (distinguish(prefixVector, k, G, N, subInterval1, tau, A, B_t_lplus1, query))
 							tmpCandidate.addInterval(subInterval1);
+						Debug.log("\tsub-interval ["+middle+","+b+"]:");
 						if (distinguish(prefixVector, k, G, N, subInterval2, tau, A, B_t_lplus1, query))
 							tmpCandidate.addInterval(subInterval2);
 					}
@@ -427,7 +435,7 @@ public class SFT {
 		
 		double est = 0;
 		long v = (long)-Math.floor((interval[0]+interval[1])/2);
-		int tIndex = (prefixVector == null)?0:prefixVector.length-1;
+		int tIndex = (prefixVector == null)?0:prefixVector.length;
 		
 		// calculate est(a,b)
 		for (long[] x: A){
@@ -435,8 +443,10 @@ public class SFT {
 			for (long[] y: B){
 				String x_sub_y = SFTUtils.vectorToString(SFTUtils.subVectorModulo(x, y, N, k));
 				Complex chiValue = SFTUtils.chi(N,v,y[tIndex]);
-				if (prefixVector != null)
-					chiValue = Complex.mulComplex(chiValue, SFTUtils.chi(tIndex-1,G,prefixVector,y));
+				if (prefixVector != null){
+					Complex prefixChiValue = SFTUtils.chi(tIndex,G,prefixVector,y);
+					chiValue = Complex.mulComplex(chiValue, prefixChiValue);
+				}
 				tmpBSum += SFTUtils.innerProduct(chiValue,query.get(x_sub_y))/((double)B.size());
 			}
 			tmpBSum *= tmpBSum;
@@ -444,10 +454,9 @@ public class SFT {
 			est += tmpBSum;
 		}
 		
-		//Debug.log("\tcalculated est: "+est);
-		
 		// compare to threshold and return result
 		double threshold = 5*tau/36;
+		Debug.log("\tcalculated est:"+est+((est >= threshold) ? "\t\tPASSED!":""));
 		
 		//Debug.log("SFT -> distinguish completed");
 		

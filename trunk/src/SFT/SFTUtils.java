@@ -131,7 +131,7 @@ public class SFTUtils {
 	 * @return		chi_(v)[y] = chi_(alpha_1,...,alpha_k)[y_1,...,y_k]
 	 */
 	public static Complex chi(int t, long[] G, long[] v, long[] y){
-		Complex ans = new Complex(1,1);
+		Complex ans = new Complex(1,0);
 		for(int i=0; i<t; i++){
 			ans = Complex.mulComplex(ans, chi(G[i],v[i],y[i]));
 		}
