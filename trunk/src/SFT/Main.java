@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 import Function.*;
 import SFT.*;
+import SFT.SFTUtils.MatlabTemporaryRepository;
 
 /*
  * Main for debugging
@@ -19,11 +20,34 @@ public class Main {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		File xmlInput = new File("d:\\sft_tmp\\test3.xml");
+		File xmlInput = new File("d:\\sft_tmp\\test2.xml");
 		//File xmlInput = new File("d:\\tmp\\test.xml");
-		long[] G = new long[]{Long.valueOf("100000"),Long.valueOf("100000")};
-		//long[] G = new long[]{Long.valueOf("10000000000")};
-		
+		//long[] G = new long[]{Long.valueOf("100000"),Long.valueOf("100000")};
+		long[] G = new long[]{Long.valueOf("10000000000")};
+		Long[] bigG = new Long[]{Long.valueOf("10000000000")};
+		try {
+			MatlabTemporaryRepository matlabRep =
+				SFT.runMatlabSFTPart1Internal(bigG,0.01,200,(double)28.41,(double)20.0,(float)1,(float)0.0001,new Boolean(true));
+			
+			Function poly = new XMLFourierPolynomial(xmlInput, G);
+			HashMap<String,Complex> query = new HashMap<String,Complex>();
+			for(Long[] Elem: matlabRep.getQ()){
+				long[] elem = new long[Elem.length];
+				for(int i=0; i<Elem.length; i++) elem[i] = Elem[i].longValue();
+				query.put(SFTUtils.vectorToString(elem),poly.getValue(elem));
+			}
+			matlabRep.setQuery(query);
+			
+			Long[][] L =
+				SFT.runMatlabSFTPart2Internal(bigG, 200, matlabRep);
+			
+		} catch (SFTException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (FunctionException fe){
+			Debug.log(">>> FunctionException thrown: "+fe.getMessage());
+		}
+		/*
 		try{
 			// get polynomial
 			Function poly = new XMLFourierPolynomial(xmlInput, G);

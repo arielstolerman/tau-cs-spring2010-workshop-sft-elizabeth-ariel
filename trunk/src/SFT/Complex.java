@@ -35,6 +35,11 @@ public class Complex {
 		this.imaginary = imaginary;
 	}
 	
+	public Complex(Double real, Double imaginary){
+		this.real = real.doubleValue();
+		this.imaginary = imaginary.doubleValue();
+	}
+	
 	/*
 	 * methods
 	 */

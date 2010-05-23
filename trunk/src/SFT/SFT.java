@@ -13,6 +13,7 @@ package SFT;
 
 import java.util.*;
 import Function.*;
+import SFT.SFTUtils.MatlabTemporaryRepository;
 
 
 /**
@@ -153,6 +154,59 @@ public class SFT {
 		return null;
 	}
 	
+	/* *********************************
+	 * Matlab interface public functions
+	 * ********************************/
+	
+	@SuppressWarnings("unchecked")
+	public static MatlabTemporaryRepository runMatlabSFTPart1Internal(Long[] G, double delta_t, double tau,
+			double fInfNorm, double fEuclideanNorm, float deltaCoeff, float randSetsCoeff, Boolean isLogged) throws SFTException{
+		// set variables to fit algorithm
+		Debug.DEBUG_MODE = isLogged;
+		long[] g = new long[G.length];
+		for(int i=0; i<G.length; i++) g[i] = G[i];
+		
+		// run algorithm
+		Set<long[]>[][] sets = runMatlabSFTPart1Internal(g, delta_t, tau, fInfNorm, fEuclideanNorm, deltaCoeff, randSetsCoeff);
+		
+		// fit results to Matlab
+		Set<long[]> longQ = sets[sets.length-1][0];
+		Long[][] Q = new Long[longQ.size()][];
+		int i=0;
+		for (long[] elem: longQ){
+			int len = elem.length;
+			Long[] Elem = new Long[len];
+			for (int k=0; k<len; k++) Elem[k] = new Long(elem[k]);
+			Q[i++] = Elem;
+		}
+		
+		// return sets to be used by part 2, Q to be used in the matlab query calculation and null for the query
+		// (will be set in the matlab script to be passed to part 2)
+		MatlabTemporaryRepository matlabRep = new MatlabTemporaryRepository(sets, Q, null);
+		return matlabRep;
+	}
+	
+	public static Long[][] runMatlabSFTPart2Internal(Long[] G, double tau,
+			MatlabTemporaryRepository matlabRep) throws SFTException{
+		// fit parameters to java
+		long[] g = new long[G.length];
+		for(int i=0; i<G.length; i++) g[i] = G[i];
+		Set<long[]>[][] sets = matlabRep.getSets();
+		Map<String,Complex> query = (HashMap<String,Complex>)matlabRep.getQuery();
+
+		// run part 2 and return the results fitted to matlab (Long[] elements)
+		Set<long[]> res = runMatlabSFTPart2Internal(g, tau, sets, query);
+		Long[][] L = new Long[res.size()][];
+		int i=0;
+		for (long[] elem: res){
+			int len = elem.length;
+			Long[] Elem = new Long[len];
+			for (int k=0; k<len; k++) Elem[k] = new Long(elem[k]);
+			L[i++] = Elem;
+		}
+		return L;
+	}
+	
 	/* ***********************************************************************
 	 * The SFT algorithms 3.9 - 3.12 implementation (as described in the paper)
 	 *************************************************************************/
@@ -229,9 +283,9 @@ public class SFT {
 		
 		String LValues = "";
 		for (long[] e: L){
-			LValues += SFTUtils.vectorToString(e)+"\n";
+			LValues += "\n\t"+SFTUtils.vectorToString(e)+"\n";
 		}
-		Debug.log("\tfinished calculating L, the list of significant Fourier coefficients for f: "+LValues);
+		Debug.log("\tfinished calculating L, the list of significant Fourier coefficients for f:"+LValues+"\n");
 		
 		Debug.log("SFT -> runMainSFTAlgorithm  - main algorithm completed");
 		return L;
@@ -541,13 +595,6 @@ public class SFT {
 		return res;
 	}
 	
-	public static Set<long[]>[][] runMatlabSFTPart1Internal(Long[] G, double delta_t, double tau,
-			double fInfNorm, double fEuclideanNorm, float deltaCoeff, float randSetsCoeff) throws SFTException{
-		long[] g = new long[G.length];
-		for(int i=0; i<G.length; i++) g[i] = G[i];
-		return runMatlabSFTPart1Internal(g, delta_t, tau, fInfNorm, fEuclideanNorm, deltaCoeff, randSetsCoeff);
-	}
-	
 	/**
 	 * Main SFT procedure (3.9) - Part 2/2 (for use in Matlab)
 	 * The main SFT is departed into two parts, where part one builds a set of elements to be
@@ -567,19 +614,11 @@ public class SFT {
 		
 		String LValues = "";
 		for (long[] e: L){
-			LValues += SFTUtils.vectorToString(e)+"\n";
+			LValues += "\n\t"+SFTUtils.vectorToString(e)+"\n";
 		}
-		Debug.log("\tfinished calculating L, the list of significant Fourier coefficients for f: "+LValues);
+		Debug.log("\tfinished calculating L, the list of significant Fourier coefficients for f:"+LValues+"\n");
 		
 		Debug.log("SFT -> runMatlabSFTPart1Internal - main algorithm part 2 completed");
 		return L;
 	}
-	
-	public static Set<long[]> runMatlabSFTPart2Internal(Long[] G, double tau, Set<long[]>[][] sets,
-			Map<String,Complex> query) throws SFTException{
-		long[] g = new long[G.length];
-		for(int i=0; i<G.length; i++) g[i] = G[i];
-		return runMatlabSFTPart2Internal(g, tau, sets, query);
-	}
-	
 }
