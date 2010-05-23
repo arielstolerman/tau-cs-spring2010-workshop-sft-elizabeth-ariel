@@ -12,6 +12,7 @@
 package SFT;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
@@ -34,6 +35,12 @@ public class SFTUtils {
 		}
 		ans = ans.substring(0, ans.length()-1)+")";
 		return ans;
+	}
+	
+	public static String vectorToString(Long[] Elem){
+		long[] elem = new long[Elem.length];
+		for(int i=0; i<Elem.length; i++) elem[i] = Elem[i].longValue();
+		return vectorToString(elem);
 	}
 	
 	/**
@@ -280,5 +287,34 @@ public class SFTUtils {
 			res.add(e);
 		}	
 		return res;
+	}
+	
+	/* ******************
+	 * Matlab adjustments
+	 * *****************/
+	
+	/**
+	 * A class for holding temporary data between part 1 and part 2 of the SFT algorithm.
+	 */
+	public static class MatlabTemporaryRepository{
+		private Set<long[]>[][] sets;
+		private Long[][] Q;
+		private Map<String,Complex> query;
+	
+		/**
+		 * default constructor
+		 */
+		public MatlabTemporaryRepository(Set<long[]>[][] sets, Long[][] Q, Map<String,Complex> query){
+			this.sets = sets;
+			this.Q = Q;
+			this.query = query;
+		}
+		
+		// getters
+		public Set<long[]>[][] getSets(){return sets;}
+		public Long[][] getQ(){return Q;}
+		public Map<String,Complex> getQuery(){return query;}
+		// setters
+		public void setQuery(Map<String,Complex> query){this.query = query;}
 	}
 }

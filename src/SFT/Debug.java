@@ -7,7 +7,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class Debug {
-	private static final String LOG_FILE = "LCT_log.txt";
+	private static String LOG_FILE = "SFT_log.txt";
 	private static BufferedWriter outputFile = null;
 	private static BufferedWriter queryOutputFile = null;
 	public static boolean DEBUG_MODE = true;
