@@ -1,0 +1,33 @@
+﻿<?xml version="1.0"?>
+<functions runid="1">
+	<function id="1">
+		<term>
+			<recoeff>10</recoeff>
+			<imcoeff>10</imcoeff>
+			<alpha>
+				<coord index="0">2305000</coord>
+			</alpha>
+		</term>
+		<term>
+			<recoeff>10</recoeff>
+			<imcoeff>10</imcoeff>
+			<alpha>
+				<coord index="0">1492</coord>
+			</alpha>
+		</term>
+		<term>
+			<recoeff>0.01</recoeff>
+			<imcoeff>0.01</imcoeff>
+			<alpha>
+				<coord index="0">542</coord>
+			</alpha>
+		</term>
+		<term>
+			<recoeff>0.07</recoeff>
+			<imcoeff>0.09</imcoeff>
+			<alpha>
+				<coord index="0">29</coord>
+			</alpha>
+		</term>
+	</function>
+</functions>
