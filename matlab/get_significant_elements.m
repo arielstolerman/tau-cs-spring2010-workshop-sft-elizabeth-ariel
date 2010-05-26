@@ -67,6 +67,6 @@ for i=1:L_java.length;
   	for j=1:length(xLong);
     	x(j)=xLong(j).longValue;
   	end
-  	L(i)=x;
+  	L(i)=x;							%% WILL NOT WORK
 end
 

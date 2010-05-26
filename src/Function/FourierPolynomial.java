@@ -65,6 +65,47 @@ public class FourierPolynomial extends DirectProdFunction{
 		return str;
 	}
 	
+	/**
+	 * get the function as a Matlab script
+	 */
+	public String toMatlabScript(String scriptName){
+		String script = "function[res]="+scriptName+"(x,G)\n";
+		script += "% this is an automatically generated function from a FourierPolynomial java object.\n\n";
+		script += "k = length(G);\n";
+		script += "alpha = [";
+		// insert all elements, each element in a column
+		String[] elemsArr = new String[terms.keySet().size()];
+		terms.keySet().toArray(elemsArr);
+		for (int i=0; i<elemsArr.length; i++){
+			String vec = elemsArr[i].replace(',', ' ');
+			vec = vec.substring(1, vec.length()-1);
+			script += vec+";";
+		}
+		script = script.substring(0, script.length()-1)+"];\n";
+		script += "alpha = transpose(alpha);\n";
+		// insert all coeffs
+		script += "coeff_alpha = [";
+		for (int i=0; i<elemsArr.length; i++){
+			script += "("+terms.get(elemsArr[i]).toString()+") ";
+		}
+		script += "];\n\n";
+		
+		script += "res = 0;\n";
+		script += "s = size(alpha); alpha_size = s(1)*s(2);\n";
+		script += "for j=1:k:alpha_size;\n";
+		script += "vec = alpha(j:(j+k-1));\n";
+		script += "\ttmp = 1;\n";
+		script += "\tfor l=1:k;\n";
+		script += "\t\tcurr_alpha = vec(l);\n";
+		script += "\t\tterm = 2*pi*curr_alpha*x(l)/G(l);\n";
+		script += "\t\ttmp = tmp * coeff_alpha(l)*(cos(term)+i*sin(term));\n";
+		script += "\tend\n";
+		script += "res = res + tmp;\n";
+		script += "end\n";
+		
+		return script;
+	}
+	
 	// setters
 	
 	/**

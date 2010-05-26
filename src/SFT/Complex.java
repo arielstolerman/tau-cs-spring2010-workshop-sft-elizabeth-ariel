@@ -80,6 +80,15 @@ public class Complex {
 	}
 	
 	/**
+	 * Returns the conjugate number.
+	 * @return
+	 * 			The conjugate number.
+	 */
+	public Complex getConjugate(){
+		return new Complex(real,-imaginary);
+	}
+	
+	/**
 	 * Returns the string representation of the complex number in the form "a + bi".
 	 * @return
 	 * 			The string representation of the complex number in the form "a + bi".
@@ -159,5 +168,12 @@ public class Complex {
 				complex1.getRe()*complex2.getRe() - complex1.getIm()*complex2.getIm(),
 				complex1.getIm()*complex2.getRe() + complex1.getRe()*complex2.getIm()
 				); 
+	}
+	
+	/**
+	 * Returns the division of the the given complex by the given double.
+	 */
+	public static Complex divComplex(Complex complex, double denum){
+		return new Complex(complex.getRe()/denum, complex.getIm()/denum); 
 	}
 }
