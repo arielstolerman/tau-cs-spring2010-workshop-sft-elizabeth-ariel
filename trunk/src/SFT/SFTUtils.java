@@ -16,6 +16,9 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
+import Function.DirectProdFunction;
+import Function.FiniteAbelianFunction;
+
 public class SFTUtils {
 
 	
@@ -121,6 +124,10 @@ public class SFTUtils {
 		
 	}
 	
+	/* ***************************
+	 * finite Abelian adaptation
+	 *****************************/
+	
 	/**
 	 * Calculates L from L' (for the finite Abelian implementation)
 	 * @param Ltag
@@ -134,6 +141,57 @@ public class SFTUtils {
 			L.add(newElem);
 		}
 		return L;
+	}
+	
+	protected static long[] getGFromAbelianFunc(FiniteAbelianFunction func){
+		long[][] funcG = func.getG();
+		long[] G = new long[funcG.length];
+		for (int i=0; i<G.length; i++) G[i] = funcG[i][1];
+		return G;
+	}
+	
+	/**
+	 * Isomorphism from direct product G to finite Abelian G 
+	 * @param elem
+	 * @param G
+	 * @return
+	 */
+	protected static Long calcAbelianProd(long[] elem, long[][] G){
+		long newElem = 1;
+		for (int i=0; i<elem.length; i++){
+			long g = G[i][0];
+			long N = G[i][1];
+			long x = elem[i];
+			long tmp = 1;
+			// calculate g^x mod N
+			for (int j=0; j<x; j++){
+				tmp *= g;
+				tmp = tmp % N;
+			}
+			newElem *= tmp;
+		}
+		
+		return new Long(newElem);
+	}
+	
+	/**
+	 * class for disguising a FiniteAbelianFunction as a DirectProdFunction
+	 */
+	protected static class DirectedProdFromAbelianFunc extends DirectProdFunction{
+		protected FiniteAbelianFunction func;
+		protected long[][] funcG;
+		
+		public DirectedProdFromAbelianFunc(long[] G, FiniteAbelianFunction func) throws FunctionException {
+			super(G);
+			this.func = func;
+			this.funcG = func.getG();
+		}
+		
+		public Complex getValue(long[] elem){
+			long abelianElem = calcAbelianProd(elem, funcG);
+			return func.getValue(abelianElem);
+		}
+		
 	}
 	
 	/* *********************************
@@ -219,30 +277,6 @@ public class SFTUtils {
 			ans[i] = tmp;
 		}
 		return ans;
-	}
-	
-	/**
-	 * Isomorphism from direct product G to finite Abelian G 
-	 * @param elem
-	 * @param G
-	 * @return
-	 */
-	protected static Long calcAbelianProd(long[] elem, long[][] G){
-		long newElem = 1;
-		for (int i=0; i<elem.length; i++){
-			long g = G[i][0];
-			long N = G[i][1];
-			long x = elem[i];
-			long tmp = 1;
-			// calculate g^x mod N
-			for (int j=0; j<x; j++){
-				tmp *= g;
-				tmp = tmp % N;
-			}
-			newElem *= tmp;
-		}
-		
-		return new Long(newElem);
 	}
 	
 	/* *********************************
