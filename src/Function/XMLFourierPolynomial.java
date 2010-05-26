@@ -66,7 +66,7 @@ import SFT.*;
  * <p>
  * TODO add link to example
  */
-public class XMLFourierPolynomial extends Function {
+public class XMLFourierPolynomial extends DirectProdFunction {
 	
 	private Map<String,FourierPolynomial> polynomials = null;
 	private XMLParser parser;

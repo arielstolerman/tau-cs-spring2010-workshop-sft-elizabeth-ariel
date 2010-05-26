@@ -3,7 +3,7 @@
 	<head>
 		<meta name="verify-v1" content="l2SJjXDq6mUozEk+2u3UkzdEwtXKch0i0/3AkAr9sFA=" />
 		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-		<title>SFT Algorithm</title>
+		<title>The SFT Algorithm</title>
 		<link rel="shortcut icon" href="graphics/site_icon.ico">
 		<link rel="stylesheet" href="style_sheet.css" type="text/css">
 		<link rel="shortcut icon" href="icon.png">
@@ -14,54 +14,35 @@
 		<div id="id_content">
 		
 			<div id="id_title">
-				<h1><font color="white">The SFT Algorithm Over Z<sub>N</sub></font></h1>
+				<h1><font color="white">The SFT Algorithm</font></h1>
 			</div>
 			
 			<div id="id_main">
 				<b><center>
-				 Learning and Coding Theory Exercise
+				 <h3>Learning and Coding Theory Workshop</h3>
+				 Creators: Elizabeth Firman and Ariel Stolerman<br>
+				 Instructor: <a href="http://www.cs.tau.ac.il/~safra/" target=_new>Prof. Muli Safra</a><br> 
+				 <h3>TAU, Spring 2010</h3>
 				</center></b>
 				
-				This applet is an implementation of the SFT algorithm over Z<sub>N</sub> for finding the list
-				of significant Fourier coefficients for some function &fnof;:Z<sub>N</sub> &rarr; C.<br>
-				The applet accepts as input	an Integer N representing Z<sub>N</sub>, a threshold &tau;, an
-				error bound &delta;' in (0,1), ||&fnof;||<sub>&infin;</sub> the infinity norm of &fnof;, ||&fnof;||<sub>2</sub> 
-				the Euclidean norm of &fnof;, a constant coefficient for calculating &delta; and a constant 
-				coefficient for calculating m<sub>A</sub> and m<sub>B</sub> as described in the pseudo-code in
-				<a href="http://www.math.ias.edu/~akavia/AkaviaPhDThesis.pdf" target=_new><i>"Learning Noisy Characters, Multiplication Codes,
-				 And Cryptographic Hardcore Predicates"</i></a> (Adi Akavia, 2008, page 52).<br>
+				This project is an implementation of the SFT algorithm for finding the list of elements whose Fourier
+				coefficients are significant for a given function &fnof;: G &rarr; C, where G is a Cartesian product of
+				finite groups (i.e. Z<sub>N1</sub> x ... x Z<sub>Nk</sub>) described by a list of N<sub>j</sub>'s or an
+				Abelian group described by a list of N<sub>j</sub>'s and the corresponding generators g<sub>j</sub>'s.<br>
+				The implementation is available for usage in two ways:
+				<ul>
+					<li>
+						Java library
+					</li>
+					<li>
+						Usage within Matlab (based on the java library)
+					</li>
+				</ul>
+				The implementation is based on the work of Adi Akavia:
+				<a href="http://www.math.ias.edu/~akavia/AkaviaPhDThesis.pdf" target=_new><i>"Learning Noisy Characters,
+				Multiplication Codes, And Cryptographic Hardcore Predicates"</i></a> (Adi Akavia, 2008, page 52).<br>
 				
-				The applet also has access to a query function &fnof;, allowing it to ask for the &fnof;-values of a
-				polynomial number of inputs (in log(N)) from Z<sub>N</sub>.<br>
-				The querying can be done in two methods:<br>
-				<ul><i>
-					<li>Interactive function query, user supplies &fnof; values on demand. 
-					<li>The user supplies an XML file describing the function by its Fourier polynomial.
-				</i></ul>
-				Explanation on the XML format can be found at the bottom of the page.<br>
-				
-				Implementation note: the applet requires the user to accept a certificate in order to enable browsing for an XML file. The applet does
-				not contain malicious code (or so we hope...).
-			
-				<p align="center">
-
-				<script src="http://www.java.com/js/deployJava.js"></script>
-				<script> 
-    				<!-- applet id can be used to get a reference to the applet object -->
-    				var attributes = { code:'GUI.MainJApplet.class', archive:'SFT.jar',  width:500, height:400} ; 
-    				var parameters = {} ; 
-    				deployJava.runApplet(attributes, parameters, '1.6'); 
-				</script>
-				
-				<center>
-				<b><font size=1>
-					Also available as a <a href="SFT.jar">Runnable JAR File</a> (also generates a fully detailed log file)<br>
-					Code can be found in <a href="http://code.google.com/p/tau-cs-spring2010-lct-workshop-exercise-elizabeth-ariel/source/browse/#svn/trunk" target=_new>this Google-code project</a>
-				</font></b>
-				</center>
-				 </p>
-				 
-				 <br>
+				<br>
 				 
 				 <font size=1>
 				 The input XML should be in the following format:<br>

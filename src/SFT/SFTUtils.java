@@ -68,14 +68,10 @@ public class SFTUtils {
 	}
 	
 	/**
-	 * parameters check
-	 * @param N
+	 * parameters check - default parameters
+	 * @param G
 	 * @param delta
 	 * @param tau
-	 * @param fInfNorm
-	 * @param fEuclideanNorm
-	 * @param deltaCoeff
-	 * @param randSetsCoeff
 	 * @throws SFTException
 	 */
 	protected static void checkParameters(long[] G, double delta, double tau, double fInfNorm,
@@ -103,6 +99,41 @@ public class SFTUtils {
 		if (deltaCoeff <= 0 || randSetsCoeff <= 0){
 			throw new SFTException("The coefficients must be positive.");
 		}
+	}
+	
+	/**
+	 * parameters check - norms
+	 * @param fInfNorm
+	 * @param fEuclideanNorm
+	 * @throws SFTException
+	 */
+	protected static void checkNorms(double fInfNorm, double fEuclideanNorm) throws SFTException{
+		
+	}
+	
+	/**
+	 * parameters check - constants
+	 * @param deltaCoeff
+	 * @param randSetsCoeff
+	 * @throws SFTException
+	 */
+	protected static void checkConstants(float deltaCoeff, float randSetsCoeff) throws SFTException{
+		
+	}
+	
+	/**
+	 * Calculates L from L' (for the finite Abelian implementation)
+	 * @param Ltag
+	 * @param G
+	 * @return
+	 */
+	protected static Set<Long> getAbelianRepresentation(Set<long[]> Ltag, long[][] G){
+		Set<Long> L = new HashSet<Long>();
+		for (long[] elem: Ltag){
+			Long newElem = calcAbelianProd(elem, G);
+			L.add(newElem);
+		}
+		return L;
 	}
 	
 	/* *********************************
@@ -188,6 +219,30 @@ public class SFTUtils {
 			ans[i] = tmp;
 		}
 		return ans;
+	}
+	
+	/**
+	 * Isomorphism from direct product G to finite Abelian G 
+	 * @param elem
+	 * @param G
+	 * @return
+	 */
+	protected static Long calcAbelianProd(long[] elem, long[][] G){
+		long newElem = 1;
+		for (int i=0; i<elem.length; i++){
+			long g = G[i][0];
+			long N = G[i][1];
+			long x = elem[i];
+			long tmp = 1;
+			// calculate g^x mod N
+			for (int j=0; j<x; j++){
+				tmp *= g;
+				tmp = tmp % N;
+			}
+			newElem *= tmp;
+		}
+		
+		return new Long(newElem);
 	}
 	
 	/* *********************************
