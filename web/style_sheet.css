@@ -1,0 +1,68 @@
+/* Standard tags */
+
+body {
+	background-color:#F5F5DC;
+	font-family:Verdana;
+	font-size:10pt;
+	line-height:16pt;
+}
+
+a {
+	text-decoration:none;
+}
+
+a:link{
+	color:#30568A;
+}
+
+a:visited{
+	color:#30568A;
+}
+
+a:hover{
+	color:#A5BDDD;
+}
+
+a:active{
+	color:#BBD1EF;
+}
+
+h1 {
+	font-size:26pt;
+	font-weight: 600;
+}
+
+h2 {
+	font-size:16pt;
+	font-weight:bolder;
+}
+
+/* IDs */
+
+#id_content {
+	position:relative;
+	margin-top:25px;
+	width:700px;
+	text-align:left;
+}
+
+#id_title {
+	background-color:#006400;
+	width:734px;
+	height:74px;
+	border:solid;
+	border-width:3px;
+	border-bottom-width:0px;
+	text-align:center;
+}
+
+#id_main {
+	background-color:white;
+	width:694px;
+	padding-left:20px;
+	padding-right:20px;
+	border:solid;
+	border-width:3px;
+	color:#0C0B0B;
+	text-align:justify;
+}
