@@ -13,51 +13,37 @@ package Function;
 
 import SFT.Complex;
 import SFT.FunctionException;
-import java.util.*;
 
 /**
  * @author Elizabeth Firman and Ariel Stolerman
- * This abstract class is used for describing functions over G -> C where G is Z_N1 x ... x Z_Nk.
+ * This abstract class is used for describing functions over G -> C where G is Z_N1 x ... x Z_Nk or
+ * alternatively G is a finite Abelian group described by (gj,Nj) j=1,...,k.
  * The SFT class uses a Function object for query access to the investigated function.
  */
 public abstract class Function {
 	
-	// The vector of values describing G, i.e. a Cartesian multiplication of Z_Ni, the domain of the function
-	protected long[] G;
 	// The infinity norm and Euclidean norm of the function
-	private Double infNorm;
-	private Double eucNorm;
+	protected Double infNorm;
+	protected Double eucNorm;
 	
 	// upper bound for summation in norm calculation
-	private static double LOCAL_MAX = Double.MAX_VALUE/2.0;
+	protected static double LOCAL_MAX = Double.MAX_VALUE/2.0;
 	
-	/*
-	 * constructors
-	 */
+	/* ***********
+	 * constructor
+	 *************/
 	
 	/**
 	 * Constructs a Function object over G -> C for the given parameter G.
-	 * @param G
-	 * 			A vector of values describing G, i.e. a Cartesian multiplication of Z_Ni,
-	 * 			the domain of the function.
-	 * @throws FunctionException
-	 * 			If one of the given G-values is less than or equals to 0.
 	 */
-	public Function(long[] G) throws FunctionException{
-		for (int i=0; i<G.length; i++){
-			if (G[i] <= 0){
-				FunctionException fe = new FunctionException("all Ns must be positive.");
-				throw fe;
-			}
-		}
-		this.G = G;
+	public Function() throws FunctionException{
 		this.infNorm = null;
 		this.eucNorm = null;
 	}
 	
-	/*
+	/* ****************
 	 * abstract methods
-	 */
+	 ******************/
 	
 	/**
 	 * Returns the value of the function for the input element in G.
@@ -68,17 +54,31 @@ public abstract class Function {
 	 */
 	public abstract Complex getValue(long[] elem);
 	
-	
-	/*
-	 * non-abstract methods
+	/**
+	 * Returns the infinity norm of this function over G.
+	 * @return
+	 * 			The infinity norm of this function over G.
 	 */
+	public abstract double calcInfinityNorm();
+	
+	/**
+	 * Returns the Euclidean norm of this function over G.
+	 * @return
+	 * 			The infinity norm of this function over G.
+	 */
+	public abstract double calcEuclideanNorm();
+	
+	
+	/* ********************
+	 * non-abstract methods
+	 **********************/
 	
 	/**
 	 * Returns the infinity norm of this function over G.
 	 * The implementation given in the abstract class is the naive implementation.
 	 * @return
 	 * 			The infinity norm of this function over G.
-	 */
+	 */ /*
 	public double calcInfinityNorm(){
 		if (infNorm == null){
 			int k = G.length;
@@ -97,7 +97,7 @@ public abstract class Function {
 	 * 			The size of G.
 	 * @return
 	 * 			The maximum value of the function in the set of vectors with prefixes currVector.
-	 */
+	 */ /*
 	private double calcInfinityNormRec(long[] currVector, int coord, int k){
 		long currN = G[coord];
 		double ans = 0;
@@ -130,7 +130,7 @@ public abstract class Function {
 	 * The implementation given in the abstract class is the naive implementation.
 	 * @return
 	 * 			The Euclidean norm of this function over G.
-	 */
+	 */ /*
 	public double calcEuclideanNorm(){
 		if (eucNorm == null){
 			int k = G.length;
@@ -149,7 +149,7 @@ public abstract class Function {
 	 * 			The size of G.
 	 * @return
 	 * 			The Euclidean norm of the function in the set of vectors with prefixes currVector.
-	 */
+	 */ /*
 	private double calcEuclideanNormSquareRec(long[] currVector, int coord, int k){
 		/*
 		 * method of summation:
@@ -157,7 +157,7 @@ public abstract class Function {
 		 * - for each partial sum, iterate over all Ns in G and divide
 		 * - sum all results
 		 * this procedure is for handling large numerical values and prevent overflow.
-		 */
+		 */ /*
 		
 		long currN = G[coord];
 		double ans = 0;
@@ -195,52 +195,5 @@ public abstract class Function {
 			}
 		}
 		return ans;
-	}
-
-	/*
-	 * getters
-	 */
-	
-	/**
-	 * Returns the vector of values describing G, the domain of the function.
-	 * @return
-	 * 			The vector of values describing G, the domain of the function.
-	 */
-	public long[] getG(){
-		return G;
-	}
-	
-	/*
-	 * setters
-	 */
-	
-	/**
-	 * Sets G to a new value.
-	 * @param G
-	 * 			The vector of values describing G, the domain of the function
-	 * @throws FunctionException
-	 * 			If the one of the given values is less than or equals to 0.
-	 */
-	public void setG(long[] G) throws FunctionException{
-		if (G.length != this.G.length)
-			throw new FunctionException("the given G is of wrong length.");
-		for (int i=0; i<G.length; i++){
-			if (G[i] <= 0){
-				FunctionException fe = new FunctionException("all Ns must be positive.");
-				throw fe;
-			}
-		}
-		boolean change = false;
-		for (int i=0; i<G.length; i++){
-			if (G[i] != this.G[i]){
-				change = true;
-				break;
-			}
-		}
-		if (change){
-			this.G = G;
-			this.infNorm = null;
-			this.eucNorm = null;
-		}
-	}
+	} */
 }

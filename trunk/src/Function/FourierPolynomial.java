@@ -18,7 +18,7 @@ import SFT.*;
  * Private class Polynomial is used to describe Fourier polynomials over Z_N by elements and their
  * complex coefficients.
  */
-public class FourierPolynomial extends Function{
+public class FourierPolynomial extends DirectProdFunction{
 	private Map<String,Complex> terms; // the string representation of the long-vector
 	private String id;
 	

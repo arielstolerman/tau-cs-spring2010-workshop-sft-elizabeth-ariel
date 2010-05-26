@@ -28,109 +28,112 @@ import SFT.SFTUtils.MatlabTemporaryRepository;
  */
 public class SFT {
 	
-	/* **************************
-	 * Interface public functions
-	 ****************************/
+	/* ****************************************************
+	 * Interface public functions for G with generators = 1
+	 ******************************************************/
 	
 	/**
-	 * Returns a set of the elements in Z_N whose coefficients in the given function are tau-significant with
+	 * Returns a set of the elements in G whose coefficients in the given function are tau-significant with
 	 * delta-confidence.
-	 * @param N
-	 * 				The value describing the group Z_N.
+	 * @param G
+	 * 				The values N1,...,Nk describing the group G = Z_N1 x ... x Z_Nk.
 	 * @param delta
 	 * 				The confidence parameter such that the algorithm succeeds with probability 1-delta.
 	 * @param tau
 	 * 				The threshold such that all tau-significant elements are returned. 
 	 * @param func
-	 * 				The given function over Z_N -> C whose Fourier coefficients (elements) are returned.
+	 * 				The given function over G -> C whose Fourier coefficients (elements) are returned.
 	 * 				Used for query access.
 	 * @return
-	 * 				A set of the elements in Z_N whose coefficients in the given function are tau-significant
+	 * 				A set of the elements in G whose coefficients in the given function are tau-significant
 	 * 				with delta-confidence.
 	 * @throws SFTException
-	 * 				TODO
+	 * 				If the given parameters are invalid.
 	 */
-	public static Set<Long> getSignificatElements(long N, double delta, double tau, Function func)
+	public static Set<long[]> getSignificatElements(long[] G, double delta, double tau, Function func)
 	throws SFTException{
+		//TODO
 		return null;
 	}
 	
 	/**
-	 * Returns a set of the elements in Z_N whose coefficients in the given function are tau-significant with
+	 * Returns a set of the elements in G whose coefficients in the given function are tau-significant with
 	 * delta-confidence.
 	 * The algorithm includes a calculation of the error-bound, based on the delta-input and a some constant.
 	 * This implementation allows the user (who knows the algorithm) to state this constant.
-	 * @param N
-	 * 				The value describing the group Z_N.
+	 * @param G
+	 * 				The values N1,...,Nk describing the group G = Z_N1 x ... x Z_Nk.
 	 * @param delta
 	 * 				The confidence parameter such that the algorithm succeeds with probability 1-delta.
 	 * @param tau
 	 * 				The threshold such that all tau-significant elements are returned. 
 	 * @param func
-	 * 				The given function over Z_N -> C whose Fourier coefficients (elements) are returned.
-	 * 				Used for query access. 
+	 * 				The given function over G -> C whose Fourier coefficients (elements) are returned.
+	 * 				Used for query access.
 	 * @param fInfNorm
 	 * 				The infinity norm of the function.
 	 * @param fEuclideanNorm
 	 * 				The Euclidean norm of the function.
 	 * @return
-	 * 				A set of the elements in Z_N whose coefficients in the given function are tau-significant
+	 * 				A set of the elements in G whose coefficients in the given function are tau-significant
 	 * 				with delta-confidence.
 	 * @throws SFTException
-	 * 				TODO
+	 * 				If the given parameters are invalid.
 	 */
-	public static Set<Long> getSignificatElements(long N, double delta, double tau, Function func,
+	public static Set<long[]> getSignificatElements(long[] G, double delta, double tau, Function func,
 			double fInfNorm, double fEuclideanNorm) throws SFTException{
+		//TODO
 		return null;
 	}
 	
 	/**
-	 * Returns a set of the elements in Z_N whose coefficients in the given function are tau-significant with
+	 * Returns a set of the elements in G whose coefficients in the given function are tau-significant with
 	 * delta-confidence.
-	 * The algorithm also includes a calculation of log(N)+1 randomly generated sets of elements in Z_N,
+	 * The algorithm also includes a calculation of randomly generated sets of elements in G,
 	 * of sizes defined as m_A and m_B in the paper, that uses some constant. This implementation allows the user
 	 * (who knows the algorithm) to state this constant as well.
-	 * @param N
-	 * 				The value describing the group Z_N.
+	 * @param G
+	 * 				The values N1,...,Nk describing the group G = Z_N1 x ... x Z_Nk.
 	 * @param delta
 	 * 				The confidence parameter such that the algorithm succeeds with probability 1-delta.
 	 * @param tau
 	 * 				The threshold such that all tau-significant elements are returned. 
 	 * @param func
-	 * 				The given function over Z_N -> C whose Fourier coefficients (elements) are returned.
-	 * 				Used for query access. 
+	 * 				The given function over G -> C whose Fourier coefficients (elements) are returned.
+	 * 				Used for query access.
 	 * @param deltaCoeff
 	 * 				A constant coefficient for the algorithm's calculation of delta.
 	 * @param randSetsCoeff
 	 * 				A constant coefficient for the algorithm's calculation of delta.
 	 * @return
-	 * 				A set of the elements in Z_N whose coefficients in the given function are tau-significant
+	 * 				A set of the elements in G whose coefficients in the given function are tau-significant
 	 * 				with delta-confidence.
 	 * @throws SFTException
-	 * 				TODO
+	 * 				If the given parameters are invalid.
 	 */
-	public static Set<Long> getSignificatElements(long N, double delta, double tau, Function func,
+	public static Set<long[]> getSignificatElements(long[] G, double delta, double tau, Function func,
 			float deltaCoeff, float randSetsCoeff) throws SFTException{
+		//TODO
 		return null;
 	}	
 	
 	/**
-	 * Returns a set of the elements in Z_N whose coefficients in the given function are tau-significant with
+	 * Returns a set of the elements in G whose coefficients in the given function are tau-significant with
 	 * delta-confidence.
 	 * The algorithm includes a calculation of the error-bound, based on the delta-input and a some constant.
 	 * This implementation allows the user (who knows the algorithm) to state this constant.
-	 * The algorithm also includes a calculation of log(N)+1 randomly generated sets of elements in Z_N,
+	 * The algorithm also includes a calculation of randomly generated sets of elements in G,
 	 * of sizes defined as m_A and m_B in the paper, that uses some constant. This implementation allows the user
 	 * (who knows the algorithm) to state this constant as well.
-	 * @param N
-	 * 				The value describing the group Z_N.
+	 * @param G
+	 * 				The values N1,...,Nk describing the group G = Z_N1 x ... x Z_Nk.
 	 * @param delta
 	 * 				The confidence parameter such that the algorithm succeeds with probability 1-delta.
 	 * @param tau
 	 * 				The threshold such that all tau-significant elements are returned. 
 	 * @param func
-	 * 				The given function over Z_N -> C whose Fourier coefficients (elements) are returned.
-	 * 				Used for query access. 
+	 * 				The given function over G -> C whose Fourier coefficients (elements) are returned.
+	 * 				Used for query access.
 	 * @param fInfNorm
 	 * 				The infinity norm of the function.
 	 * @param fEuclideanNorm
@@ -140,19 +143,146 @@ public class SFT {
 	 * @param randSetsCoeff
 	 * 				A constant coefficient for the algorithm's calculation of delta.
 	 * @return
-	 * 				A set of the elements in Z_N whose coefficients in the given function are tau-significant
+	 * 				A set of the elements in G whose coefficients in the given function are tau-significant
 	 * 				with delta-confidence.
 	 * @throws SFTException
-	 * 				TODO
+	 * 				If the given parameters are invalid.
 	 */
-	public static Set<Long> getSignificatElements(long N, double delta, double tau, Function func,
+	public static Set<long[]> getSignificatElements(long[] G, double delta, double tau, Function func,
 			double fInfNorm, double fEuclideanNorm, float deltaCoeff, float randSetsCoeff) throws SFTException{
-		// check inputs (will throw SFTException on input error)
-		//SFTUtils.checkParameters(N, delta, tau, fInfNorm, fEuclideanNorm, deltaCoeff, randSetsCoeff);
-		// run the SFT algorithm
 		//TODO
 		return null;
 	}
+	
+	/* *****************************************************
+	 * Interface public functions for G with generators != 1
+	 *******************************************************/
+	
+	/**
+	 * Returns a set of the elements in G whose coefficients in the given function are tau-significant with
+	 * delta-confidence.
+	 * @param G
+	 * 				The values (g1,N1),...,(gk,Nk) describing the Abelian group G where gj are the
+	 * 				corresponding generators for Nj.
+	 * @param delta
+	 * 				The confidence parameter such that the algorithm succeeds with probability 1-delta.
+	 * @param tau
+	 * 				The threshold such that all tau-significant elements are returned. 
+	 * @param func
+	 * 				The given function over G -> C whose Fourier coefficients (elements) are returned.
+	 * 				Used for query access.
+	 * @return
+	 * 				A set of the elements in G whose coefficients in the given function are tau-significant
+	 * 				with delta-confidence.
+	 * @throws SFTException
+	 * 				If the given parameters are invalid.
+	 */
+	public static Set<long[]> getSignificatElements(long[][] G, double delta, double tau, Function func)
+	throws SFTException{
+		//TODO
+		return null;
+	}
+	
+	/**
+	 * Returns a set of the elements in G whose coefficients in the given function are tau-significant with
+	 * delta-confidence.
+	 * The algorithm includes a calculation of the error-bound, based on the delta-input and a some constant.
+	 * This implementation allows the user (who knows the algorithm) to state this constant.
+	 * @param G
+	 * 				The values (g1,N1),...,(gk,Nk) describing the Abelian group G where gj are the
+	 * 				corresponding generators for Nj.
+	 * @param delta
+	 * 				The confidence parameter such that the algorithm succeeds with probability 1-delta.
+	 * @param tau
+	 * 				The threshold such that all tau-significant elements are returned. 
+	 * @param func
+	 * 				The given function over G -> C whose Fourier coefficients (elements) are returned.
+	 * 				Used for query access.
+	 * @param fInfNorm
+	 * 				The infinity norm of the function.
+	 * @param fEuclideanNorm
+	 * 				The Euclidean norm of the function.
+	 * @return
+	 * 				A set of the elements in G whose coefficients in the given function are tau-significant
+	 * 				with delta-confidence.
+	 * @throws SFTException
+	 * 				If the given parameters are invalid.
+	 */
+	public static Set<long[]> getSignificatElements(long[][] G, double delta, double tau, Function func,
+			double fInfNorm, double fEuclideanNorm) throws SFTException{
+		//TODO
+		return null;
+	}
+	
+	/**
+	 * Returns a set of the elements in G whose coefficients in the given function are tau-significant with
+	 * delta-confidence.
+	 * The algorithm also includes a calculation of randomly generated sets of elements in G,
+	 * of sizes defined as m_A and m_B in the paper, that uses some constant. This implementation allows the user
+	 * (who knows the algorithm) to state this constant as well.
+	 * @param G
+	 * 				The values (g1,N1),...,(gk,Nk) describing the Abelian group G where gj are the
+	 * 				corresponding generators for Nj.
+	 * @param delta
+	 * 				The confidence parameter such that the algorithm succeeds with probability 1-delta.
+	 * @param tau
+	 * 				The threshold such that all tau-significant elements are returned. 
+	 * @param func
+	 * 				The given function over G -> C whose Fourier coefficients (elements) are returned.
+	 * 				Used for query access.
+	 * @param deltaCoeff
+	 * 				A constant coefficient for the algorithm's calculation of delta.
+	 * @param randSetsCoeff
+	 * 				A constant coefficient for the algorithm's calculation of delta.
+	 * @return
+	 * 				A set of the elements in G whose coefficients in the given function are tau-significant
+	 * 				with delta-confidence.
+	 * @throws SFTException
+	 * 				If the given parameters are invalid.
+	 */
+	public static Set<long[]> getSignificatElements(long[][] G, double delta, double tau, Function func,
+			float deltaCoeff, float randSetsCoeff) throws SFTException{
+		//TODO
+		return null;
+	}	
+	
+	/**
+	 * Returns a set of the elements in G whose coefficients in the given function are tau-significant with
+	 * delta-confidence.
+	 * The algorithm includes a calculation of the error-bound, based on the delta-input and a some constant.
+	 * This implementation allows the user (who knows the algorithm) to state this constant.
+	 * The algorithm also includes a calculation of randomly generated sets of elements in G,
+	 * of sizes defined as m_A and m_B in the paper, that uses some constant. This implementation allows the user
+	 * (who knows the algorithm) to state this constant as well.
+	 * @param G
+	 * 				The values (g1,N1),...,(gk,Nk) describing the Abelian group G where gj are the
+	 * 				corresponding generators for Nj.
+	 * @param delta
+	 * 				The confidence parameter such that the algorithm succeeds with probability 1-delta.
+	 * @param tau
+	 * 				The threshold such that all tau-significant elements are returned. 
+	 * @param func
+	 * 				The given function over G -> C whose Fourier coefficients (elements) are returned.
+	 * 				Used for query access.
+	 * @param fInfNorm
+	 * 				The infinity norm of the function.
+	 * @param fEuclideanNorm
+	 * 				The Euclidean norm of the function.
+	 * @param deltaCoeff
+	 * 				A constant coefficient for the algorithm's calculation of delta.
+	 * @param randSetsCoeff
+	 * 				A constant coefficient for the algorithm's calculation of delta.
+	 * @return
+	 * 				A set of the elements in G whose coefficients in the given function are tau-significant
+	 * 				with delta-confidence.
+	 * @throws SFTException
+	 * 				If the given parameters are invalid.
+	 */
+	public static Set<long[]> getSignificatElements(long[][] G, double delta, double tau, Function func,
+			double fInfNorm, double fEuclideanNorm, float deltaCoeff, float randSetsCoeff) throws SFTException{
+		//TODO
+		return null;
+	}	
 	
 	/* *********************************
 	 * Matlab interface public functions
