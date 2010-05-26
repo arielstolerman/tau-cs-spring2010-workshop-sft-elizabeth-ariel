@@ -1,0 +1,114 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+	<head>
+		<meta name="verify-v1" content="l2SJjXDq6mUozEk+2u3UkzdEwtXKch0i0/3AkAr9sFA=" />
+		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+		<title>SFT Algorithm</title>
+		<link rel="shortcut icon" href="graphics/site_icon.ico">
+		<link rel="stylesheet" href="style_sheet.css" type="text/css">
+		<link rel="shortcut icon" href="icon.png">
+	</head>
+
+	<body>
+		<center>
+		<div id="id_content">
+		
+			<div id="id_title">
+				<h1><font color="white">The SFT Algorithm Over Z<sub>N</sub></font></h1>
+			</div>
+			
+			<div id="id_main">
+				<b><center>
+				 Learning and Coding Theory Exercise
+				</center></b>
+				
+				This applet is an implementation of the SFT algorithm over Z<sub>N</sub> for finding the list
+				of significant Fourier coefficients for some function &fnof;:Z<sub>N</sub> &rarr; C.<br>
+				The applet accepts as input	an Integer N representing Z<sub>N</sub>, a threshold &tau;, an
+				error bound &delta;' in (0,1), ||&fnof;||<sub>&infin;</sub> the infinity norm of &fnof;, ||&fnof;||<sub>2</sub> 
+				the Euclidean norm of &fnof;, a constant coefficient for calculating &delta; and a constant 
+				coefficient for calculating m<sub>A</sub> and m<sub>B</sub> as described in the pseudo-code in
+				<a href="http://www.math.ias.edu/~akavia/AkaviaPhDThesis.pdf" target=_new><i>"Learning Noisy Characters, Multiplication Codes,
+				 And Cryptographic Hardcore Predicates"</i></a> (Adi Akavia, 2008, page 52).<br>
+				
+				The applet also has access to a query function &fnof;, allowing it to ask for the &fnof;-values of a
+				polynomial number of inputs (in log(N)) from Z<sub>N</sub>.<br>
+				The querying can be done in two methods:<br>
+				<ul><i>
+					<li>Interactive function query, user supplies &fnof; values on demand. 
+					<li>The user supplies an XML file describing the function by its Fourier polynomial.
+				</i></ul>
+				Explanation on the XML format can be found at the bottom of the page.<br>
+				
+				Implementation note: the applet requires the user to accept a certificate in order to enable browsing for an XML file. The applet does
+				not contain malicious code (or so we hope...).
+			
+				<p align="center">
+
+				<script src="http://www.java.com/js/deployJava.js"></script>
+				<script> 
+    				<!-- applet id can be used to get a reference to the applet object -->
+    				var attributes = { code:'GUI.MainJApplet.class', archive:'SFT.jar',  width:500, height:400} ; 
+    				var parameters = {} ; 
+    				deployJava.runApplet(attributes, parameters, '1.6'); 
+				</script>
+				
+				<center>
+				<b><font size=1>
+					Also available as a <a href="SFT.jar">Runnable JAR File</a> (also generates a fully detailed log file)<br>
+					Code can be found in <a href="http://code.google.com/p/tau-cs-spring2010-lct-workshop-exercise-elizabeth-ariel/source/browse/#svn/trunk" target=_new>this Google-code project</a>
+				</font></b>
+				</center>
+				 </p>
+				 
+				 <br>
+				 
+				 <font size=1>
+				 The input XML should be in the following format:<br>
+				<ul>
+					<li>
+						<b>&lt;functions&gt;</b>: the opening tag, must have a <b>runid</b> attribute with the value
+						<i>random</i> for the function to be chosen randomly from a list of functions each time an element's
+						&fnof;-value is calculated, or <i>an integer id of a function</i> in the list of functions ahead.<br>
+						examples: <b>&lt;functions runid="random"&gt;, &lt;functions runid="2"&gt;</b>
+					</li>
+					<li>
+						<b>&lt;function&gt;</b>: the opening tag of a function description. Must have an <b>id</b> attribute
+						with some positive integer value (1, 2, ...).<br>
+						example: <b>&lt;function id="3"&gt;</b>
+					</li>
+					<li>
+						<b>&lt;term&gt;</b>: opening tag of a term (representing (a + bi)&sdot;&chi;<sub>&alpha;</sub>(x)). Has no attributes.
+					</li>
+					<li>
+						<b>&lt;reCoeff&gt;</b>: opening tag of the real coefficient of the term (a in the example above). The
+						text in it should be some double.<br>
+						example: <b>&lt;reCoeff&gt;19.58&lt;/reCoeff&gt;</b>
+					</li>
+					<li>
+						<b>&lt;imCoeff&gt;</b>: opening tag of the imaginary coefficient of the term (b in the example above). The
+						text in it should be some double.
+					</li>
+					<li>
+						<b>&lt;alpha&gt;</b>: opening tag of the element of the term (&alpha; in the example above). The
+						text in it should be some integer in Z<sub>N</sub>.<br>
+						example: <b>&lt;alpha&gt;3&lt;/alpha&gt;</b>
+					</li>
+				</ul>
+				Download an exmaple file: <a href="example.xml">example.xml</a><br>
+				You can run this example with the following parameters to see best results: N = 500,000, ||&fnof;||<sub>&infin;</sub> = 28.41, 
+				||&fnof;||<sub>2</sub> = 20, &delta;' = 0.1, coefficient for &delta;' = 1, coefficient for m<sub>A</sub>,m<sub>B</sub> = 0.0001 and &tau; = 200.
+				The results should give 230 and 1492 as the significant Fourier coefficients (actually, the &alpha;'s whose coefficients are significant).<br>
+				</font>
+				 
+				 <br>
+				 <center>Created by Elizabeth Firman &amp; Ariel Stolerman, CS Workshop, TAU Spring 2010</center>
+			
+			</div>
+			
+			<center><font size=1pt>This page is best viewed in Mozilla FireFox</font></center>
+		</div>
+		</center>
+		
+	</body>
+</html>
