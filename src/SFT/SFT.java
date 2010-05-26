@@ -13,6 +13,7 @@ package SFT;
 
 import java.util.*;
 import Function.*;
+import SFT.SFTUtils.DirectedProdFromAbelianFunc;
 import SFT.SFTUtils.MatlabTemporaryRepository;
 
 
@@ -28,9 +29,9 @@ import SFT.SFTUtils.MatlabTemporaryRepository;
  */
 public class SFT {
 	
-	/* ****************************************************
-	 * Interface public functions for G with generators = 1
-	 ******************************************************/
+	/* *******************************************************************
+	 * Interface public functions for direct product G (Z_N1 x ... x Z_Nk)
+	 *********************************************************************/
 	
 	/**
 	 * Returns a set of the elements in G whose coefficients in the given function are tau-significant with
@@ -50,7 +51,7 @@ public class SFT {
 	 * @throws SFTException
 	 * 				If the given parameters are invalid.
 	 */
-	public static Set<long[]> getSignificatElements(long[] G, double delta, double tau, Function func)
+	public static Set<long[]> getSignificatElements(long[] G, double delta, double tau, DirectProdFunction func)
 	throws SFTException{
 		//TODO
 		return null;
@@ -80,7 +81,7 @@ public class SFT {
 	 * @throws SFTException
 	 * 				If the given parameters are invalid.
 	 */
-	public static Set<long[]> getSignificatElements(long[] G, double delta, double tau, Function func,
+	public static Set<long[]> getSignificatElements(long[] G, double delta, double tau, DirectProdFunction func,
 			double fInfNorm, double fEuclideanNorm) throws SFTException{
 		//TODO
 		return null;
@@ -111,7 +112,7 @@ public class SFT {
 	 * @throws SFTException
 	 * 				If the given parameters are invalid.
 	 */
-	public static Set<long[]> getSignificatElements(long[] G, double delta, double tau, Function func,
+	public static Set<long[]> getSignificatElements(long[] G, double delta, double tau, DirectProdFunction func,
 			float deltaCoeff, float randSetsCoeff) throws SFTException{
 		//TODO
 		return null;
@@ -148,14 +149,14 @@ public class SFT {
 	 * @throws SFTException
 	 * 				If the given parameters are invalid.
 	 */
-	public static Set<long[]> getSignificatElements(long[] G, double delta, double tau, Function func,
+	public static Set<long[]> getSignificatElements(long[] G, double delta, double tau, DirectProdFunction func,
 			double fInfNorm, double fEuclideanNorm, float deltaCoeff, float randSetsCoeff) throws SFTException{
 		//TODO
 		return null;
 	}
 	
 	/* *****************************************************
-	 * Interface public functions for G with generators != 1
+	 * Interface public functions for finite Abelian G
 	 *******************************************************/
 	
 	/**
@@ -177,12 +178,22 @@ public class SFT {
 	 * @throws SFTException
 	 * 				If the given parameters are invalid.
 	 */
-	public static Set<long[]> getSignificatElements(long[][] G, double delta, double tau, Function func)
+	public static Set<Long> getSignificatElements(long[][] G, double delta, double tau, FiniteAbelianFunction func)
 	throws SFTException{
-		//TODO
-		return null;
+		// create parameters for the direct product version
+		long[] dpG = SFTUtils.getGFromAbelianFunc(func);
+		try{
+			DirectProdFunction dpFunc = new DirectedProdFromAbelianFunc(dpG,func);
+			// call the direct product version of this method
+			Set<long[]> Ltag = getSignificatElements(dpG,delta,tau,dpFunc);
+			// return the finite Abelian representation of the result set
+			return SFTUtils.getAbelianRepresentation(Ltag, G);
+		} catch (FunctionException fe){
+			System.err.println("Invalid function.");
+			return null;
+		}
 	}
-	
+
 	/**
 	 * Returns a set of the elements in G whose coefficients in the given function are tau-significant with
 	 * delta-confidence.
@@ -208,10 +219,20 @@ public class SFT {
 	 * @throws SFTException
 	 * 				If the given parameters are invalid.
 	 */
-	public static Set<long[]> getSignificatElements(long[][] G, double delta, double tau, Function func,
+	public static Set<Long> getSignificatElements(long[][] G, double delta, double tau, FiniteAbelianFunction func,
 			double fInfNorm, double fEuclideanNorm) throws SFTException{
-		//TODO
-		return null;
+		// create parameters for the direct product version
+		long[] dpG = SFTUtils.getGFromAbelianFunc(func);
+		try{
+			DirectProdFunction dpFunc = new DirectedProdFromAbelianFunc(dpG,func);
+			// call the direct product version of this method
+			Set<long[]> Ltag = getSignificatElements(dpG,delta,tau,dpFunc,fInfNorm,fEuclideanNorm);
+			// return the finite Abelian representation of the result set
+			return SFTUtils.getAbelianRepresentation(Ltag, G);
+		} catch (FunctionException fe){
+			System.err.println("Invalid function.");
+			return null;
+		}
 	}
 	
 	/**
@@ -240,10 +261,20 @@ public class SFT {
 	 * @throws SFTException
 	 * 				If the given parameters are invalid.
 	 */
-	public static Set<long[]> getSignificatElements(long[][] G, double delta, double tau, Function func,
+	public static Set<Long> getSignificatElements(long[][] G, double delta, double tau, FiniteAbelianFunction func,
 			float deltaCoeff, float randSetsCoeff) throws SFTException{
-		//TODO
-		return null;
+		// create parameters for the direct product version
+		long[] dpG = SFTUtils.getGFromAbelianFunc(func);
+		try{
+			DirectProdFunction dpFunc = new DirectedProdFromAbelianFunc(dpG,func);
+			// call the direct product version of this method
+			Set<long[]> Ltag = getSignificatElements(dpG,delta,tau,dpFunc,deltaCoeff,randSetsCoeff);
+			// return the finite Abelian representation of the result set
+			return SFTUtils.getAbelianRepresentation(Ltag, G);
+		} catch (FunctionException fe){
+			System.err.println("Invalid function.");
+			return null;
+		}
 	}	
 	
 	/**
@@ -278,17 +309,26 @@ public class SFT {
 	 * @throws SFTException
 	 * 				If the given parameters are invalid.
 	 */
-	public static Set<long[]> getSignificatElements(long[][] G, double delta, double tau, Function func,
+	public static Set<Long> getSignificatElements(long[][] G, double delta, double tau, FiniteAbelianFunction func,
 			double fInfNorm, double fEuclideanNorm, float deltaCoeff, float randSetsCoeff) throws SFTException{
-		//TODO
-		return null;
+		// create parameters for the direct product version
+		long[] dpG = SFTUtils.getGFromAbelianFunc(func);
+		try{
+			DirectProdFunction dpFunc = new DirectedProdFromAbelianFunc(dpG,func);
+			// call the direct product version of this method
+			Set<long[]> Ltag = getSignificatElements(dpG,delta,tau,dpFunc,fInfNorm,fEuclideanNorm,deltaCoeff,randSetsCoeff);
+			// return the finite Abelian representation of the result set
+			return SFTUtils.getAbelianRepresentation(Ltag, G);
+		} catch (FunctionException fe){
+			System.err.println("Invalid function.");
+			return null;
+		}
 	}	
 	
 	/* *********************************
 	 * Matlab interface public functions
 	 * ********************************/
 	
-	@SuppressWarnings("unchecked")
 	public static MatlabTemporaryRepository runMatlabSFTPart1Internal(Long[] G, double delta_t, double tau,
 			double fInfNorm, double fEuclideanNorm, float deltaCoeff, float randSetsCoeff, Boolean isLogged) throws SFTException{
 		// set variables to fit algorithm
@@ -338,6 +378,12 @@ public class SFT {
 	}
 	
 	/* ***********************************************************************
+	/* ***********************************************************************
+	/* ***********************************************************************
+	/* ***********************************************************************/
+	
+	
+	/* ***********************************************************************
 	 * The SFT algorithms 3.9 - 3.12 implementation (as described in the paper)
 	 *************************************************************************/
 	
@@ -351,7 +397,7 @@ public class SFT {
 	 * @return			a short list L in G of the tau-significant Fourier coefficients
 	 * 					of f with probability at least 1-delta_t
 	 */
-	protected static Set<long[]> runMainSFTAlgorithm(long[] G, double delta_t, double tau, Function func,
+	protected static Set<long[]> runMainSFTAlgorithm(long[] G, double delta_t, double tau, DirectProdFunction func,
 			double fInfNorm, double fEuclideanNorm, float deltaCoeff, float randSetsCoeff) throws SFTException{
 		Debug.log("SFT -> runMainSFTAlgorithm - main algorithm started");
 		
@@ -661,6 +707,7 @@ public class SFT {
 	 * @return			a short list L in G of the tau-significant Fourier coefficients
 	 * 					of f with probability at least 1-delta_t
 	 */
+	@SuppressWarnings("unchecked")
 	public static Set<long[]>[][] runMatlabSFTPart1Internal(long[] G, double delta_t, double tau,
 			double fInfNorm, double fEuclideanNorm, float deltaCoeff, float randSetsCoeff) throws SFTException{
 		Debug.log("SFT -> runMatlabSFTPart1Internal - main algorithm part 1 started");
