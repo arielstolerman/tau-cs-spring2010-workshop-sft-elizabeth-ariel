@@ -590,11 +590,11 @@ public class SFT {
 						// for each sub interval check if it is "heavy"
 						Set<long[]> B_t_lplus1 = querySets[t][l];
 						String vec = (prefixVector == null) ? "empty string" : SFTUtils.vectorToString(prefixVector); 
-						Debug.log("\tcalling distinguish for prefix "+vec+", t="+t+", l="+(l+1)+":");
-						Debug.log("\tsub-interval ["+a+","+middle+"]:");
+						//Debug.log("\tcalling distinguish for prefix "+vec+", t="+t+", l="+(l+1)+":");
+						//Debug.log("\tsub-interval ["+a+","+middle+"]:");
 						if (distinguish(prefixVector, k, G, N, subInterval1, tau, A, B_t_lplus1, query))
 							tmpCandidate.addInterval(subInterval1);
-						Debug.log("\tsub-interval ["+middle+","+b+"]:");
+						//Debug.log("\tsub-interval ["+middle+","+b+"]:");
 						if (distinguish(prefixVector, k, G, N, subInterval2, tau, A, B_t_lplus1, query))
 							tmpCandidate.addInterval(subInterval2);
 					}
@@ -669,24 +669,25 @@ public class SFT {
 		
 		// calculate est(a,b)
 		for (long[] x: A){
-			double tmpBSum = 0;
+			Complex tmpBSum = new Complex(0,0);
 			for (long[] y: B){
 				String x_sub_y = SFTUtils.vectorToString(SFTUtils.subVectorModulo(x, y, N, k));
 				Complex chiValue = SFTUtils.chi(N,v,y[tIndex]);
+				// make it conjucate
+				chiValue = chiValue.getConjugate();
 				if (prefixVector != null){
 					Complex prefixChiValue = SFTUtils.chi(tIndex,G,prefixVector,y);
 					chiValue = Complex.mulComplex(chiValue, prefixChiValue);
 				}
-				tmpBSum += SFTUtils.innerProduct(chiValue,query.get(x_sub_y))/((double)B.size());
+				tmpBSum.addComplex(Complex.divComplex(Complex.mulComplex(chiValue,query.get(x_sub_y)),(double)B.size()));
 			}
-			tmpBSum *= tmpBSum;
-			tmpBSum /= (double)A.size();
-			est += tmpBSum;
+			
+			est += tmpBSum.getNormSquare()/(double)A.size();
 		}
 		
 		// compare to threshold and return result
 		double threshold = 5*tau/36;
-		Debug.log("\tcalculated est:"+est+((est >= threshold) ? "\t\tPASSED!":""));
+		//Debug.log("\tcalculated est:"+est+((est >= threshold) ? "\t\tPASSED!":""));
 		
 		//Debug.log("SFT -> distinguish completed");
 		

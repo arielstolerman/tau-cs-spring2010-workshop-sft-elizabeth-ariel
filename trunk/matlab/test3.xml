@@ -2,19 +2,21 @@
 <functions runid="1">
 	<function id="1">
 		<term>
-			<recoeff>10</recoeff>
-			<imcoeff>10</imcoeff>
+			<recoeff>101</recoeff>
+			<imcoeff>130</imcoeff>
 			<alpha>
 				<coord index="0">230</coord>
 				<coord index="1">500</coord>
+				<coord index="2">28</coord>
 			</alpha>
 		</term>
 		<term>
-			<recoeff>10</recoeff>
-			<imcoeff>10</imcoeff>
+			<recoeff>19</recoeff>
+			<imcoeff>120</imcoeff>
 			<alpha>
 				<coord index="0">1492</coord>
 				<coord index="1">800</coord>
+				<coord index="2">9221</coord>
 			</alpha>
 		</term>
 		<term>
@@ -23,6 +25,7 @@
 			<alpha>
 				<coord index="0">542</coord>
 				<coord index="1">49</coord>
+				<coord index="2">2918</coord>
 			</alpha>
 		</term>
 		<term>
@@ -31,6 +34,7 @@
 			<alpha>
 				<coord index="0">29</coord>
 				<coord index="1">29</coord>
+				<coord index="2">9238</coord>
 			</alpha>
 		</term>
 	</function>
