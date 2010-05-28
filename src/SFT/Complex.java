@@ -98,12 +98,11 @@ public class Complex {
 	}
 	
 	/**
-	 * Calculates and returns the Euclidean norm of the complex number
+	 * Calculates and returns the norm of the complex number, i.e. for a+bi: |a+bi| = sqrt(a^2+b^2)
 	 * @return
 	 * 			The Euclidean norm of the complex number
 	 */
-	//TODO IS THIS CORRECT? SHOULD IT RETURN THE SQUARE OF (X^2 + Y^2) ???
-	public double getEuclideanNorm(){
+	public double getNorm(){
 		return Math.sqrt(getNormSquare());
 	}
 	

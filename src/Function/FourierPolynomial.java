@@ -93,14 +93,15 @@ public class FourierPolynomial extends DirectProdFunction{
 		script += "res = 0;\n";
 		script += "s = size(alpha); alpha_size = s(1)*s(2);\n";
 		script += "for j=1:k:alpha_size;\n";
-		script += "vec = alpha(j:(j+k-1));\n";
-		script += "\ttmp = 1;\n";
-		script += "\tfor l=1:k;\n";
-		script += "\t\tcurr_alpha = vec(l);\n";
-		script += "\t\tterm = 2*pi*curr_alpha*x(l)/G(l);\n";
-		script += "\t\ttmp = tmp * coeff_alpha(l)*(cos(term)+i*sin(term));\n";
-		script += "\tend\n";
-		script += "res = res + tmp;\n";
+		script += "\t"+"vec = alpha(j:(j+k-1));\n";
+		script += "\t"+"tmp = 1;\n";
+		script += "\t"+"for l=1:k;\n";
+		script += "\t\t"+"curr_alpha = vec(l);\n";
+		script += "\t\t"+"term = 2*pi*curr_alpha*x(l)/G(l);\n";
+		script += "\t\t"+"tmp = tmp * exp(term*i);\n";
+		script += "\t"+"end\n";
+		script += "\t"+"coeff_index = floor(j/k)+1;\n";
+		script += "\t"+"res = res + coeff_alpha(coeff_index)*tmp;\n";
 		script += "end\n";
 		
 		return script;
