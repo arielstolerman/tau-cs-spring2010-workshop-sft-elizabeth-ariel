@@ -409,7 +409,7 @@ public class SFT {
 		int k = G.length;
 		for (int i=0; i<k; i++) sizeOfG += G[i];
 		double delta = SFTUtils.calcDelta(delta_t,deltaCoeff,fEuclideanNorm,tau,sizeOfG);
-		Debug.log("\tgamma is: "+gamma+", delta is: "+delta+", fInfNorm is: "+fInfNorm);
+		Debug.log("\tgamma is: "+gamma+", delta is: "+delta+", fEuclideanNorm is: "+fEuclideanNorm+", fInfNorm is: "+fInfNorm);
 		
 		Set<long[]>[][] sets = generateQueries(G, gamma, fInfNorm, delta, randSetsCoeff);
 		Debug.log("\tgenerated sets A,B1,..,BNt for t in {1,...,k} ");
@@ -457,9 +457,9 @@ public class SFT {
 		// run getFixedQueriesSFT and return its output, L
 		Set<long[]> L = getFixedQueriesSFT(G,tau,sets,query);
 		
-		String LValues = "";
+		String LValues = "\n";
 		for (long[] e: L){
-			LValues += "\n\t"+SFTUtils.vectorToString(e)+"\n";
+			LValues += "\t"+SFTUtils.vectorToString(e)+"\n";
 		}
 		Debug.log("\tfinished calculating L, the list of significant Fourier coefficients for f:"+LValues+"\n");
 		
@@ -487,6 +487,7 @@ public class SFT {
 		long m_B = (long) (randSetsCoeff * Math.ceil(tmpCoeff*Math.log(fInfNorm/(delta*gamma))));
 		
 		Debug.log("\tm_A is: "+m_A+", m_B is: "+m_B);
+		if (m_A <= 0 || m_B <= 0) System.exit(0);
 		
 		// generate A,B_1,...,B_Ntl for each t in {1,...,k} and l in {1,...,logN_t}
 		
@@ -497,11 +498,13 @@ public class SFT {
 		res[0] = new HashSet[1];
 		res[0][0] = SFTUtils.generateRandomSubsetA(m_A, G);
 		
-		String AValues = "";
-		for (Iterator<long[]> j = res[0][0].iterator(); j.hasNext(); ){
-			AValues += "\t\t"+SFTUtils.vectorToString(j.next())+"\n";
+		String AValues = "\t\t";
+		long[][] Aarr = new long[res[0][0].size()][]; res[0][0].toArray(Aarr);
+		for (int j=0; j<Aarr.length; j++){
+			AValues += SFTUtils.vectorToString(Aarr[j])+" ";
+			if (j % 20 == 0 && j != 0) AValues+="\n\t\t";
 		}
-		Debug.log("\tA: \n"+AValues+"End of A");
+		Debug.log("\tA: \n"+AValues+"\n\tEnd of A");
 
 		// generate for each t in {1,...,k} logN_t random subsets B_tl partial to 
 		// Z_N1 X ... X Z_Nt-1 X {0,...,2^(l-1)-1} X {0} X ... X {0}
@@ -518,11 +521,12 @@ public class SFT {
 		for (t=1; t<=G.length; t++){
 			for(l=0; l<logG[t-1]; l++){
 				String BtlValues = "size: "+res[t][l].size()+"; elements:\n\t\t";
-				for (Iterator<long[]> j = res[t][l].iterator(); j.hasNext(); ){
-					BtlValues += SFTUtils.vectorToString(j.next())+" ";
-					if (BtlValues.length() % 100 == 0) BtlValues+="\n\t\t";
+				long[][] Btlarr = new long[res[t][l].size()][]; res[t][l].toArray(Btlarr);
+				for (int j=0; j<Btlarr.length; j++){
+					BtlValues += SFTUtils.vectorToString(Btlarr[j])+" ";
+					if (j % 20 == 0 && j != 0) BtlValues+="\n\t\t";
 				}
-				Debug.log("\tB_"+t+"_"+(l+1)+": "+BtlValues);
+				Debug.log("\n\tB_"+t+"_"+(l+1)+": "+BtlValues);
 			}
 		}
 		Debug.log("\tEnd of B's");

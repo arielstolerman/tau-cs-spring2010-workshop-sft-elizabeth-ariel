@@ -1,6 +1,9 @@
 package SFT;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -24,33 +27,20 @@ public class Main {
 		
 		File xmlInput = new File("matlab\\test3.xml");
 		//File xmlInput = new File("d:\\tmp\\test.xml");
-		long[] G = new long[]{Long.valueOf("100000"),Long.valueOf("100000"),Long.valueOf("100000")};
-		//long[] G = new long[]{Long.valueOf("10000000000")};
+		long[] G = new long[]{Long.valueOf("300"),Long.valueOf("300")};
+		//long[] G = new long[]{Long.valueOf("2000")};
 		//Long[] bigG = new Long[]{Long.valueOf("10000000000")};
 		
 		try {
 			DirectProdFunction poly = new XMLFourierPolynomial(xmlInput, G);
 			for(FourierPolynomial p: ((XMLFourierPolynomial)poly).getPolynomials().values()){
-				System.out.println(p.toMatlabScript("jojo"));
-				System.out.println(p.getValue(new long[]{3,4,5}));
+				//System.out.println(p.toMatlabScript("jojo"));
+				//System.out.println(p.getValue(new long[]{3,4,5}));
+				double infNorm = 286.24680524209737;
+				double eucNorm = 0.056396049397373395;
+				SFT.runMainSFTAlgorithm(G, 0.01, 200, p, infNorm, eucNorm, (float)250000, (float)0.000000002);
 			}
-			SFT.runMainSFTAlgorithm(G, 0.01, 220, poly, 28.41, 20.0, (float)1, (float)0.0001);
-			
-			/*MatlabTemporaryRepository matlabRep =
-				SFT.runMatlabSFTPart1Internal(bigG,0.01,210,(double)28.41,(double)20.0,(float)1,(float)0.0001,new Boolean(true));
-
-			Function poly = new XMLFourierPolynomial(xmlInput, G);
-			HashMap<String,Complex> query = new HashMap<String,Complex>();
-			for(Long[] Elem: matlabRep.getQ()){
-				long[] elem = new long[Elem.length];
-				for(int i=0; i<Elem.length; i++) elem[i] = Elem[i].longValue();
-				query.put(SFTUtils.vectorToString(elem),poly.getValue(elem));
-			}
-			matlabRep.setQuery(query);
-
-			Long[][] L =
-				SFT.runMatlabSFTPart2Internal(bigG, 200, matlabRep); */
-			
+						
 		} catch (SFTException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -190,17 +180,17 @@ public class Main {
 		try {
 			// testing variables
 			int NUM_OF_POLYS = 1;									// number of functions to generate and test
-			long[] G = new long[]{100000};							// domain specification
-			long[] REGULAR_ELEMS_RANGE = new long[]{0,50};			// regular elements range
-			long[] SIGNIFICANT_ELEMS_RANGE = new long[]{1000,2000};	// significant elements range
+			long[] G = new long[]{100,100};						// domain specification
+			long[] REGULAR_ELEMS_RANGE = new long[]{0,10};			// regular elements coeff range
+			long[] SIGNIFICANT_ELEMS_RANGE = new long[]{50,80};		// significant elements rcoeff ange
 			double SIGNIFICAT_ELEMS_PERCENTAGE = 0.01;				// the percentage of the elements to be significant
-			double NON_ZERO_ELEMS_PERCENTAGE = 0.2;					// number of non-zero coeff elements
+			double NON_ZERO_ELEMS_PERCENTAGE = 0.05;					// number of non-zero coeff elements
 			
 			// important stuff
 			double DELTA_T = 0.1;									// confidence parameter
 			double TAU = 200;										// threshold
 			float DELTA_COEFF = 1;									// coeff for calculating delta
-			float RAND_SETS_COEFF = (float)0.0001;							// coeff for creating random subsets 
+			float RAND_SETS_COEFF = (float)0.001;							// coeff for creating random subsets 
 			
 			FourierPolynomial[] polys;
 			FourierPolynomial[] sftPolys;
@@ -215,18 +205,20 @@ public class Main {
 			for (int i=0; i<NUM_OF_POLYS; i++) polys[i] = new FourierPolynomial(G, i+"");
 			
 			long numOfNonZeroRegElems = (long)Math.floor(numOfElements*NON_ZERO_ELEMS_PERCENTAGE*(1-SIGNIFICAT_ELEMS_PERCENTAGE));
+			System.out.println("number of non-zero regular elemets: "+numOfNonZeroRegElems);
 			long numOfNonZeroSigElems = (long)Math.floor(numOfElements*NON_ZERO_ELEMS_PERCENTAGE*SIGNIFICAT_ELEMS_PERCENTAGE);
+			System.out.println("number of non-zero SIGNIFICANT elemets: "+numOfNonZeroSigElems);
+			
+			System.out.println("Polynomials:");
+			System.out.println("============");
 			// for each function, choose its coefficients randomly
-			for (FourierPolynomial poly: polys){
-				Random[] rands = new Random[G.length];
-				for (Random rand: rands) rand = new Random();
-				
+			for (FourierPolynomial poly: polys){				
 				// create regular elements
 				for (int j=0; j<numOfNonZeroRegElems; j++){
 					// create element
 					long[] elem = new long[G.length];
 					for (int k=0; k<G.length; k++){
-						elem[k] = rands[k].nextLong();
+						elem[k] = getRandElem(G[k]);
 					}
 					// insert as new term
 					poly.addUpdateTerm(elem, getRandCoeff(REGULAR_ELEMS_RANGE), getRandCoeff(REGULAR_ELEMS_RANGE));
@@ -238,11 +230,16 @@ public class Main {
 					// create element
 					long[] elem = new long[G.length];
 					for (int k=0; k<G.length; k++){
-						elem[k] = rands[k].nextLong();
+						elem[k] = getRandElem(G[k]);
 					}
 					// insert as new SIGNIFICANT term
 					poly.addUpdateTerm(elem, getRandCoeff(SIGNIFICANT_ELEMS_RANGE), getRandCoeff(SIGNIFICANT_ELEMS_RANGE));
 				}
+				
+				// print to screen
+				System.out.println("f_"+poly.getId()+"[X] = "+poly);
+				System.out.println("\tinfinity norm: "+poly.calcInfinityNorm());
+				System.out.println("\tEuclidean norm: "+poly.calcEuclideanNorm());
 			}
 			
 			// STEP 2: create SFT-guess functions
@@ -266,12 +263,25 @@ public class Main {
 			
 			// STEP 3: calculate the difference between f its sft-guess
 			// --------------------------------------------------------
-			
+			// create matlab functions from the functions and the sft-functions
+			for (int i=0; i<polys.length; i++){
+				String f_name = "matlab\\func_"+polys[i].getId()+".m";
+				String f_sft_name = "matlab\\func_"+sftPolys[i].getId()+".m";
+				
+				BufferedWriter f = new BufferedWriter(new FileWriter(f_name));
+				BufferedWriter f_sft = new BufferedWriter(new FileWriter(f_sft_name));
+				
+				f.write(polys[i].toMatlabScript(f_name));
+				f_sft.write(sftPolys[i].toMatlabScript(f_sft_name));
+			}
 			
 		} catch (FunctionException e) {
 			System.err.println("FunctionException thrown");
 		} catch (SFTException e) {
 			System.err.println("SFTException thrown");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		/* */
 	}
@@ -279,8 +289,13 @@ public class Main {
 	private static double getRandCoeff(long[] range){
 		return (Math.random()*(range[1]-range[0])+range[0]);
 	}
+	
+	private static long getRandElem(long range){
+		return (long)Math.floor(Math.random()*range);
+	}
 
+	/*
 	private static double getRand(double F_VALUES_BOUND){
 		return Math.random()*F_VALUES_BOUND-F_VALUES_BOUND/2;
-	}
+	} */
 }

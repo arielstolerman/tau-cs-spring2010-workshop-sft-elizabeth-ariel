@@ -6,35 +6,31 @@
 			<imcoeff>130</imcoeff>
 			<alpha>
 				<coord index="0">230</coord>
-				<coord index="1">500</coord>
-				<coord index="2">28</coord>
+				<coord index="1">100</coord>
 			</alpha>
 		</term>
 		<term>
 			<recoeff>19</recoeff>
 			<imcoeff>120</imcoeff>
 			<alpha>
-				<coord index="0">1492</coord>
-				<coord index="1">800</coord>
-				<coord index="2">9221</coord>
+				<coord index="0">142</coord>
+				<coord index="1">80</coord>
 			</alpha>
 		</term>
 		<term>
 			<recoeff>0.01</recoeff>
 			<imcoeff>0.01</imcoeff>
 			<alpha>
-				<coord index="0">542</coord>
+				<coord index="0">52</coord>
 				<coord index="1">49</coord>
-				<coord index="2">2918</coord>
 			</alpha>
 		</term>
 		<term>
 			<recoeff>0.07</recoeff>
 			<imcoeff>0.09</imcoeff>
 			<alpha>
-				<coord index="0">29</coord>
+				<coord index="0">259</coord>
 				<coord index="1">29</coord>
-				<coord index="2">9238</coord>
 			</alpha>
 		</term>
 	</function>
