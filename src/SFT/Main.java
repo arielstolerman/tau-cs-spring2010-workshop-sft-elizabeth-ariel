@@ -12,6 +12,7 @@ import java.util.Random;
 import java.util.Set;
 import Function.*;
 import SFT.*;
+import SFT.SFTUtils.DirectedProdFromAbelianFunc;
 import SFT.SFTUtils.MatlabTemporaryRepository;
 
 /*
@@ -25,25 +26,29 @@ public class Main {
 	 */
 	public static void main(String[] args) {
 		
-		File xmlInput = new File("matlab\\test3.xml");
-		//File xmlInput = new File("d:\\tmp\\test.xml");
-		long[] G = new long[]{Long.valueOf("300"),Long.valueOf("300")};
-		//long[] G = new long[]{Long.valueOf("2000")};
-		//Long[] bigG = new Long[]{Long.valueOf("10000000000")};
+		/* *************
+		 *  single test
+		 * *************/
 		
 		try {
+			// input variables
+			File xmlInput = new File("matlab\\test3.xml");
+			long[] G = new long[]{Long.valueOf("1000"),Long.valueOf("1000")};
+			double delta_t = 0.01;
+			double tau = 200;
 			DirectProdFunction poly = new XMLFourierPolynomial(xmlInput, G);
-			for(FourierPolynomial p: ((XMLFourierPolynomial)poly).getPolynomials().values()){
-				//System.out.println(p.toMatlabScript("jojo"));
-				//System.out.println(p.getValue(new long[]{3,4,5}));
-				double infNorm = 286.24680524209737;
-				double eucNorm = 0.056396049397373395;
-				SFT.runMainSFTAlgorithm(G, 0.01, 200, p, infNorm, eucNorm, (float)250000, (float)0.000000002);
-			}
-						
-		} catch (SFTException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			double infNorm = 286.2467568832943;
+			double eucNorm = 0.5349658666523577;
+			float deltaCoeff = (float)100;
+			float randSetsCoeff = (float)0.00001;
+			
+			//System.out.println(poly.calcEuclideanNorm());
+			//System.out.println(poly.calcInfinityNorm());
+			
+			for(FourierPolynomial p: ((XMLFourierPolynomial)poly).getPolynomials().values())
+				SFT.runMainSFTAlgorithm(G, delta_t, tau, p, infNorm, eucNorm, deltaCoeff, randSetsCoeff);
+		} catch (SFTException se) {
+			Debug.log(">>> SFTException thrown: "+se.getMessage());
 		} catch (FunctionException fe){
 			Debug.log(">>> FunctionException thrown: "+fe.getMessage());
 		} 
