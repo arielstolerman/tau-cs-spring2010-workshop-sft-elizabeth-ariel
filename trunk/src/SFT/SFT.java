@@ -418,6 +418,14 @@ public class SFT {
 		Set<long[]> Q = new HashSet<long[]>();
 		Set<long[]> A = sets[0][0];
 		
+		int qSize = 0;
+		for (int t=1; t<=k; t++){
+			for (int l=0; l<sets[t].length; l++){
+				qSize += A.size() * sets[t][l].size();
+			}
+		}
+		Debug.log("\tstarting to generate set Q of maximum size of "+qSize);
+		
 		long qCalcCounter = 0;
 		for (int t=1; t<=k; t++){
 			Set<long[]>[] tSets = sets[t];
@@ -435,16 +443,19 @@ public class SFT {
 				}
 			}
 		}
+		Debug.log("\tdone calculating Q, actual size is "+Q.size());
 		
-		String QValues = "";
-		int rowCount = 0;
-		for (Iterator<long[]> j = Q.iterator(); j.hasNext();){
-			rowCount++;
-			QValues += SFTUtils.vectorToString(j.next());
-			QValues += (rowCount % 20 == 0)? "\n\t":" ";
-		}
-		String Qsize = Q.size()+"";
-		Debug.log("\tcreated Q = {x - y | x in A, y in union(B_t_l), t=1,...,k, l=1,...,log(Nt)} of size "+Qsize+":\n\t"+QValues);
+		if (Q.size() < 3000){
+			String QValues = "";
+			int rowCount = 0;
+			for (Iterator<long[]> j = Q.iterator(); j.hasNext();){
+				rowCount++;
+				QValues += SFTUtils.vectorToString(j.next());
+				QValues += (rowCount % 20 == 0)? "\n\t":" ";
+			}
+			String Qsize = Q.size()+"";
+			Debug.log("\tcreated Q = {x - y | x in A, y in union(B_t_l), t=1,...,k, l=1,...,log(Nt)} of size "+Qsize+":\n\t"+QValues);
+		} else Debug.log("\tQ is to big to print...");
 		
 		// create query
 		Map<String,Complex> query = new HashMap<String,Complex>();
@@ -456,6 +467,7 @@ public class SFT {
 		
 		// run getFixedQueriesSFT and return its output, L
 		Set<long[]> L = getFixedQueriesSFT(G,tau,sets,query);
+		Debug.log("\tL size is: "+L.size());
 		
 		String LValues = "\n";
 		for (long[] e: L){
@@ -563,12 +575,14 @@ public class SFT {
 			// run iterations over l = 0,...,log_2(N)-1
 			int logN = SFTUtils.calcLogN(N);
 			
-			Debug.log("\t\t>>> Prefix vectors for stage t = "+t+":");
+			Debug.log("\t\t>>> Prefix vectors for stage t = "+t+" (total of "+prefixes.size()+" vectors):");
 			String prefixVectorsString = "";
 			for (long[] prefixVector: prefixes) prefixVectorsString += SFTUtils.vectorToString(prefixVector)+" ";
 			Debug.log("\t\t>>> "+prefixVectorsString);
 			
+			int vecCount = 1;
 			for (long[] prefixVector: prefixes){
+				Debug.log("\t\t\t"+(vecCount++)+" of "+prefixes.size()+" - doing calculation for prefix vector "+SFTUtils.vectorToString(prefixVector)+"...");
 				// check if this is the first iteration, that is t == 1. if so, mark the prefix vector as
 				// "the empty string", which will be null.
 				if (t == 1) prefixVector = null;
