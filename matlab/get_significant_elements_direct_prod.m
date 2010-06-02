@@ -7,6 +7,7 @@
 % - func:			the function for querying, over G -> C
 % - fInfNorm:		the infinity norm of the function
 % - fEuclideanNorm:	the Euclidean norm of the function
+% OPTIONAL:
 % - deltaCoeff:		a constant coefficient for calculating delta
 % - randSetsCoeff:	a constant coefficient for calculating the random subsets when creating Q, a set of elements for querying
 % Returns a list of elements in G whose Fourier coefficients are tau-significant.
@@ -73,6 +74,6 @@ for i=1:L_java.length;
   	for j=1:length(xLong);
     	x(j)=xLong(j).longValue;
   	end
-  	L(i)=x;							%% WILL NOT WORK
+  	L(i)=x;
 end
 
