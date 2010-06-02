@@ -1,0 +1,133 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+	<head>
+		<meta name="verify-v1" content="l2SJjXDq6mUozEk+2u3UkzdEwtXKch0i0/3AkAr9sFA=" />
+		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+		<title>The SFT Algorithm</title>
+		<link rel="shortcut icon" href="graphics/site_icon.ico">
+		<link rel="stylesheet" href="style_sheet.css" type="text/css">
+		<link rel="shortcut icon" href="icon.png">
+	</head>
+
+	<body>
+		<center>
+		<div id="id_content">
+		
+			<div id="id_title">
+				<h1><font color="white">The SFT Algorithm</font></h1>
+			</div>
+			
+			<div id="id_main">
+				<b><center>
+				 <h3>Learning and Coding Theory Workshop</h3>
+				 <h2>The Java SFT Library</h2> 
+				</center></b>
+				
+				<h3>Summary</h3>
+				The Java SFT library allows users to use the public SFT methods for calculating a list of elements whose Fourier
+				coefficients are significant. The library includes two packages:
+				<ul>
+					<li>
+						<b>SFT</b>: main package, includes the SFT implementation.
+					</li>
+					<li>
+						<b>Function</b>: a package with data structures to describe general user-defined functions, as part of the
+						SFT methods input, for the function-query (see the paper for details).
+					</li>
+				</ul>
+				The SFT main package allows the user to call the SFT calculation in 4 variations:
+				<ul>
+					<li>
+						<b>Function domain</b>: input function is either Cartesian product of finite groups (Z<sub>N1</sub> x ... x Z<sub>Nk</sub>)
+						described by a list of N<sub>j</sub>'s or an Abelian group described by a list of N<sub>j</sub>'s and the
+						corresponding generators g<sub>j</sub>'s.
+					</li>
+					<li>
+						<b>Optional algorithm constants</b>: the algorithm uses two optional user-defined constants for calculating
+						the confidence parameter &delta; and the size of the random subsets from which a relatively small group Q of elements
+						in the domain G is generated (and its values are to be queried from the given query-access). The user may input these
+						constants, otherwise they are given a default value.
+					</li>
+				</ul>
+				
+				The Function package allows the user to define a function object to be sent as the <b>query access</b> in the SFT
+				implementation. Hierarchy:
+				<ul>
+					<li>
+						Abstract class <b>Function</b>:<br>
+						The basic function object, has two abstract extensions corresponding to the different optional function
+						domain: Cartesian product of finite groups or Abelian group. There are three main procedures for this object:
+						<i>getValue, calcInfinityNorm</i> and <i>calcEuclideanNorm</i>.
+						<ul>
+						<li>
+							Abstract class <b>DirectProdFunction</b>: an abstract extension to class Function, for describing functions
+							over Z<sub>N1</sub> x ... x Z<sub>Nk</sub> &rarr; C. It provides a naive implementation of the <i>calcInfinityNorm</i>
+							and <i>calcEuclideanNorm</i> that are not recommended for use (very long calculation that iterates over
+							all the elements in G).<br>
+							The Function package also includes two implementations for the DirectProdFunction:
+							<ul>
+							<li>
+								Class <b>FourierPolynomial</b>: extends class DirectProdFunction and describes a Fourier polynomial
+								by a list of terms and their coefficients, i.e. for a Fourier polynomial:<br>
+								p(x) = &sum;c<sub>&alpha;</sub>&bull;&Chi;<sub>&alpha;</sub>(x) it holds the mapping of &alpha;
+								to its coefficient c<sub>&alpha;</sub>.
+							</li>
+							<li>
+								Class <b>XMLFourierPolynomial</b>: extends class DirectProdFunction and describes a Fourier polynomial
+								as class FourierPolynomial, allowing the user to construct it from a XML description of the function.
+								In addition this implementation can receive multiple functions in one XML, and let the user choose which
+								of the functions to use or randomly choose a function from the given list at each calculation.
+							</li>
+							</ul>
+						</li>
+						<li>
+							Abstract class <b>FiniteAbelianFunction</b>: an abstract extension to class Function, for describing functions
+							over a finite Abelian group G &rarr; C. 
+						</li>
+						</ul>
+					</li>
+				</ul>
+				
+				<br>
+				
+				<h3>Usage</h3>
+				In order to use the SFT library in your Java project, follow these steps:
+				<ul>
+					<li>
+						<b>Download</b>: download the SFT jar file (link below under <b>Tools and Downloads</b>).
+					</li>
+					<li>
+						<b>Import</b>: import the library into your Java project.
+					</li>
+					<li>
+						<b>Use</b>: import <i>SFT.*</i> and <i>Function.*</i> in your Java code and start using it! use the Function
+						documentation to understand how to describe your function as a SFT-suitable input.
+					</li>
+				</ul>
+				
+				<b>Tools and Downloads:</b><br>
+				<ul>
+					<li>
+						<a href="sft_lib.jar">The SFT JAR file</a>.
+					</li>
+					<li>
+						<a href="">Java Documentation</a>.
+					</li>
+					<li>
+						<a href="http://code.google.com/p/tau-cs-spring2010-workshop-sft-elizabeth-ariel/source/browse/#svn/trunk" target=_new>Google-code</a>.
+					</li>
+				</ul>
+				 
+				<br>
+				<b><center>Browse this site: <a href="index.html">Home</a> | <a href="java.html">Java Usage</a> | <a href="matlab.html">Matlab Usage</a></center></b>  
+				<br>
+				<center>Created by Elizabeth Firman &amp; Ariel Stolerman, CS Workshop, TAU Spring 2010</center>
+			
+			</div>
+			
+			<center><font size=1pt>This page is best viewed in Mozilla FireFox</font></center>
+		</div>
+		</center>
+		
+	</body>
+</html>

@@ -9,7 +9,6 @@ import java.util.*;
 public class Debug {
 	private static String LOG_FILE = "SFT_log.txt";
 	private static BufferedWriter outputFile = null;
-	private static BufferedWriter queryOutputFile = null;
 	public static boolean DEBUG_MODE = true;
 
 	//Time
@@ -82,7 +81,6 @@ public class Debug {
 	public static void closeLog(){
 		try {
 			outputFile.close();
-			queryOutputFile.close();
 		} catch (IOException e) {}      
 	}
 

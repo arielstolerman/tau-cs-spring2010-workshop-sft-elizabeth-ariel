@@ -39,49 +39,26 @@
 					</li>
 				</ul>
 				The implementation is based on the work of Adi Akavia:
-				<a href="http://www.math.ias.edu/~akavia/AkaviaPhDThesis.pdf" target=_new><i>"Learning Noisy Characters,
-				Multiplication Codes, And Cryptographic Hardcore Predicates"</i></a> (Adi Akavia, 2008, page 52).<br>
+				<a href="http://www.math.ias.edu/~akavia/AkaviaPhDThesis.pdf" target=_new><i><b>"Learning Noisy Characters,
+				Multiplication Codes, And Cryptographic Hardcore Predicates"</b></i></a> (Adi Akavia, 2008, algorithm on page 52).<br>
 				
 				<br>
-				 
-				 <font size=1>
-				 The input XML should be in the following format:<br>
+				
+				Select your option for user manual and package download:<br>
 				<ul>
 					<li>
-						<b>&lt;functions&gt;</b>: the opening tag, must have a <b>runid</b> attribute with the value
-						<i>random</i> for the function to be chosen randomly from a list of functions each time an element's
-						&fnof;-value is calculated, or <i>an integer id of a function</i> in the list of functions ahead.<br>
-						examples: <b>&lt;functions runid="random"&gt;, &lt;functions runid="2"&gt;</b>
+						<a href="java.html">Java usage</a>: download the SFT library, view Java documentation.
 					</li>
 					<li>
-						<b>&lt;function&gt;</b>: the opening tag of a function description. Must have an <b>id</b> attribute
-						with some positive integer value (1, 2, ...).<br>
-						example: <b>&lt;function id="3"&gt;</b>
-					</li>
-					<li>
-						<b>&lt;term&gt;</b>: opening tag of a term (representing (a + bi)&sdot;&chi;<sub>&alpha;</sub>(x)). Has no attributes.
-					</li>
-					<li>
-						<b>&lt;reCoeff&gt;</b>: opening tag of the real coefficient of the term (a in the example above). The
-						text in it should be some double.<br>
-						example: <b>&lt;reCoeff&gt;19.58&lt;/reCoeff&gt;</b>
-					</li>
-					<li>
-						<b>&lt;imCoeff&gt;</b>: opening tag of the imaginary coefficient of the term (b in the example above). The
-						text in it should be some double.
-					</li>
-					<li>
-						<b>&lt;alpha&gt;</b>: opening tag of the element of the term (&alpha; in the example above). The
-						text in it should be some integer in Z<sub>N</sub>.<br>
-						example: <b>&lt;alpha&gt;3&lt;/alpha&gt;</b>
+						<a href="matlab.html">Matlab usage</a>: download the Matlab SFT tools (library and scripts), view user manual.
 					</li>
 				</ul>
-				Download an exmaple file: <a href="example.xml">example.xml</a><br>
-				You can run this example with the following parameters to see best results: N = 500,000, ||&fnof;||<sub>&infin;</sub> = 28.41, 
-				||&fnof;||<sub>2</sub> = 20, &delta;' = 0.1, coefficient for &delta;' = 1, coefficient for m<sub>A</sub>,m<sub>B</sub> = 0.0001 and &tau; = 200.
-				The results should give 230 and 1492 as the significant Fourier coefficients (actually, the &alpha;'s whose coefficients are significant).<br>
-				</font>
 				 
+				Browse the SFT package code on <a href="http://code.google.com/p/tau-cs-spring2010-workshop-sft-elizabeth-ariel/source/browse/#svn/trunk" target=_new>Google-code</a>.
+				 
+				 <br>
+				 <br>
+				 <b><center>Browse this site: <a href="index.html">Home</a> | <a href="java.html">Java Usage</a> | <a href="matlab.html">Matlab Usage</a></center></b>  
 				 <br>
 				 <center>Created by Elizabeth Firman &amp; Ariel Stolerman, CS Workshop, TAU Spring 2010</center>
 			

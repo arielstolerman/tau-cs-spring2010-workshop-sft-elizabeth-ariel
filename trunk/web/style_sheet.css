@@ -66,3 +66,17 @@ h2 {
 	color:#0C0B0B;
 	text-align:justify;
 }
+
+#id_code {
+	background-color:#AACCDD;
+	border:solid;
+	border-width:1px;
+	font-family:Courier New;
+	padding-left:20px;
+	padding-right:20px;
+	text-align:left;
+}
+
+#id_code_note {
+	color:green;
+}

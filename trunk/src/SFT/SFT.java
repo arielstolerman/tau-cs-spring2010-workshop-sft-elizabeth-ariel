@@ -45,32 +45,6 @@ public class SFT {
 	 * @param func
 	 * 				The given function over G -> C whose Fourier coefficients (elements) are returned.
 	 * 				Used for query access.
-	 * @return
-	 * 				A set of the elements in G whose coefficients in the given function are tau-significant
-	 * 				with delta-confidence.
-	 * @throws SFTException
-	 * 				If the given parameters are invalid.
-	 */
-	public static Set<long[]> getSignificatElements(long[] G, double delta, double tau, DirectProdFunction func)
-	throws SFTException{
-		//TODO
-		return null;
-	}
-	
-	/**
-	 * Returns a set of the elements in G whose coefficients in the given function are tau-significant with
-	 * delta-confidence.
-	 * The algorithm includes a calculation of the error-bound, based on the delta-input and a some constant.
-	 * This implementation allows the user (who knows the algorithm) to state this constant.
-	 * @param G
-	 * 				The values N1,...,Nk describing the group G = Z_N1 x ... x Z_Nk.
-	 * @param delta
-	 * 				The confidence parameter such that the algorithm succeeds with probability 1-delta.
-	 * @param tau
-	 * 				The threshold such that all tau-significant elements are returned. 
-	 * @param func
-	 * 				The given function over G -> C whose Fourier coefficients (elements) are returned.
-	 * 				Used for query access.
 	 * @param fInfNorm
 	 * 				The infinity norm of the function.
 	 * @param fEuclideanNorm
@@ -86,37 +60,6 @@ public class SFT {
 		//TODO
 		return null;
 	}
-	
-	/**
-	 * Returns a set of the elements in G whose coefficients in the given function are tau-significant with
-	 * delta-confidence.
-	 * The algorithm also includes a calculation of randomly generated sets of elements in G,
-	 * of sizes defined as m_A and m_B in the paper, that uses some constant. This implementation allows the user
-	 * (who knows the algorithm) to state this constant as well.
-	 * @param G
-	 * 				The values N1,...,Nk describing the group G = Z_N1 x ... x Z_Nk.
-	 * @param delta
-	 * 				The confidence parameter such that the algorithm succeeds with probability 1-delta.
-	 * @param tau
-	 * 				The threshold such that all tau-significant elements are returned. 
-	 * @param func
-	 * 				The given function over G -> C whose Fourier coefficients (elements) are returned.
-	 * 				Used for query access.
-	 * @param deltaCoeff
-	 * 				A constant coefficient for the algorithm's calculation of delta.
-	 * @param randSetsCoeff
-	 * 				A constant coefficient for the algorithm's calculation of delta.
-	 * @return
-	 * 				A set of the elements in G whose coefficients in the given function are tau-significant
-	 * 				with delta-confidence.
-	 * @throws SFTException
-	 * 				If the given parameters are invalid.
-	 */
-	public static Set<long[]> getSignificatElements(long[] G, double delta, double tau, DirectProdFunction func,
-			float deltaCoeff, float randSetsCoeff) throws SFTException{
-		//TODO
-		return null;
-	}	
 	
 	/**
 	 * Returns a set of the elements in G whose coefficients in the given function are tau-significant with
@@ -158,47 +101,10 @@ public class SFT {
 	/* *****************************************************
 	 * Interface public functions for finite Abelian G
 	 *******************************************************/
-	
-	/**
-	 * Returns a set of the elements in G whose coefficients in the given function are tau-significant with
-	 * delta-confidence.
-	 * @param G
-	 * 				The values (g1,N1),...,(gk,Nk) describing the Abelian group G where gj are the
-	 * 				corresponding generators for Nj.
-	 * @param delta
-	 * 				The confidence parameter such that the algorithm succeeds with probability 1-delta.
-	 * @param tau
-	 * 				The threshold such that all tau-significant elements are returned. 
-	 * @param func
-	 * 				The given function over G -> C whose Fourier coefficients (elements) are returned.
-	 * 				Used for query access.
-	 * @return
-	 * 				A set of the elements in G whose coefficients in the given function are tau-significant
-	 * 				with delta-confidence.
-	 * @throws SFTException
-	 * 				If the given parameters are invalid.
-	 */
-	public static Set<Long> getSignificatElements(long[][] G, double delta, double tau, FiniteAbelianFunction func)
-	throws SFTException{
-		// create parameters for the direct product version
-		long[] dpG = SFTUtils.getGFromAbelianFunc(func);
-		try{
-			DirectProdFunction dpFunc = new DirectedProdFromAbelianFunc(dpG,func);
-			// call the direct product version of this method
-			Set<long[]> Ltag = getSignificatElements(dpG,delta,tau,dpFunc);
-			// return the finite Abelian representation of the result set
-			return SFTUtils.getAbelianRepresentation(Ltag, G);
-		} catch (FunctionException fe){
-			System.err.println("Invalid function.");
-			return null;
-		}
-	}
 
 	/**
 	 * Returns a set of the elements in G whose coefficients in the given function are tau-significant with
 	 * delta-confidence.
-	 * The algorithm includes a calculation of the error-bound, based on the delta-input and a some constant.
-	 * This implementation allows the user (who knows the algorithm) to state this constant.
 	 * @param G
 	 * 				The values (g1,N1),...,(gk,Nk) describing the Abelian group G where gj are the
 	 * 				corresponding generators for Nj.
@@ -234,48 +140,6 @@ public class SFT {
 			return null;
 		}
 	}
-	
-	/**
-	 * Returns a set of the elements in G whose coefficients in the given function are tau-significant with
-	 * delta-confidence.
-	 * The algorithm also includes a calculation of randomly generated sets of elements in G,
-	 * of sizes defined as m_A and m_B in the paper, that uses some constant. This implementation allows the user
-	 * (who knows the algorithm) to state this constant as well.
-	 * @param G
-	 * 				The values (g1,N1),...,(gk,Nk) describing the Abelian group G where gj are the
-	 * 				corresponding generators for Nj.
-	 * @param delta
-	 * 				The confidence parameter such that the algorithm succeeds with probability 1-delta.
-	 * @param tau
-	 * 				The threshold such that all tau-significant elements are returned. 
-	 * @param func
-	 * 				The given function over G -> C whose Fourier coefficients (elements) are returned.
-	 * 				Used for query access.
-	 * @param deltaCoeff
-	 * 				A constant coefficient for the algorithm's calculation of delta.
-	 * @param randSetsCoeff
-	 * 				A constant coefficient for the algorithm's calculation of delta.
-	 * @return
-	 * 				A set of the elements in G whose coefficients in the given function are tau-significant
-	 * 				with delta-confidence.
-	 * @throws SFTException
-	 * 				If the given parameters are invalid.
-	 */
-	public static Set<Long> getSignificatElements(long[][] G, double delta, double tau, FiniteAbelianFunction func,
-			float deltaCoeff, float randSetsCoeff) throws SFTException{
-		// create parameters for the direct product version
-		long[] dpG = SFTUtils.getGFromAbelianFunc(func);
-		try{
-			DirectProdFunction dpFunc = new DirectedProdFromAbelianFunc(dpG,func);
-			// call the direct product version of this method
-			Set<long[]> Ltag = getSignificatElements(dpG,delta,tau,dpFunc,deltaCoeff,randSetsCoeff);
-			// return the finite Abelian representation of the result set
-			return SFTUtils.getAbelianRepresentation(Ltag, G);
-		} catch (FunctionException fe){
-			System.err.println("Invalid function.");
-			return null;
-		}
-	}	
 	
 	/**
 	 * Returns a set of the elements in G whose coefficients in the given function are tau-significant with
