@@ -4,6 +4,11 @@ import SFT.Complex;
 import SFT.FunctionException;
 import java.util.*;
 
+/**
+ * An abstract extension to class Function, for describing functions
+ * over Z<sub>N1</sub> x ... x Z<sub>Nk</sub> &rarr; C.
+ * @author Elizabeth Firman and Ariel Stolerman
+ */
 public abstract class DirectProdFunction extends Function{
 	// The vector of values describing G, i.e. a Cartesian multiplication of Z_Ni, the domain of the function
 	protected long[] G;
