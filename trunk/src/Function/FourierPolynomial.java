@@ -15,7 +15,7 @@ import java.util.*;
 import SFT.*;
 
 /**
- * Extends class DirectProdFunction and describes a Fourier polynomial
+ * Describes a Fourier polynomial
  * by a list of terms and their coefficients, i.e. for a Fourier polynomial:<br>
  * p(x) = &sum;c<sub>&alpha;</sub>&bull;&Chi;<sub>&alpha;</sub>(x) it holds the mapping of &alpha;
  * to its coefficient c<sub>&alpha;</sub>.
@@ -26,8 +26,9 @@ public class FourierPolynomial extends DirectProdFunction{
 	private String id;
 	
 	/**
-	 * default constructor
+	 * Default constructor.
 	 * @param id
+	 * 			unique identifier for the polynomial.
 	 */
 	public FourierPolynomial(long[] G, String id) throws FunctionException{
 		super(G);

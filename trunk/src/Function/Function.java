@@ -12,7 +12,6 @@
 package Function;
 
 import SFT.Complex;
-import SFT.FunctionException;
 
 /**
  * This abstract class is used for describing functions over G -> C where G is Z_N1 x ... x Z_Nk or

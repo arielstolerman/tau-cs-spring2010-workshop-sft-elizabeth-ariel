@@ -9,7 +9,7 @@
  * 
  */
 
-package SFT;
+package Function;
 
 @SuppressWarnings("serial")
 /**
@@ -21,7 +21,7 @@ public class FunctionException extends Exception {
 	/**
 	 * Constructs a FunctionException instance with the given message.
 	 * @param message
-	 * 			The detail message for the exception.
+	 * 			The detailed message for the exception.
 	 */
 	public FunctionException(String message){
 		super(message);

@@ -1,7 +1,6 @@
 package Function;
 
 import SFT.Complex;
-import SFT.FunctionException;
 import java.util.*;
 
 /**
@@ -40,30 +39,6 @@ public abstract class DirectProdFunction extends Function{
 	 ******************/
 	
 	public abstract Complex getValue(long[] elem);
-	
-	/* ********************
-	 * non abstract methods
-	 **********************/
-	
-	/**
-	 * Returns the infinity norm of this function over G.
-	 * @return
-	 * 			The infinity norm of this function over G.
-	 */ /*
-	public double calcInfinityNorm(){
-		return 1;
-		//TODO
-	}
-	
-	/**
-	 * Returns the Euclidean norm of this function over G.
-	 * @return
-	 * 			The infinity norm of this function over G.
-	 */ /*
-	public double calcEuclideanNorm(){
-		return 1;
-		//TODO
-	}
 	
 	/* ********************
 	 * non-abstract methods
@@ -116,10 +91,10 @@ public abstract class DirectProdFunction extends Function{
 	}
 	
 	/**
-	 * Returns the l2 norm of this function over G.
+	 * Returns the Euclidean norm of this function over G.
 	 * The implementation given in the abstract class is the naive implementation.
 	 * @return
-	 * 			The l2 norm of this function over G.
+	 * 			The Euclidean norm of this function over G.
 	 */
 	public double calcEuclideanNorm(){
 		if (eucNorm == null){
@@ -133,7 +108,7 @@ public abstract class DirectProdFunction extends Function{
 	}
 	
 	/**
-	 * Recursively calculates the l2 norm of the function in a straight-forward way.
+	 * Recursively calculates the Euclidean norm of the function in a straight-forward way.
 	 * @param currVector
 	 * 			The vector currently checked with partial values.
 	 * @param coord
@@ -143,7 +118,7 @@ public abstract class DirectProdFunction extends Function{
 	 * @param sizeOfG
 	 * 			The number of elements in G.
 	 * @return
-	 * 			The l2 norm of the function in a straight-forward way.
+	 * 			The Euclidean norm of the function in a straight-forward way.
 	 */
 	private double calcEuclideanNormRec(long[] currVector, int coord, int k, double sizeOfG){
 		long currN = G[coord];
