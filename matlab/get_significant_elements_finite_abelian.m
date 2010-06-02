@@ -22,8 +22,8 @@ import SFT.*
 import SFT.SFTUtils.*
 
 % fit all parameters to java before calling the first part of the algorithm
-G_java = javaArray('java.lang.Long[]',length(G));
-for i=1:length(G);
+G_java = javaArray('java.lang.Long[]',size(G,2));
+for i=1:size(G,2);
 	tmp = javaArray('java.lang.Long',2);
 	tmp(1) = javaObject('java.lang.Long',G(1,i));
 	tmp(2) = javaObject('java.lang.Long',G(2,i));
