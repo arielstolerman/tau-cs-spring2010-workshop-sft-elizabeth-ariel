@@ -1,7 +1,7 @@
 G = 10^10;
 delta_t=0.01;
 tau=200;
-func=@(x,G)test(x,G);
+func=@(x,G)example(x,G);
 fInfNorm=28.41;
 fEuclideanNorm=20;
 deltaCoeff=1;
