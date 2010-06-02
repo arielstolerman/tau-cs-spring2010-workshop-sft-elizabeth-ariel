@@ -593,7 +593,7 @@ public class SFT {
 	 * 					of f with probability at least 1-delta_t
 	 */
 	@SuppressWarnings("unchecked")
-	public static Set<long[]>[][] runMatlabSFTPart1Internal(long[] G, double delta_t, double tau,
+	private static Set<long[]>[][] runMatlabSFTPart1Internal(long[] G, double delta_t, double tau,
 			double fInfNorm, double fEuclideanNorm, float deltaCoeff, float randSetsCoeff) throws SFTException{
 		Debug.log("SFT -> runMatlabSFTPart1Internal - main algorithm part 1 started");
 		/* run generateQueries (algorithm 3.10) on:
@@ -667,7 +667,7 @@ public class SFT {
 	 * @return			a short list L in G of the tau-significant Fourier coefficients
 	 * 					of f with probability at least 1-delta_t
 	 */
-	public static Set<long[]> runMatlabSFTPart2Internal(long[] G, double tau, Set<long[]>[][] sets,
+	private static Set<long[]> runMatlabSFTPart2Internal(long[] G, double tau, Set<long[]>[][] sets,
 			Map<String,Complex> query) throws SFTException{
 		Debug.log("SFT -> runMatlabSFTPart1Internal - main algorithm part 2 started");
 		
