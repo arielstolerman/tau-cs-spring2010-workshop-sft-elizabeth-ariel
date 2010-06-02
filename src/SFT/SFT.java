@@ -16,7 +16,6 @@ import Function.*;
 import SFT.SFTUtils.DirectedProdFromAbelianFunc;
 import SFT.SFTUtils.MatlabTemporaryRepository;
 
-
 /**
  * An implementation of the SFT algorithm for finding the list of elements whose Fourier
  * coefficients are significant for a given function &fnof;: G &rarr; C, where G is a Cartesian product of
@@ -30,6 +29,12 @@ import SFT.SFTUtils.MatlabTemporaryRepository;
  * @author Elizabeth Firman and Ariel Stolerman
  */
 public class SFT {
+	
+	/* *******************************************
+	 * delta calculation and random sets constants
+	 * *******************************************/
+	private static double deltaCoeff = 1;
+	private static double randSetsCoeff = 0.0001;
 	
 	/* *******************************************************************
 	 * Interface public functions for direct product G (Z_N1 x ... x Z_Nk)
@@ -59,8 +64,7 @@ public class SFT {
 	 */
 	public static Set<long[]> getSignificatElements(long[] G, double delta, double tau, DirectProdFunction func,
 			double fInfNorm, double fEuclideanNorm) throws SFTException{
-		//TODO
-		return null;
+		return runMainSFTAlgorithm(G, delta, tau, func, fInfNorm, fEuclideanNorm, deltaCoeff, randSetsCoeff);
 	}
 	
 	/**
@@ -96,8 +100,7 @@ public class SFT {
 	 */
 	public static Set<long[]> getSignificatElements(long[] G, double delta, double tau, DirectProdFunction func,
 			double fInfNorm, double fEuclideanNorm, float deltaCoeff, float randSetsCoeff) throws SFTException{
-		//TODO
-		return null;
+		return runMainSFTAlgorithm(G, delta, tau, func, fInfNorm, fEuclideanNorm, deltaCoeff, randSetsCoeff);
 	}
 	
 	/* *****************************************************
@@ -264,7 +267,7 @@ public class SFT {
 	 * 					of f with probability at least 1-delta_t
 	 */
 	protected static Set<long[]> runMainSFTAlgorithm(long[] G, double delta_t, double tau, DirectProdFunction func,
-			double fInfNorm, double fEuclideanNorm, float deltaCoeff, float randSetsCoeff) throws SFTException{
+			double fInfNorm, double fEuclideanNorm, double deltaCoeff, double randSetsCoeff) throws SFTException{
 		Debug.log("SFT -> runMainSFTAlgorithm - main algorithm started");
 		
 		/* run generateQueries (algorithm 3.10) on:
@@ -355,7 +358,7 @@ public class SFT {
 	 * 					create the set of x's to ask their f-value
 	 */
 	@SuppressWarnings("unchecked")
-	protected static Set<long[]>[][] generateQueries(long[] G, double gamma, double fInfNorm, double delta, float randSetsCoeff){
+	protected static Set<long[]>[][] generateQueries(long[] G, double gamma, double fInfNorm, double delta, double randSetsCoeff){
 		Debug.log("SFT -> generateQueries started");
 		
 		// compute m_A and m_B
@@ -454,7 +457,7 @@ public class SFT {
 				if (t == 1) prefixVector = null;
 				
 				// initialize candidate (candidate_0)
-				long[] initInterval = {0,N}; //TODO: possibly should be N-1, since N is not a candidate!
+				long[] initInterval = {0,N};
 				Candidate candidate = new Candidate(initInterval);
 
 				for(int l=0; l<logN; l++){
@@ -473,7 +476,7 @@ public class SFT {
 						
 						// for each sub interval check if it is "heavy"
 						Set<long[]> B_t_lplus1 = querySets[t][l];
-						String vec = (prefixVector == null) ? "empty string" : SFTUtils.vectorToString(prefixVector); 
+						//String vec = (prefixVector == null) ? "empty string" : SFTUtils.vectorToString(prefixVector); 
 						//Debug.log("\tcalling distinguish for prefix "+vec+", t="+t+", l="+(l+1)+":");
 						//Debug.log("\tsub-interval ["+a+","+middle+"]:");
 						if (distinguish(prefixVector, k, G, N, subInterval1, tau, A, B_t_lplus1, query))

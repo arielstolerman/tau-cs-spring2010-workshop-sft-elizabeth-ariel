@@ -66,7 +66,7 @@ public class SFTUtils {
 	 * @param	all parameters needed to calculate delta
 	 * @return	delta
 	 */
-	protected static double calcDelta(double delta_t,float coeff, double fEucNorm, double tau, long N){
+	protected static double calcDelta(double delta_t, double coeff, double fEucNorm, double tau, long N){
 		return delta_t/( coeff * Math.pow(Math.pow(fEucNorm,2)/tau,1.5) *
 				(Math.log(N)/Math.log(2)) );
 	}
