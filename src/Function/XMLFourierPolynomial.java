@@ -22,8 +22,7 @@ import org.xml.sax.helpers.DefaultHandler;
 import SFT.*;
 
 /**
- * @author Elizabeth Firman and Ariel Stolerman
- * This class is an implementation of the abstract class Function used by class SFT, which defines a Function
+ * An implementation of the abstract class Function used by class SFT, which defines a Function
  * object by a given XML file that contains description of functions over G -> C , where G is the Cartesian product
  * of Z_Ni. The representation is kept by storing elements in G and their function-coefficients.
  * <p>
@@ -64,7 +63,7 @@ import SFT.*;
  * 		</li>
  * </ul>
  * <p>
- * TODO add link to example
+ * @author Elizabeth Firman and Ariel Stolerman
  */
 public class XMLFourierPolynomial extends DirectProdFunction {
 	

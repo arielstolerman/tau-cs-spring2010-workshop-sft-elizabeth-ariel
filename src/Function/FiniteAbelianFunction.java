@@ -3,6 +3,11 @@ package Function;
 import SFT.Complex;
 import SFT.FunctionException;
 
+/**
+ * An abstract extension to class Function, for describing functions
+ * over a finite Abelian group G &rarr; C.
+ * @author Elizabeth Firman and Ariel Stolerman
+ */
 public abstract class FiniteAbelianFunction extends Function{
 	
 	// The vector of values describing an Abelian G

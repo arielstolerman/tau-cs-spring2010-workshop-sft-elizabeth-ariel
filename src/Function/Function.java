@@ -15,10 +15,10 @@ import SFT.Complex;
 import SFT.FunctionException;
 
 /**
- * @author Elizabeth Firman and Ariel Stolerman
  * This abstract class is used for describing functions over G -> C where G is Z_N1 x ... x Z_Nk or
  * alternatively G is a finite Abelian group described by (gj,Nj) j=1,...,k.
  * The SFT class uses a Function object for query access to the investigated function.
+ * @author Elizabeth Firman and Ariel Stolerman
  */
 public abstract class Function {
 	

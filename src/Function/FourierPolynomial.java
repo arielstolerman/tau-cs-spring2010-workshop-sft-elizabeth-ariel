@@ -15,8 +15,11 @@ import java.util.*;
 import SFT.*;
 
 /**
- * Private class Polynomial is used to describe Fourier polynomials over Z_N by elements and their
- * complex coefficients.
+ * Extends class DirectProdFunction and describes a Fourier polynomial
+ * by a list of terms and their coefficients, i.e. for a Fourier polynomial:<br>
+ * p(x) = &sum;c<sub>&alpha;</sub>&bull;&Chi;<sub>&alpha;</sub>(x) it holds the mapping of &alpha;
+ * to its coefficient c<sub>&alpha;</sub>.
+ * @author Elizabeth Firman and Ariel Stolerman
  */
 public class FourierPolynomial extends DirectProdFunction{
 	private Map<String,Complex> terms; // the string representation of the long-vector
