@@ -43,7 +43,8 @@
 					</li>
 				</ul>
 				<b>Example</b>:<br>
-				This code example demonstrates how to use the Matlab SFT package including the environment setup:<br>
+				This code example demonstrates how to use the Matlab SFT package including the environment setup.
+				The following will describe the example for a function over a direct-product of finite groups domain:<br>
 				<li>
 				<b>Step #1</b>: extract the zip file into your home directory and edit <i>sft_setenv.m</i>. Here the files are
 				extracted into a directory named <i>sft</i>.
@@ -66,15 +67,15 @@
 					&gt;&gt; G = 10^10; <br>
 					&gt;&gt; delta_t = 0.01; <br>
 					&gt;&gt; tau = 200; <br>
-					&gt;&gt; func = @(x,G)example(x,G); <br>
+					&gt;&gt; func = @(x,G)example_direct_prod(x,G); <br>
 					&gt;&gt; fInfNorm = 28.41; <br>
 					&gt;&gt; fEuclideanNorm = 20; <br>
 					&gt;&gt; deltaCoeff = 1; <br>
 					&gt;&gt; randSetsCoeff = 0.0001; <br>
 					&gt;&gt; isLogged = true; <br>
 					&gt;&gt; <font id="id_code_note"><b>% RUN THE SFT ALGORITHM</b></font><br>
-					&gt;&gt; L = get_significant_elements(G,delta_t,tau,func,fInfNorm,fEuclideanNorm,deltaCoeff,<br>
-						randSetsCoeff,isLogged); <br><br>
+					&gt;&gt; L = get_significant_elements_direct_prod(G,delta_t,tau,func,fInfNorm,fEuclideanNorm,<br>
+						deltaCoeff,randSetsCoeff,isLogged); <br><br>
 					... <i>printing out SFT run log</i><br><br>
 					&gt;&gt; L<br>
 					L = <br>
