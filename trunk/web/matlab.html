@@ -24,7 +24,7 @@
 				</center></b>
 				
 				<h3>Summary</h3>
-				This project includes an integration with Matlab, allowing Matlab users to use the Java SFT calculation embedded in a
+				This project includes an integration with Matlab, allowing Matlab users to use the Java SFT calculation embedded in
 				simple-to-use Matlab scripts. The difference between the Java usage and the Matlab usage, other than the environment,
 				is that the Matlab SFT scripts use matlab objects - vectors and functions - and return a Matlab object as well, so
 				the usage can be integrated in a normal Matlab code flow.
@@ -33,7 +33,7 @@
 				In order to use the SFT Matlab package, follow these steps:
 				<ul>
 					<li>
-						<b>Download</b>: <a href="matlab.zip">download the environment files and scripts</a>.
+						<b>Download</b>: <a href="sft_matlab_pkg.zip">download the environment files and scripts</a>.
 					</li>
 					<li>
 						<b>Matlab environment setup</b>: set the environment in order to be able to use the scripts, as described in the example below.
@@ -61,23 +61,25 @@
 				The example below shows a simple usage in Matlab prompt, that uses an example Matlab-function script (included
 				in the package). 
 				<p id="id_code">
-					&gt; sft_setenv		<font id="id_code_note">% setting up the environment</font><br>
-					&gt; <font id="id_code_note">% set parameters</font><br>
-					&gt; G = 10^10; <br>
-					&gt; delta_t = 0.01; <br>
-					&gt; tau = 200; <br>
-					&gt; func = @(x,G)example(x,G); <br>
-					&gt; fInfNorm = 28.41; <br>
-					&gt; fEuclideanNorm = 20; <br>
-					&gt; deltaCoeff = 1; <br>
-					&gt; randSetsCoeff = 0.0001; <br>
-					&gt; isLogged = true; <br>
-					&gt; <font id="id_code_note"><b>% RUN THE SFT ALGORITHM</b></font><br>
-					&gt; L = get_significant_elements(G,delta_t,tau,func,fInfNorm,fEuclideanNorm,deltaCoeff,<br>
-						randSetsCoeff,isLogged); <br>
-					... <i>printing out SFT run log</i><br>
-					&gt; L<br>
-					&gt; L = 
+					&gt;&gt; sft_setenv		<font id="id_code_note">% setting up the environment</font><br>
+					&gt;&gt; <font id="id_code_note">% set parameters</font><br>
+					&gt;&gt; G = 10^10; <br>
+					&gt;&gt; delta_t = 0.01; <br>
+					&gt;&gt; tau = 200; <br>
+					&gt;&gt; func = @(x,G)example(x,G); <br>
+					&gt;&gt; fInfNorm = 28.41; <br>
+					&gt;&gt; fEuclideanNorm = 20; <br>
+					&gt;&gt; deltaCoeff = 1; <br>
+					&gt;&gt; randSetsCoeff = 0.0001; <br>
+					&gt;&gt; isLogged = true; <br>
+					&gt;&gt; <font id="id_code_note"><b>% RUN THE SFT ALGORITHM</b></font><br>
+					&gt;&gt; L = get_significant_elements(G,delta_t,tau,func,fInfNorm,fEuclideanNorm,deltaCoeff,<br>
+						randSetsCoeff,isLogged); <br><br>
+					... <i>printing out SFT run log</i><br><br>
+					&gt;&gt; L<br>
+					L = <br>
+					&nbsp;230<br>
+					&nbsp;1492<br> 
 					
 				</p>
 				</li>
