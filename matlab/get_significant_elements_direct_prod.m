@@ -1,5 +1,6 @@
 % The SFT algorithm implementation for MATLAB
 % Parameters:
+% - isLogged:		a flag to indicate weather to log the algorithm actions or not
 % - G: 				Vector of Integers representing Z_N1 x ... x Z_Nk
 % - delta_t: 		The confidence parameter such that the algorithm succeeds with probability 1-delta.
 % - tau:			The threshold such that all tau-significant elements are returned.
@@ -8,18 +9,17 @@
 % - fEuclideanNorm:	the Euclidean norm of the function
 % - deltaCoeff:		a constant coefficient for calculating delta
 % - randSetsCoeff:	a constant coefficient for calculating the random subsets when creating Q, a set of elements for querying
-% - isLogged:		a flag to indicate weather to log the algorithm actions or not
-% TODO: add description
+% Returns a list of elements in G whose Fourier coefficients are tau-significant.
 
-function[L]=get_significant_elements(G,delta_t,tau,func,fInfNorm,fEuclideanNorm,deltaCoeff,randSetsCoeff,isLogged);
+function[L]=get_significant_elements_direct_prod(isLogged,G,delta_t,tau,func,fInfNorm,fEuclideanNorm,deltaCoeff,randSetsCoeff);
 
-javaaddpath('/specific/a/home/cc/students/cs/arielst1/sft/sft_lib.jar')
+%javaaddpath('/specific/a/home/cc/students/cs/arielst1/sft/sft_lib.jar')
 import java.util.*
 import java.io.File
 import SFT.*
 import SFT.SFTUtils.*
 
-% comply all parameters to java before calling the first part of the algorithm
+% fit all parameters to java before calling the first part of the algorithm
 G_java = javaArray('java.lang.Long',length(G));
 for i=1:length(G);
     G_java(i) = javaObject('java.lang.Long',G(i));
@@ -28,6 +28,12 @@ isLogged_java = javaObject('java.lang.Boolean',isLogged);
 
 % create a static object in order to allow calls to the SFT algorithm methods
 sft = SFT.SFT();
+
+% if this is the "short" call (without the constants deltaCoeff and randSetsCoeff), get them
+if nargin == 7;
+	deltaCoeff = sft.getDeltaCoeff();
+	randSetsCoeff = sft.getRandSetsCoeff();
+end;
 
 % ===================
 % =		PART 1		=

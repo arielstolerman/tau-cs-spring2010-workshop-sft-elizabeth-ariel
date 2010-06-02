@@ -13,8 +13,7 @@ package SFT;
 
 import java.util.*;
 import Function.*;
-import SFT.SFTUtils.DirectedProdFromAbelianFunc;
-import SFT.SFTUtils.MatlabTemporaryRepository;
+import SFT.SFTUtils.*;
 
 /**
  * An implementation of the SFT algorithm for finding the list of elements whose Fourier
@@ -194,11 +193,13 @@ public class SFT {
 		}
 	}	
 	
-	/* *********************************
-	 * Matlab interface public functions
-	 * ********************************/
-	
-	public static MatlabTemporaryRepository runMatlabSFTPart1Internal(Long[] G, double delta_t, double tau,
+	/* ************************************************************************
+	 * Matlab interface public functions for Cartesian product of finite groups
+	 * ************************************************************************/
+	/**
+	 * For inner use in the Matlab SFT scripts.
+	 */
+	public static MatlabTemporaryRepositoryDirectProd runMatlabSFTPart1Internal(Long[] G, double delta_t, double tau,
 			double fInfNorm, double fEuclideanNorm, float deltaCoeff, float randSetsCoeff, Boolean isLogged) throws SFTException{
 		// set variables to fit algorithm
 		Debug.DEBUG_MODE = isLogged;
@@ -221,12 +222,15 @@ public class SFT {
 		
 		// return sets to be used by part 2, Q to be used in the matlab query calculation and null for the query
 		// (will be set in the matlab script to be passed to part 2)
-		MatlabTemporaryRepository matlabRep = new MatlabTemporaryRepository(sets, Q, null);
+		MatlabTemporaryRepositoryDirectProd matlabRep = new MatlabTemporaryRepositoryDirectProd(sets, Q, null);
 		return matlabRep;
 	}
 	
+	/**
+	 * For inner use in the Matlab SFT scripts.
+	 */
 	public static Long[][] runMatlabSFTPart2Internal(Long[] G, double tau,
-			MatlabTemporaryRepository matlabRep) throws SFTException{
+			MatlabTemporaryRepositoryDirectProd matlabRep) throws SFTException{
 		// fit parameters to java
 		long[] g = new long[G.length];
 		for(int i=0; i<G.length; i++) g[i] = G[i];
@@ -246,10 +250,53 @@ public class SFT {
 		return L;
 	}
 	
-	/* ***********************************************************************
-	/* ***********************************************************************
-	/* ***********************************************************************
-	/* ***********************************************************************/
+	/* ***********************************************************
+	 * Matlab interface public functions for finite Abelian groups
+	 * ***********************************************************/
+	
+	/**
+	 * For inner use in the Matlab SFT scripts.
+	 */
+	public static MatlabTemporaryRepositoryFiniteAbelian runMatlabSFTPart1Internal(Long[][] G, double delta_t, double tau,
+			double fInfNorm, double fEuclideanNorm, float deltaCoeff, float randSetsCoeff, Boolean isLogged) throws SFTException{
+		
+		// adapt parameters to direct product call
+		Long[] directG = SFTUtils.getDirectProdGFromAbelianG(G);
+		
+		// call the corresponding direct product method
+		MatlabTemporaryRepositoryDirectProd rep = runMatlabSFTPart1Internal(directG,delta_t,tau,
+				fInfNorm,fEuclideanNorm,deltaCoeff,randSetsCoeff,isLogged);
+		
+		// create a finite-abelian corresponding repository and return it
+		return SFTUtils.getMatlabFiniteAbelianRep(rep, G);
+	}
+	
+	/**
+	 * For inner use in the Matlab SFT scripts.
+	 */
+	public static Long[] runMatlabSFTPart2Internal(Long[][] G, double tau,
+			MatlabTemporaryRepositoryFiniteAbelian matlabRep) throws SFTException{
+		
+		// adapt parameters to direct product call
+		Long[] directG = SFTUtils.getDirectProdGFromAbelianG(G);
+		MatlabTemporaryRepositoryDirectProd directRep = SFTUtils.getMatlabDirectProdRep(matlabRep, G);
+		
+		// call the coreesponding direct product method
+		Long[][] L = runMatlabSFTPart2Internal(directG,tau,directRep);
+		
+		// create a finite-abelian corresponding L and return it
+		Long[] res = new Long[L.length];
+		for (int i=0; i<res.length; i++){
+			res[i] = SFTUtils.calcAbelianProd(L[i], G);
+		}
+		return res;
+	}
+	
+	/* #########################################################################################
+	 * 
+	 * 							Implementation of the SFT algorithm
+	 * 
+	 * #########################################################################################/
 	
 	
 	/* ***********************************************************************
@@ -685,5 +732,13 @@ public class SFT {
 		
 		Debug.log("SFT -> runMatlabSFTPart1Internal - main algorithm part 2 completed");
 		return L;
+	}
+
+	public static double getDeltaCoeff() {
+		return deltaCoeff;
+	}
+
+	public static double getRandSetsCoeff() {
+		return randSetsCoeff;
 	}
 }
