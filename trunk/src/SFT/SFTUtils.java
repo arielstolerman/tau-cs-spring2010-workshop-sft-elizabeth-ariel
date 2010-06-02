@@ -11,11 +11,7 @@
 
 package SFT;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-
+import java.util.*;
 import Function.DirectProdFunction;
 import Function.FiniteAbelianFunction;
 import Function.FunctionException;
@@ -151,13 +147,55 @@ public class SFTUtils {
 		return G;
 	}
 	
+	protected static Long[] getDirectProdGFromAbelianG(Long[][] abelianG){
+		Long[] G = new Long[abelianG.length];
+		for (int i=0; i<G.length; i++) G[i] = abelianG[i][1];
+		return G;
+	}
+	
 	/**
-	 * Isomorphism from direct product G to finite Abelian G 
+	 * Isomorphism from an element in a direct product G to an element in a finite Abelian G 
 	 * @param elem
 	 * @param G
 	 * @return
 	 */
 	protected static Long calcAbelianProd(long[] elem, long[][] G){
+		long newElem = 1;
+		for (int i=0; i<elem.length; i++){
+			long g = G[i][0];
+			long N = G[i][1];
+			long x = elem[i];
+			long tmp = 1;
+			// calculate g^x mod N
+			for (int j=0; j<x; j++){
+				tmp *= g;
+				tmp = tmp % N;
+			}
+			newElem *= tmp;
+		}
+		
+		return new Long(newElem);
+	}
+	
+	protected static Long calcAbelianProd(long[] elem, Long[][] G){
+		long newElem = 1;
+		for (int i=0; i<elem.length; i++){
+			long g = G[i][0];
+			long N = G[i][1];
+			long x = elem[i];
+			long tmp = 1;
+			// calculate g^x mod N
+			for (int j=0; j<x; j++){
+				tmp *= g;
+				tmp = tmp % N;
+			}
+			newElem *= tmp;
+		}
+		
+		return new Long(newElem);
+	}
+	
+	protected static Long calcAbelianProd(Long[] elem, Long[][] G){
 		long newElem = 1;
 		for (int i=0; i<elem.length; i++){
 			long g = G[i][0];
@@ -384,9 +422,9 @@ public class SFTUtils {
 	 * *****************/
 	
 	/**
-	 * A class for holding temporary data between part 1 and part 2 of the SFT algorithm.
+	 * A class for holding temporary data between part 1 and part 2 of the SFT algorithm for direct product G.
 	 */
-	public static class MatlabTemporaryRepository{
+	protected static class MatlabTemporaryRepositoryDirectProd{
 		private Set<long[]>[][] sets;
 		private Long[][] Q;
 		private Map<String,Complex> query;
@@ -394,7 +432,7 @@ public class SFTUtils {
 		/**
 		 * default constructor
 		 */
-		public MatlabTemporaryRepository(Set<long[]>[][] sets, Long[][] Q, Map<String,Complex> query){
+		public MatlabTemporaryRepositoryDirectProd(Set<long[]>[][] sets, Long[][] Q, Map<String,Complex> query){
 			this.sets = sets;
 			this.Q = Q;
 			this.query = query;
@@ -406,5 +444,74 @@ public class SFTUtils {
 		public Map<String,Complex> getQuery(){return query;}
 		// setters
 		public void setQuery(Map<String,Complex> query){this.query = query;}
+	}
+	
+	/**
+	 * A class for holding temporary data between part 1 and part 2 of the SFT algorithm for finite Abelian G.
+	 */
+	protected static class MatlabTemporaryRepositoryFiniteAbelian{
+		private Set<long[]>[][] sets; // stays the same as for direct product
+		private Long[] Q;
+		private Long[][] directProdQ;
+		private Map<String,Complex> query;
+	
+		/**
+		 * default constructor
+		 */
+		public MatlabTemporaryRepositoryFiniteAbelian(Set<long[]>[][] sets, Long[] Q, Long[][] directProdQ, Map<String,Complex> query){
+			this.sets = sets;
+			this.Q = Q;
+			this.directProdQ = directProdQ;
+			this.query = query;
+		}
+		
+		// getters
+		public Set<long[]>[][] getSets(){return sets;}
+		public Long[] getQ(){return Q;}
+		public Long[][] getDirectProdQ(){return directProdQ;}
+		public Map<String,Complex> getQuery(){return query;}
+		// setters
+		public void setQuery(Map<String,Complex> query){this.query = query;}
+	}
+	
+	protected static MatlabTemporaryRepositoryFiniteAbelian getMatlabFiniteAbelianRep(MatlabTemporaryRepositoryDirectProd rep, Long[][] G){
+		// generate isomorphic parameters
+		// sets:
+		Set<long[]>[][] sets = rep.getSets();
+		// Q:
+		long[][] repQ = new long[rep.getQ().length][];
+		for (int i=0; i<rep.getQ().length; i++){
+			Long[] tmp = rep.getQ()[i];
+			repQ[i] = new long[tmp.length];
+			for (int j=0; j<tmp.length; j++) repQ[i][j] = tmp[j].longValue();
+		}
+		Long[] Q = new Long[repQ.length];
+		for (int i=0; i<repQ.length; i++) Q[i] = calcAbelianProd(repQ[i],G);
+		// directProdQ:
+		Long[][] directProdQ = rep.getQ();
+		// query
+		Map<String,Complex> query = rep.getQuery();
+		
+		// create new finite Abelian repository and return it
+		return new MatlabTemporaryRepositoryFiniteAbelian(sets, Q, directProdQ, query);
+	}
+	
+	protected static MatlabTemporaryRepositoryDirectProd getMatlabDirectProdRep(MatlabTemporaryRepositoryFiniteAbelian rep, Long[][] G){
+		// generate isomorphic parameters
+		// sets:
+		Set<long[]>[][] sets = rep.getSets();
+		// Q:
+		Long[][] Q = rep.getDirectProdQ();
+		// query
+		Map<String,Complex> newQuery = new HashMap<String,Complex>();
+		Map<String,Complex> query = rep.getQuery();
+		for(Long[] elem: Q){
+			Long abelianElem = calcAbelianProd(elem, G);
+			String strElem = vectorToString(elem);
+			newQuery.put(strElem, query.get(abelianElem.toString()));
+		}
+		
+		// create new direct product repository and return it
+		return new MatlabTemporaryRepositoryDirectProd(sets, Q, newQuery);
 	}
 }

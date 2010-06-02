@@ -1,3 +1,4 @@
+isLogged=false;
 G = 10^10;
 delta_t=0.01;
 tau=200;
@@ -6,4 +7,3 @@ fInfNorm=28.41;
 fEuclideanNorm=20;
 deltaCoeff=1;
 randSetsCoeff=0.0001;
-isLogged=true;

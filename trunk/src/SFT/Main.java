@@ -13,7 +13,7 @@ import java.util.Set;
 import Function.*;
 import SFT.*;
 import SFT.SFTUtils.DirectedProdFromAbelianFunc;
-import SFT.SFTUtils.MatlabTemporaryRepository;
+import SFT.SFTUtils.MatlabTemporaryRepositoryDirectProd;
 
 /*
  * Main for debugging
