@@ -18,6 +18,7 @@ import java.util.Set;
 
 import Function.DirectProdFunction;
 import Function.FiniteAbelianFunction;
+import Function.FunctionException;
 
 public class SFTUtils {
 

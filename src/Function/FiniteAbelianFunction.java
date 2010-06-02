@@ -1,7 +1,6 @@
 package Function;
 
 import SFT.Complex;
-import SFT.FunctionException;
 
 /**
  * An abstract extension to class Function, for describing functions

@@ -18,14 +18,16 @@ import SFT.SFTUtils.MatlabTemporaryRepository;
 
 
 /**
- * @author Elizabeth Firman and Ariel Stolerman
- * The SFT class provides static methods for calculating the elements in Z_N whose coefficients in a given
- * function over Z_N -> C are significant, done in a 
- * 
+ * An implementation of the SFT algorithm for finding the list of elements whose Fourier
+ * coefficients are significant for a given function &fnof;: G &rarr; C, where G is a Cartesian product of
+ * finite groups (i.e. Z<sub>N1</sub> x ... x Z<sub>Nk</sub>) described by a list of N<sub>j</sub>'s or an
+ * Abelian group described by a list of N<sub>j</sub>'s and the corresponding generators g<sub>j</sub>'s.<br>
+ * <br>
  * The implementation is based on the SFT algorithm described in "Learning Noisy Characters, Multiplication Codes, 
- * And Cryptographic Hardcore Predicates" (Adi Akavia, 2008, page 52).
- * 
+ * And Cryptographic Hardcore Predicates" (Adi Akavia, 2008, page 52).<br>
+ * <br>
  * This library is a project in CS workshop, TAU, Spring 2010.
+ * @author Elizabeth Firman and Ariel Stolerman
  */
 public class SFT {
 	
