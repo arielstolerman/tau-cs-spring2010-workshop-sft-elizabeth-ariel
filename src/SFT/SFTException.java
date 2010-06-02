@@ -21,7 +21,7 @@ public class SFTException extends Exception{
 	/**
 	 * Constructs a SFTException instance with the given message.
 	 * @param message
-	 * 			The detail message for the exception.
+	 * 			The detailed message for the exception.
 	 */
 	public SFTException(String message){
 		super(message);
