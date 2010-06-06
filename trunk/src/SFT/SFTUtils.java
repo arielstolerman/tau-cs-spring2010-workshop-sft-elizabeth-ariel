@@ -165,45 +165,24 @@ public class SFTUtils {
 			long g = G[i][0];
 			long N = G[i][1];
 			long x = elem[i];
-			long tmp = 1;
-			// calculate g^x mod N
-			for (int j=0; j<x; j++){
-				tmp *= g;
-				tmp = tmp % N;
-			}
-			newElem *= tmp;
-		}
-		
-		return new Long(newElem);
-	}
-	
-	protected static Long calcAbelianProd(long[] elem, Long[][] G){
-		long newElem = 1;
-		for (int i=0; i<elem.length; i++){
-			long g = G[i][0];
-			long N = G[i][1];
-			long x = elem[i];
 			newElem *= (g*x % N);
 		}
 		return new Long(newElem);
 	}
 	
+	protected static Long calcAbelianProd(long[] elem, Long[][] G){
+		long[][] smallG = new long[G.length][];
+		for (int i=0; i<G.length; i++) smallG[i] = new long[G[i].length];
+		for (int i=0; i<G.length; i++)
+			for (int j=0; j<G[i].length; j++)
+				smallG[i][j] = G[i][j].longValue();
+		return calcAbelianProd(elem,smallG);
+	}
+	
 	protected static Long calcAbelianProd(Long[] elem, Long[][] G){
-		long newElem = 1;
-		for (int i=0; i<elem.length; i++){
-			long g = G[i][0];
-			long N = G[i][1];
-			long x = elem[i];
-			long tmp = 1;
-			// calculate g^x mod N
-			for (int j=0; j<x; j++){
-				tmp *= g;
-				tmp = tmp % N;
-			}
-			newElem *= tmp;
-		}
-		
-		return new Long(newElem);
+		long[] e = new long[elem.length];
+		for (int i=0; i<e.length; i++) e[i] = elem[i].longValue();
+		return calcAbelianProd(e,G);
 	}
 	
 	/**
@@ -497,13 +476,14 @@ public class SFTUtils {
 		Set<long[]>[][] sets = rep.getSets();
 		// Q:
 		Long[][] Q = rep.getDirectProdQ();
+		
 		// query
 		Map<String,Complex> newQuery = new HashMap<String,Complex>();
 		Map<String,Complex> query = rep.getQuery();
 		for(Long[] elem: Q){
 			Long abelianElem = calcAbelianProd(elem, G);
 			String strElem = vectorToString(elem);
-			newQuery.put(strElem, query.get(abelianElem.toString()));
+			newQuery.put(strElem, query.get("("+abelianElem.toString()+")"));
 		}
 		
 		// create new direct product repository and return it
