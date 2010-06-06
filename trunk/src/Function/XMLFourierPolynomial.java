@@ -207,7 +207,7 @@ public class XMLFourierPolynomial extends DirectProdFunction {
 		 */
 		public void parseDocument(File XMLInputFile) throws FunctionException {
 			
-			Debug.log("XMLParser -> parseDocument started");
+			Log.log("XMLParser -> parseDocument started");
 			
 			try {
 				//get a factory
@@ -224,7 +224,7 @@ public class XMLFourierPolynomial extends DirectProdFunction {
 				throw new FunctionException("IOException had occurred.\n"+ie.getMessage());
 			}
 			
-			Debug.log("XMLParser -> parseDocument completed");
+			Log.log("XMLParser -> parseDocument completed");
 		}
 		
 		/* ***************
@@ -252,7 +252,7 @@ public class XMLFourierPolynomial extends DirectProdFunction {
 				// set current tag
 				currTag = Tag.FUNCTIONS;
 				
-				Debug.log("<functions runid=\""+runId+"\">");
+				Log.log("<functions runid=\""+runId+"\">");
 			}
 			
 			else if(qName.equalsIgnoreCase("function")){
@@ -278,14 +278,14 @@ public class XMLFourierPolynomial extends DirectProdFunction {
 				// set current tag
 				currTag = Tag.FUNCTION;
 				
-				Debug.log("\t<function id=\""+funcId+"\">");
+				Log.log("\t<function id=\""+funcId+"\">");
 			}
 			else if(qName.equalsIgnoreCase("term")){
 				// do nothing
 				// set current tag
 				currTag = Tag.TERM;
 				
-				Debug.log("\t\t<term>");
+				Log.log("\t\t<term>");
 			}
 			else if(qName.equalsIgnoreCase("alpha")){
 				// set current tag
@@ -293,7 +293,7 @@ public class XMLFourierPolynomial extends DirectProdFunction {
 				// initialize alpha
 				alpha = new long[G.length];
 				
-				Debug.log("\t\t\t<alpha>");
+				Log.log("\t\t\t<alpha>");
 			}
 			else if(qName.equalsIgnoreCase("coord")){
 				// set current tag
@@ -310,19 +310,19 @@ public class XMLFourierPolynomial extends DirectProdFunction {
 					throw new SAXException("coord opening tag has invalid index (not an integer): "+ind);
 				}
 				
-				Debug.log("\t\t\t\t<coord index=\""+coordIndex+"\">");
+				Log.log("\t\t\t\t<coord index=\""+coordIndex+"\">");
 			}
 			else if(qName.equalsIgnoreCase("reCoeff")){
 				// set current tag
 				currTag = Tag.RECOEFF;
 				
-				Debug.log("\t\t\t<reCoeff>");
+				Log.log("\t\t\t<reCoeff>");
 			}
 			else if(qName.equalsIgnoreCase("imCoeff")){
 				// set current tag
 				currTag = Tag.IMCOEFF;
 				
-				Debug.log("\t\t\t<imCoeff>");
+				Log.log("\t\t\t<imCoeff>");
 			}
 			// otherwise
 			else {
@@ -339,14 +339,14 @@ public class XMLFourierPolynomial extends DirectProdFunction {
 				// set current tag
 				currTag = Tag.END;
 				
-				Debug.log("</functions>");
+				Log.log("</functions>");
 			}
 			else if(qName.equalsIgnoreCase("function")){
 				funcId = null;
 				// set current tag
 				currTag = Tag.FUNCTIONS;
 				
-				Debug.log("\t</function>");
+				Log.log("\t</function>");
 			}
 			else if(qName.equalsIgnoreCase("term")){
 				// add a new term to the current polynomial (only if needed)
@@ -361,7 +361,7 @@ public class XMLFourierPolynomial extends DirectProdFunction {
 				// set current tag
 				currTag = Tag.FUNCTION;
 				
-				Debug.log("\t\t</term>");
+				Log.log("\t\t</term>");
 			}
 			else if(qName.equalsIgnoreCase("alpha")){
 				// set current tag
@@ -373,7 +373,7 @@ public class XMLFourierPolynomial extends DirectProdFunction {
 							"for index "+i);
 				}
 				
-				Debug.log("\t\t\t</alpha>");
+				Log.log("\t\t\t</alpha>");
 			}
 			else if(qName.equalsIgnoreCase("coord")){
 				// set current tag
@@ -381,19 +381,19 @@ public class XMLFourierPolynomial extends DirectProdFunction {
 				// insert the coordinate into alpha (may override value)
 				alpha[coordIndex] = coord;
 				
-				Debug.log("\t\t\t\t</coord>");
+				Log.log("\t\t\t\t</coord>");
 			}
 			else if(qName.equalsIgnoreCase("reCoeff")){
 				// set current tag
 				currTag = Tag.TERM;
 				
-				Debug.log("\t\t\t</reCoeff>");
+				Log.log("\t\t\t</reCoeff>");
 			}
 			else if(qName.equalsIgnoreCase("imCoeff")){
 				// set current tag
 				currTag = Tag.TERM;
 				
-				Debug.log("\t\t\t</imCoeff>");
+				Log.log("\t\t\t</imCoeff>");
 			}
 			// otherwise
 			else {
@@ -424,7 +424,7 @@ public class XMLFourierPolynomial extends DirectProdFunction {
 				try{
 					Long value = Long.parseLong(str);
 					coord = value;
-					Debug.log("\t\t\t\t\t"+str);
+					Log.log("\t\t\t\t\t"+str);
 					if (coord < 0 || coord >= G[coordIndex])
 						throw new SAXException("coordinate in index "+coordIndex+" not in range [0,1,...,G["+coordIndex+"]-1]: "+coord);
 				} catch (NumberFormatException nfe){
@@ -434,7 +434,7 @@ public class XMLFourierPolynomial extends DirectProdFunction {
 			case RECOEFF:
 				try{
 					recoeff = Double.parseDouble(str);
-					Debug.log("\t\t\t\t"+str);
+					Log.log("\t\t\t\t"+str);
 				} catch (NumberFormatException nfe){
 					throw new SAXException("reCoeff not a double");
 				}
@@ -442,7 +442,7 @@ public class XMLFourierPolynomial extends DirectProdFunction {
 			case IMCOEFF:
 				try{
 					imcoeff = Double.parseDouble(str);
-					Debug.log("\t\t\t\t"+str);
+					Log.log("\t\t\t\t"+str);
 				} catch (NumberFormatException nfe){
 					throw new SAXException("imCoeff not a double");
 				}

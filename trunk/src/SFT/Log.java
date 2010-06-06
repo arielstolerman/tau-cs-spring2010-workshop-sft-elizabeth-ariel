@@ -1,15 +1,13 @@
 package SFT;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-public class Debug {
+public class Log {
 	private static String LOG_FILE = "SFT_log.txt";
 	private static BufferedWriter outputFile = null;
-	public static boolean DEBUG_MODE = true;
+	public static boolean IS_LOGGED = true;
 
 	//Time
 	private static final String DATE_FORMAT = "HH:mm:ss";
@@ -24,12 +22,12 @@ public class Debug {
 
 	/**
 	 * A method for logging.
-	 * The usage is: Debug.log("This message goes to file..", DebugOutput.FILE);
+	 * The usage is: Log.log("This message goes to file..", DebugOutput.FILE);
 	 * @param message: The massage explaining the current stage/problem.
 	 * @param logger: The destination to write the message (STDOUT, STDERR, FILE)
 	 */
 	public static void log(String message, DebugOutput logger) {
-		if (DEBUG_MODE){
+		if (IS_LOGGED){
 			switch (logger) {
 			case STDOUT : {
 				System.out.println(message);				
@@ -69,7 +67,7 @@ public class Debug {
 	}
 
 	/**
-	 * Calls log with FILE as DebugOutput
+	 * Calls log with FILE and STDOUT as DebugOutputs
 	 */
 	public static void log(String message){
 		log(message, DebugOutput.FILE, DebugOutput.STDOUT);
@@ -85,13 +83,14 @@ public class Debug {
 	}
 
 
-	public static boolean isDEBUG_MODE() {
-		return DEBUG_MODE;
+	// log-mode getter and setter
+	
+	public static boolean getLogMode(){
+		return IS_LOGGED;
 	}
-
-
-	public static void setDEBUG_MODE(boolean dEBUGMODE) {
-		DEBUG_MODE = dEBUGMODE;
+	
+	public static void setLogMode(boolean mode){
+		IS_LOGGED = mode;
 	}
 }
 

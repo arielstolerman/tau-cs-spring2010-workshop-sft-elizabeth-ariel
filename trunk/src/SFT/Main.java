@@ -48,9 +48,9 @@ public class Main {
 			for(FourierPolynomial p: ((XMLFourierPolynomial)poly).getPolynomials().values())
 				SFT.runMainSFTAlgorithm(G, delta_t, tau, p, infNorm, eucNorm, deltaCoeff, randSetsCoeff);
 		} catch (SFTException se) {
-			Debug.log(">>> SFTException thrown: "+se.getMessage());
+			Log.log(">>> SFTException thrown: "+se.getMessage());
 		} catch (FunctionException fe){
-			Debug.log(">>> FunctionException thrown: "+fe.getMessage());
+			Log.log(">>> FunctionException thrown: "+fe.getMessage());
 		} 
 		/*
 		try{
