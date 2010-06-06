@@ -1,5 +1,6 @@
 package SFT;
 
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -32,11 +33,11 @@ public class Main {
 		File xmlInput = new File("matlab\\test2.xml");
 		long[] G = new long[]{Long.valueOf("10000000000")};
 		double delta_t = 0.01;
-		double tau = 200;
+		double tau = 6.5;
 		double infNorm = 28.41; // 286.2467568832943; - for test3.xml
 		double eucNorm = 20; // 0.5349658666523577;
 		float deltaCoeff = (float)1;
-		float randSetsCoeff = (float)0.0001;
+		float randSetsCoeff = (float)1;
 		
 		/* *************
 		 *  single test
@@ -57,7 +58,7 @@ public class Main {
 		
 		/* *****************************
 		 *  matlab test - direct product
-		 * *****************************/ /*
+		 * *****************************/
 		
 		try{
 			
@@ -65,6 +66,12 @@ public class Main {
 			Long[] bigG = new Long[G.length];
 			DirectProdFunction poly = new XMLFourierPolynomial(xmlInput, G);
 			for (int i=0; i<G.length; i++) bigG[i] = new Long(G[i]);
+			
+			// wav sample parameters:
+			bigG = new Long[]{new Long(105840)};
+			infNorm = 1.25553298056245;
+			eucNorm = 0.21671405578766;
+			
 			MatlabTemporaryRepositoryDirectProd rep = 
 				SFT.runMatlabSFTPart1Internal(bigG, delta_t, tau, infNorm, eucNorm, deltaCoeff, randSetsCoeff, new Boolean(true));
 			
@@ -89,7 +96,7 @@ public class Main {
 		
 		/* *****************************
 		 *  matlab test - finite Abelian
-		 * *****************************/
+		 * *****************************/ /*
 		
 		try{
 			
