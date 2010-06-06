@@ -108,7 +108,7 @@ public class Main {
 				long[] e = new long[]{elem.longValue()}; 
 				String key = SFTUtils.vectorToString(e);
 				Complex value = poly.getValue(e);
-				query.put(key, value);
+				query.put(elem.toString(), value);
 			}
 			rep.setQuery(query);
 			Log.log("moving to part 2...");
