@@ -14,6 +14,7 @@ import Function.*;
 import SFT.*;
 import SFT.SFTUtils.DirectedProdFromAbelianFunc;
 import SFT.SFTUtils.MatlabTemporaryRepositoryDirectProd;
+import SFT.SFTUtils.MatlabTemporaryRepositoryFiniteAbelian;
 
 /*
  * Main for debugging
@@ -25,23 +26,24 @@ public class Main {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		/* ***************
+		 * input variables
+		 * ***************/
+		File xmlInput = new File("matlab\\test2.xml");
+		long[] G = new long[]{Long.valueOf("10000000000")};
+		double delta_t = 0.01;
+		double tau = 200;
+		double infNorm = 28.41; // 286.2467568832943; - for test3.xml
+		double eucNorm = 20; // 0.5349658666523577;
+		float deltaCoeff = (float)1;
+		float randSetsCoeff = (float)0.0001;
 		
 		/* *************
 		 *  single test
-		 * *************/
+		 * *************/ /*
 		
 		try {
-			// input variables
-			File xmlInput = new File("matlab\\test3.xml");
-			long[] G = new long[]{Long.valueOf("1000"),Long.valueOf("1000")};
-			double delta_t = 0.01;
-			double tau = 200;
 			DirectProdFunction poly = new XMLFourierPolynomial(xmlInput, G);
-			double infNorm = 286.2467568832943;
-			double eucNorm = 0.5349658666523577;
-			float deltaCoeff = (float)100;
-			float randSetsCoeff = (float)0.00001;
-			
 			//System.out.println(poly.calcEuclideanNorm());
 			//System.out.println(poly.calcInfinityNorm());
 			
@@ -51,31 +53,73 @@ public class Main {
 			Log.log(">>> SFTException thrown: "+se.getMessage());
 		} catch (FunctionException fe){
 			Log.log(">>> FunctionException thrown: "+fe.getMessage());
-		} 
-		/*
+		}
+		
+		/* *****************************
+		 *  matlab test - direct product
+		 * *****************************/ /*
+		
 		try{
-			// get polynomial
-			Function poly = new XMLFourierPolynomial(xmlInput, G);
-			// calculate the function and output values
-			// print the function
-			System.out.println("list of polynomials:");
-			for (FourierPolynomial p: ((XMLFourierPolynomial)poly).getPolynomials().values()){
-				System.out.println(">> "+p.toString());
+			
+			// Matlab DirectProd PART #1
+			Long[] bigG = new Long[G.length];
+			DirectProdFunction poly = new XMLFourierPolynomial(xmlInput, G);
+			for (int i=0; i<G.length; i++) bigG[i] = new Long(G[i]);
+			MatlabTemporaryRepositoryDirectProd rep = 
+				SFT.runMatlabSFTPart1Internal(bigG, delta_t, tau, infNorm, eucNorm, deltaCoeff, randSetsCoeff, new Boolean(true));
+			
+			// calculate Q's values
+			Map<String,Complex> query = new HashMap<String,Complex>();
+			for (Long[] elem: rep.getQ()){
+				String key = SFTUtils.vectorToString(elem);
+				long[] e = SFTUtils.getVectorFromString(key);
+				Complex value = poly.getValue(e);
+				query.put(key, value);
 			}
-			//System.out.println("infinity norm: "+poly.calcInfinityNorm());
-			//System.out.println("Euclidean norm: "+poly.calcEuclideanNorm());
-
-			Set<long[]> L = SFT.runMainSFTAlgorithm(G, 0.01, 200, poly, (double)28.41, (double)20.0, (float)1, (float)0.0001);
-			String res = "";
-			for(long[] e: L){
-				res += SFTUtils.vectorToString(e)+" ";
-			}
-			System.out.println("\nSFT: "+res+"\n\nDone!");
-
+			rep.setQuery(query);
+			
+			// Matlab DirectProd PART #2
+			Long[][] L = SFT.runMatlabSFTPart2Internal(bigG, tau, rep);
+			
 		} catch (FunctionException fe){
-			Debug.log(">>> FunctionException thrown: "+fe.getMessage());
+			Log.log(">>> FunctionException thrown: "+fe.getMessage());
 		} catch (SFTException se){
-			Debug.log(">>> SFTException thrown: "+se.getMessage());
+			Log.log(">>> SFTException thrown: "+se.getMessage());
+		}
+		
+		/* *****************************
+		 *  matlab test - finite Abelian
+		 * *****************************/
+		
+		try{
+			
+			// Matlab DirectProd PART #1
+			Long[] bigG = new Long[G.length];
+			DirectProdFunction poly = new XMLFourierPolynomial(xmlInput, G);
+			Long[][] abelianG = new Long[1][2]; abelianG[0][0] = new Long(1); abelianG[0][1] = new Long(G[0]);
+			
+			for (int i=0; i<G.length; i++) bigG[i] = new Long(G[i]);
+			MatlabTemporaryRepositoryFiniteAbelian rep = 
+				SFT.runMatlabSFTPart1Internal(abelianG, delta_t, tau, infNorm, eucNorm, deltaCoeff, randSetsCoeff, new Boolean(true));
+			Log.log("creating query...");
+			// calculate Q's values
+			Map<String,Complex> query = new HashMap<String,Complex>();
+			for (Long elem: rep.getQ()){
+				long[] e = new long[]{elem.longValue()}; 
+				String key = SFTUtils.vectorToString(e);
+				Complex value = poly.getValue(e);
+				query.put(key, value);
+			}
+			rep.setQuery(query);
+			Log.log("moving to part 2...");
+			
+			// Matlab DirectProd PART #2
+			Long[] L = SFT.runMatlabSFTPart2Internal(abelianG, tau, rep);
+			
+		} catch (FunctionException fe){
+			Log.log(">>> FunctionException thrown: "+fe.getMessage());
+		} catch (SFTException se){
+			Log.log(">>> SFTException thrown: "+se.getMessage());
 		}
 
 		/* **********************************************************
@@ -104,7 +148,6 @@ public class Main {
 			try {
 				polys[i] = new FourierPolynomial(G_TEST,i+"");
 			} catch (FunctionException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			// randomly pick elements in Z_N and their coefficients
@@ -117,27 +160,26 @@ public class Main {
 			System.out.println("the poly is: "+polys[i].toString());
 		}
 
-		Debug.log(">>> MAIN TEST: created fourier polynomials >>>");
+		Log.log(">>> MAIN TEST: created fourier polynomials >>>");
 
 		// calculate significant elements for each polynomial and create it's corresponding polynomial
 		FourierPolynomial[] SFTPolys = new FourierPolynomial[NUM_OF_POLYS];
 		for(i=0; i<NUM_OF_POLYS;i++){
 			try {
 				SFTPolys[i] = new FourierPolynomial(G_TEST,i+"");
-				Debug.log(">>> MAIN TEST: initialized guess polynomial >>>");
+				Log.log(">>> MAIN TEST: initialized guess polynomial >>>");
 			} catch (FunctionException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
 			double infNorm = polys[i].calcInfinityNorm();
-			Debug.log(">>> MAIN TEST: calculated infinity norm >>>");
+			Log.log(">>> MAIN TEST: calculated infinity norm >>>");
 			double eucNorm = polys[i].calcEuclideanNorm();
-			Debug.log(">>> MAIN TEST: calculated infinityEuclidean norm >>>");
+			Log.log(">>> MAIN TEST: calculated infinityEuclidean norm >>>");
 
 			// run the SFT algorithm and create polynomial
 			try {
-				//Debug.setDEBUG_MODE(false);
+				//Log.setLogMode(false);
 				Set<Long>[] sets = SFT.runMainSFTAlgorithmDividedPart1(G_TEST, DELTA, TAU, infNorm, eucNorm, deltaCoeff, randSetsCoeff);
 				Set<Long> Q = sets[sets.length-1];
 				Map<Long,Complex> query = new HashMap<Long,Complex>();
@@ -153,7 +195,6 @@ public class Main {
 					sftPoly.addUpdateTerm(alpha, value.getRe(), value.getIm());
 				}
 			} catch (SFTException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -285,7 +326,6 @@ public class Main {
 		} catch (SFTException e) {
 			System.err.println("SFTException thrown");
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		/* */
