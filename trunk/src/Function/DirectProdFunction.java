@@ -38,6 +38,13 @@ public abstract class DirectProdFunction extends Function{
 	 * abstract methods
 	 ******************/
 	
+	/**
+	 * Returns the value of the function for the input element in G.
+	 * @param elem
+	 * 			The element whose this function's value is calculated.
+	 * @return
+	 * 			The value of the function for the input element in G.
+	 */
 	public abstract Complex getValue(long[] elem);
 	
 	/* ********************

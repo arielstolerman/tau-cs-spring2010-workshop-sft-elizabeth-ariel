@@ -663,6 +663,14 @@ public class SFT {
 		Set<long[]> Q = new HashSet<long[]>();
 		Set<long[]> A = sets[0][0];
 		
+		int qSize = 0;
+		for (int t=1; t<=k; t++){
+			for (int l=0; l<sets[t].length; l++){
+				qSize += A.size() * sets[t][l].size();
+			}
+		}
+		Log.log("\tstarting to generate set Q of maximum size of "+qSize);
+		
 		long qCalcCounter = 0;
 		for (int t=1; t<=k; t++){
 			Set<long[]>[] tSets = sets[t];
@@ -680,16 +688,19 @@ public class SFT {
 				}
 			}
 		}
+		Log.log("\tdone calculating Q, actual size is "+Q.size());
 		
-		String QValues = "";
-		int rowCount = 0;
-		for (Iterator<long[]> j = Q.iterator(); j.hasNext();){
-			rowCount++;
-			QValues += SFTUtils.vectorToString(j.next());
-			QValues += (rowCount % 20 == 0)? "\n\t":" ";
-		}
-		String Qsize = Q.size()+"";
-		Log.log("\tcreated Q = {x - y | x in A, y in union(B_t_l), t=1,...,k, l=1,...,log(Nt)} of size "+Qsize+":\n\t"+QValues);
+		if (Q.size() < 3000){
+			String QValues = "";
+			int rowCount = 0;
+			for (Iterator<long[]> j = Q.iterator(); j.hasNext();){
+				rowCount++;
+				QValues += SFTUtils.vectorToString(j.next());
+				QValues += (rowCount % 20 == 0)? "\n\t":" ";
+			}
+			String Qsize = Q.size()+"";
+			Log.log("\tcreated Q = {x - y | x in A, y in union(B_t_l), t=1,...,k, l=1,...,log(Nt)} of size "+Qsize+":\n\t"+QValues);
+		} else Log.log("\tQ is to big to print...");
 		
 		Log.log("SFT -> runMatlabSFTPart1Internal - main algorithm part 1 completed");
 		
@@ -726,9 +737,9 @@ public class SFT {
 		
 		String LValues = "";
 		for (long[] e: L){
-			LValues += "\n\t"+SFTUtils.vectorToString(e)+"\n";
+			LValues += "\t"+SFTUtils.vectorToString(e)+"\n";
 		}
-		Log.log("\tfinished calculating L, the list of significant Fourier coefficients for f:"+LValues+"\n");
+		Log.log("\tfinished calculating L, the list of significant Fourier coefficients for f:\n"+LValues+"\n");
 		
 		Log.log("SFT -> runMatlabSFTPart1Internal - main algorithm part 2 completed");
 		return L;

@@ -183,15 +183,8 @@ public class SFTUtils {
 			long g = G[i][0];
 			long N = G[i][1];
 			long x = elem[i];
-			long tmp = 1;
-			// calculate g^x mod N
-			for (int j=0; j<x; j++){
-				tmp *= g;
-				tmp = tmp % N;
-			}
-			newElem *= tmp;
+			newElem *= (g*x % N);
 		}
-		
 		return new Long(newElem);
 	}
 	
@@ -486,7 +479,9 @@ public class SFTUtils {
 			for (int j=0; j<tmp.length; j++) repQ[i][j] = tmp[j].longValue();
 		}
 		Long[] Q = new Long[repQ.length];
-		for (int i=0; i<repQ.length; i++) Q[i] = calcAbelianProd(repQ[i],G);
+		for (int i=0; i<repQ.length; i++){
+			Q[i] = calcAbelianProd(repQ[i],G);
+		}
 		// directProdQ:
 		Long[][] directProdQ = rep.getQ();
 		// query
