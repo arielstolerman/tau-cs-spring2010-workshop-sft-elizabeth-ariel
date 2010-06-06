@@ -57,7 +57,7 @@ for i=1:q.length;
   x=xLong.longValue;
   y=func(x,G);
   yComplex = Complex(real(y),imag(y));
-  query.put(utils.vectorToString(xLong),yComplex);
+  query.put(xLong.toString,yComplex);
 end
 % update temporary repository
 rep.setQuery(query);

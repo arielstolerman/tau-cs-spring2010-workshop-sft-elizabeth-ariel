@@ -483,7 +483,7 @@ public class SFTUtils {
 		for(Long[] elem: Q){
 			Long abelianElem = calcAbelianProd(elem, G);
 			String strElem = vectorToString(elem);
-			newQuery.put(strElem, query.get("("+abelianElem.toString()+")"));
+			newQuery.put(strElem, query.get(abelianElem.toString()));
 		}
 		
 		// create new direct product repository and return it
