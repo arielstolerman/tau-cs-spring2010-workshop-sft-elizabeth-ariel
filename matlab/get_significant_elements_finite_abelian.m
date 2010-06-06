@@ -40,9 +40,9 @@ if nargin == 7;
 	randSetsCoeff = sft.getRandSetsCoeff();
 end;
 
-% ===================
-% =		PART 1		=
-% ===================
+% ======
+% PART 1
+% ======
 % call part 1 - create a set Q of elements in G to be queried
 rep = sft.runMatlabSFTPart1Internal(G_java,delta_t,tau,fInfNorm,fEuclideanNorm,deltaCoeff,randSetsCoeff,isLogged_java);
 
@@ -62,9 +62,9 @@ end
 % update temporary repository
 rep.setQuery(query);
 
-% ===================
-% =		PART 2		=
-% ===================
+% ======
+% PART 2
+% ======
 % call part 2 - create an array of Long from which will create a final matlab matrix where
 % each row is an element (vector) in L, the set of significant elements
 L_java=sft.runMatlabSFTPart2Internal(G_java,tau,rep);
