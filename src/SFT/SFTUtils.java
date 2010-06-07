@@ -18,6 +18,16 @@ import Function.FunctionException;
 
 public class SFTUtils {
 
+	/* ********************************************
+	 * 					INDEX
+	 * ********************************************
+	 * - General calculations and parameters check
+	 * - finite Abelian adaptation
+	 * - Mathematical functions
+	 * - Random subsets generation
+	 * - Matlab adjustments
+	 * - WAV parsing function
+	 * ********************************************/
 	
 	/* *****************************************
 	 * General calculations and parameters check
@@ -488,5 +498,22 @@ public class SFTUtils {
 		
 		// create new direct product repository and return it
 		return new MatlabTemporaryRepositoryDirectProd(sets, Q, newQuery);
+	}
+	
+	/* *********************
+	 * 	WAV parsing function
+	 * *********************/
+	
+	protected static class WavFunction extends DirectProdFunction{ //TODO
+
+		public WavFunction(long[] G) throws FunctionException {
+			super(G);
+		}
+
+		@Override
+		public Complex getValue(long[] elem) {
+			return null;
+		}
+		
 	}
 }
