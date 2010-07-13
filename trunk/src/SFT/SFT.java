@@ -40,7 +40,7 @@ public class SFT {
 	 *********************************************************************/
 	
 	/**
-	 * Returns a set of the elements in G whose coefficients in the given function are tau-significant with
+	 * Returns a map of the elements in G and their tau-significant coefficients in the given function with
 	 * delta-confidence.
 	 * @param G
 	 * 				The values N1,...,Nk describing the group G = Z_N1 x ... x Z_Nk.
@@ -56,18 +56,18 @@ public class SFT {
 	 * @param fEuclideanNorm
 	 * 				The Euclidean norm of the function.
 	 * @return
-	 * 				A set of the elements in G whose coefficients in the given function are tau-significant
-	 * 				with delta-confidence.
+	 * 				A map of the elements in G and their tau-significant coefficients in the given function with
+	 * 				delta-confidence.
 	 * @throws SFTException
 	 * 				If the given parameters are invalid.
 	 */
-	public static Set<long[]> getSignificatElements(long[] G, double delta, double tau, DirectProdFunction func,
-			double fInfNorm, double fEuclideanNorm) throws SFTException{
-		return runMainSFTAlgorithm(G, delta, tau, func, fInfNorm, fEuclideanNorm, deltaCoeff, randSetsCoeff);
+	public static Map<long[],Complex> getSignificantElements(long[] G, double delta, double tau, DirectProdFunction func,
+			double fInfNorm, double fEuclideanNorm) throws SFTException,FunctionException{
+		return SFTUtils.calcSFTIterations(G, delta, tau, func, fInfNorm, fEuclideanNorm, deltaCoeff, randSetsCoeff);
 	}
 	
 	/**
-	 * Returns a set of the elements in G whose coefficients in the given function are tau-significant with
+	 * Returns a map of the elements in G and their tau-significant coefficients in the given function with
 	 * delta-confidence.
 	 * The algorithm includes a calculation of the error-bound, based on the delta-input and a some constant.
 	 * This implementation allows the user (who knows the algorithm) to state this constant.
@@ -92,14 +92,14 @@ public class SFT {
 	 * @param randSetsCoeff
 	 * 				A constant coefficient for the algorithm's calculation of delta.
 	 * @return
-	 * 				A set of the elements in G whose coefficients in the given function are tau-significant
-	 * 				with delta-confidence.
+	 * 				A map of the elements in G and their tau-significant coefficients in the given function with
+	 * 				delta-confidence.
 	 * @throws SFTException
 	 * 				If the given parameters are invalid.
 	 */
-	public static Set<long[]> getSignificatElements(long[] G, double delta, double tau, DirectProdFunction func,
-			double fInfNorm, double fEuclideanNorm, float deltaCoeff, float randSetsCoeff) throws SFTException{
-		return runMainSFTAlgorithm(G, delta, tau, func, fInfNorm, fEuclideanNorm, deltaCoeff, randSetsCoeff);
+	public static Map<long[],Complex> getSignificantElements(long[] G, double delta, double tau, DirectProdFunction func,
+			double fInfNorm, double fEuclideanNorm, float deltaCoeff, float randSetsCoeff) throws SFTException,FunctionException{
+		return SFTUtils.calcSFTIterations(G, delta, tau, func, fInfNorm, fEuclideanNorm, deltaCoeff, randSetsCoeff);
 	}
 	
 	/* *****************************************************
@@ -129,16 +129,16 @@ public class SFT {
 	 * @throws SFTException
 	 * 				If the given parameters are invalid.
 	 */
-	public static Set<Long> getSignificatElements(long[][] G, double delta, double tau, FiniteAbelianFunction func,
+	public static Map<Long,Complex> getSignificantElements(long[][] G, double delta, double tau, FiniteAbelianFunction func,
 			double fInfNorm, double fEuclideanNorm) throws SFTException{
 		// create parameters for the direct product version
 		long[] dpG = SFTUtils.getGFromAbelianFunc(func);
 		try{
 			DirectProdFunction dpFunc = new DirectedProdFromAbelianFunc(dpG,func);
 			// call the direct product version of this method
-			Set<long[]> Ltag = getSignificatElements(dpG,delta,tau,dpFunc,fInfNorm,fEuclideanNorm);
+			Map<long[],Complex> Ltag = getSignificantElements(dpG,delta,tau,dpFunc,fInfNorm,fEuclideanNorm);
 			// return the finite Abelian representation of the result set
-			return SFTUtils.getAbelianRepresentation(Ltag, G);
+			return SFTUtils.calcElemCoeffPairsAbelian(Ltag, G);
 		} catch (FunctionException fe){
 			System.err.println("Invalid function.");
 			return null;
@@ -177,16 +177,16 @@ public class SFT {
 	 * @throws SFTException
 	 * 				If the given parameters are invalid.
 	 */
-	public static Set<Long> getSignificatElements(long[][] G, double delta, double tau, FiniteAbelianFunction func,
+	public static Map<Long,Complex> getSignificantElements(long[][] G, double delta, double tau, FiniteAbelianFunction func,
 			double fInfNorm, double fEuclideanNorm, float deltaCoeff, float randSetsCoeff) throws SFTException{
 		// create parameters for the direct product version
 		long[] dpG = SFTUtils.getGFromAbelianFunc(func);
 		try{
 			DirectProdFunction dpFunc = new DirectedProdFromAbelianFunc(dpG,func);
 			// call the direct product version of this method
-			Set<long[]> Ltag = getSignificatElements(dpG,delta,tau,dpFunc,fInfNorm,fEuclideanNorm,deltaCoeff,randSetsCoeff);
+			Map<long[],Complex> Ltag = getSignificantElements(dpG,delta,tau,dpFunc,fInfNorm,fEuclideanNorm,deltaCoeff,randSetsCoeff);
 			// return the finite Abelian representation of the result set
-			return SFTUtils.getAbelianRepresentation(Ltag, G);
+			return SFTUtils.calcElemCoeffPairsAbelian(Ltag, G);
 		} catch (FunctionException fe){
 			System.err.println("Invalid function.");
 			return null;
@@ -310,10 +310,10 @@ public class SFT {
 	 * @param G			an integer array describing the group Z_N1 X ... X Z_Nk
 	 * @param tau		threshold on the weight of the Fourier coefficients we seek
 	 * @param delta_t	confidence parameter
-	 * @return			a short list L in G of the tau-significant Fourier coefficients
+	 * @return			a short list L in G of the tau-significant elements and their Fourier coefficients
 	 * 					of f with probability at least 1-delta_t
 	 */
-	protected static Set<long[]> runMainSFTAlgorithm(long[] G, double delta_t, double tau, DirectProdFunction func,
+	protected static Map<long[],Complex> runMainSFTAlgorithm(long[] G, double delta_t, double tau, DirectProdFunction func,
 			double fInfNorm, double fEuclideanNorm, double deltaCoeff, double randSetsCoeff) throws SFTException{
 		Log.log("SFT -> runMainSFTAlgorithm - main algorithm started");
 		
@@ -385,14 +385,18 @@ public class SFT {
 		Set<long[]> L = getFixedQueriesSFT(G,tau,sets,query);
 		Log.log("\tL size is: "+L.size());
 		
+		// calculate the coefficients for the elements in L
+		Map<long[],Complex> res = SFTUtils.calcElemCoeffPairs(L, query, G);
+		
 		String LValues = "\n";
 		for (long[] e: L){
-			LValues += "\t"+SFTUtils.vectorToString(e)+"\n";
+			LValues += "\t<"+SFTUtils.vectorToString(e)+","+(res.get(e))+">\n";
 		}
 		Log.log("\tfinished calculating L, the list of significant Fourier coefficients for f:"+LValues+"\n");
+		Log.log("\tL is of size "+L.size());
 		
 		Log.log("SFT -> runMainSFTAlgorithm  - main algorithm completed");
-		return L;
+		return res;
 	}
 		
 	/**
@@ -413,9 +417,12 @@ public class SFT {
 		double tmpCoeff = Math.pow(fInfNorm/eta, 2);
 		long m_A = (long) (randSetsCoeff * Math.ceil(tmpCoeff*Math.log(1.0/delta)));
 		long m_B = (long) (randSetsCoeff * Math.ceil(tmpCoeff*Math.log(fInfNorm/(delta*gamma))));
+		m_A = SFTUtils.calcLogN(G[0]);
+		m_B = m_A; //TODO WORKING WITH LOG...
 		
 		Log.log("\tm_A is: "+m_A+", m_B is: "+m_B);
 		if (m_A <= 0 || m_B <= 0) System.exit(0);
+		//System.exit(0);
 		
 		// generate A,B_1,...,B_Ntl for each t in {1,...,k} and l in {1,...,logN_t}
 		
@@ -621,9 +628,9 @@ public class SFT {
 		
 		// compare to threshold and return result
 		double threshold = 5*tau/36;
-		//Debug.log("\tcalculated est:"+est+((est >= threshold) ? "\t\tPASSED!":""));
+		Log.log("\tcalculated est:"+est+((est >= threshold) ? "\t\tPASSED!":""));
 		
-		//Debug.log("SFT -> distinguish completed");
+		//Log.log("SFT -> distinguish completed");
 		
 		return est >= threshold;
 	}

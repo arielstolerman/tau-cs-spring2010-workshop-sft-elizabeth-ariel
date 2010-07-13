@@ -3,19 +3,31 @@ package SFT;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+
+import javax.media.format.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+
+import com.sun.media.format.WavAudioFormat;
+import com.sun.media.multiplexer.audio.WAVMux;
+
 import Function.*;
 import SFT.*;
 import SFT.SFTUtils.DirectedProdFromAbelianFunc;
 import SFT.SFTUtils.MatlabTemporaryRepositoryDirectProd;
 import SFT.SFTUtils.MatlabTemporaryRepositoryFiniteAbelian;
+import SFT.SFTUtils.WavFunction;
 
 /*
  * Main for debugging
@@ -26,39 +38,76 @@ public class Main {
 	 * main for debugging
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception{
+		/*File wav = new File("matlab\\wav\\sample.wav");
+		AudioInputStream ais = AudioSystem.getAudioInputStream(wav);
+		System.out.println(ais.getFormat());
+		byte[] b = new byte[128];
+		String str = "";
+		ais.read(b);
+		for (int i=0; i<128; i++) str+= b[i]+" ";
+		System.out.println(str);
+		
 		/* ***************
 		 * input variables
 		 * ***************/
+		double delta_t = 0.01;
+		/* xml */ /*
 		File xmlInput = new File("matlab\\test2.xml");
 		long[] G = new long[]{Long.valueOf("10000000000")};
-		double delta_t = 0.01;
-		double tau = 6.5;
+		double tau = 190;
 		double infNorm = 28.41; // 286.2467568832943; - for test3.xml
 		double eucNorm = 20; // 0.5349658666523577;
 		float deltaCoeff = (float)1;
-		float randSetsCoeff = (float)1;
+		float randSetsCoeff = (float)0.0001;
+		
+		/* wav */
+		long[] G = new long[]{105840};
+		double tau = 0.05; //6.5;
+		double infNorm = 0.95241897260893; // 1.25553298056245;
+		double eucNorm = 0.23300982331162; //0.21671405578766;
+		
+		float deltaCoeff = (float)0.007;
+		float randSetsCoeff = (float)0.00001;
 		
 		/* *************
 		 *  single test
-		 * *************/ /*
+		 * *************/
 		
 		try {
-			DirectProdFunction poly = new XMLFourierPolynomial(xmlInput, G);
-			//System.out.println(poly.calcEuclideanNorm());
-			//System.out.println(poly.calcInfinityNorm());
+			//DirectProdFunction poly = new XMLFourierPolynomial(xmlInput, G);
+			G = new long[]{WavFunction.WAV_FUNC_FIXED_SIZE};
+			DirectProdFunction poly = new WavFunction("matlab\\wav\\y.csv");
 			
-			for(FourierPolynomial p: ((XMLFourierPolynomial)poly).getPolynomials().values())
-				SFT.runMainSFTAlgorithm(G, delta_t, tau, p, infNorm, eucNorm, deltaCoeff, randSetsCoeff);
-		} catch (SFTException se) {
-			Log.log(">>> SFTException thrown: "+se.getMessage());
-		} catch (FunctionException fe){
-			Log.log(">>> FunctionException thrown: "+fe.getMessage());
+			SFTUtils.ResultFunction f_tag = new SFTUtils.ResultFunction(G,
+					SFT.getSignificantElements(G, delta_t, tau, poly, infNorm, eucNorm, deltaCoeff, randSetsCoeff));
+			FileWriter f = new FileWriter("matlab\\wav\\output.txt");
+			PrintWriter p = new PrintWriter(f);
+			for(int i=0; i<WavFunction.WAV_FUNC_FIXED_SIZE; i++){
+				Complex val = f_tag.getValue(new long[]{i});
+				p.print(val.getRe()+" "+val.getIm()+"\n");
+			}
+			p.close(); f.close();
+			
+			SFTUtils.DiffFunction diff = new SFTUtils.DiffFunction(G, poly, f_tag);
+			FileWriter f2 = new FileWriter("matlab\\wav\\diff.txt");
+			PrintWriter p2 = new PrintWriter(f2);
+			for(int i=0; i<WavFunction.WAV_FUNC_FIXED_SIZE; i++){
+				Complex val = diff.getValue(new long[]{i});
+				p2.print(val.getRe()+" "+val.getIm()+"\n");
+			}
+			p2.close(); f2.close();
+			
+			//for(FourierPolynomial p: ((XMLFourierPolynomial)poly).getPolynomials().values())
+				//SFT.runMainSFTAlgorithm(G, delta_t, tau, p, infNorm, eucNorm, deltaCoeff, randSetsCoeff);
+		} catch (Exception e){
+			System.out.println(">>> exception thrown >>>");
+			e.printStackTrace();
 		}
 		
 		/* *****************************
 		 *  matlab test - direct product
-		 * *****************************/
+		 * *****************************/ /*
 		
 		try{
 			
