@@ -17,6 +17,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.io.Serializable;
 import java.util.*;
 
 import Function.DirectProdFunction;
@@ -39,35 +40,6 @@ public class SFTUtils {
 	/* *****************************************
 	 * General calculations and parameters check
 	 *******************************************/
-	
-	protected static int NUM_OF_ITERATIONS = 1;
-	
-	/**
-	 * --- Running iterations of the SFT algorithm ---
-	 */
-	protected static Map<long[],Complex> calcSFTIterations(long[] G, double delta_t, double tau, DirectProdFunction func,
-			double fInfNorm, double fEuclideanNorm, double deltaCoeff, double randSetsCoeff) throws SFTException, FunctionException{
-		Map<long[],Complex> res = new HashMap<long[],Complex>();
-		Map<long[],Complex> tmp;
-		
-		// run iterations of the SFT algorithm
-		int i = 0;
-		DirectProdFunction currFunc = func;
-		do{
-			i++;
-			tmp = SFT.runMainSFTAlgorithm(G, delta_t, tau, currFunc, fInfNorm, fEuclideanNorm, deltaCoeff, randSetsCoeff);
-			
-			// add iteration results to main result
-			for (long[] elem:tmp.keySet()) res.put(elem, tmp.get(elem));
-			
-			// calculate the difference function
-			ResultFunction resFunc = new ResultFunction(G, tmp);
-			currFunc = new DiffFunction(G, func, resFunc);
-			Log.log("-- done iteration "+i+" --");
-		} while (i < NUM_OF_ITERATIONS);
-		
-		return res;
-	}
 	
 	/**
 	 * Class for calculating a difference function for two given functions f1, f2 s.t. DiffFunction(x) = f1(x) - f2(x) 
@@ -97,22 +69,22 @@ public class SFTUtils {
 	/**
 	 * class for creating a function from the results of the SFT algorithm.
 	 */
-	protected static class ResultFunction extends DirectProdFunction{
-		Map<String,Complex> mapping;
+	protected static class ResultFunction extends DirectProdFunction implements Serializable{
+		Map<long[],Complex> mapping;
 
 		public ResultFunction(long[] G, Map<long[],Complex> sftRes) throws FunctionException {
 			super(G);
-			mapping = new HashMap<String,Complex>();
-			for(long[] elem: sftRes.keySet()){
-				String e = vectorToString(elem);
-				mapping.put(e, sftRes.get(elem));
-			}
+			mapping = sftRes;
 		}
 
 		@Override
 		public Complex getValue(long[] elem) {
-			Complex res = mapping.get(vectorToString(elem));
-			return (res == null? new Complex(0,0):res);
+			Complex res = new Complex(0,0);
+			for(long[] alphaVector:mapping.keySet())
+				res.addComplex(Complex.mulComplex(
+						mapping.get(alphaVector),
+						SFTUtils.chi(G.length,this.G,alphaVector,elem)));
+			return res;
 		}
 		
 	}
@@ -399,6 +371,7 @@ public class SFTUtils {
 		int qSize = query.size();
 		
 		// for each element alpha in L, calculate sum_(x in query's domain) [ f(x) * cojugate(chi_alpha[x]) ]
+		int i = 0;
 		for(long[] elem: L){ //TODO problem here with calculation of coefficient
 			Complex coeff = new Complex(0,0);
 			for (String e:query.keySet()){
@@ -406,8 +379,12 @@ public class SFTUtils {
 				coeff.addComplex(Complex.divComplex(
 						Complex.mulComplex(query.get(e),chi(G.length,G,vec,elem).getConjugate()),
 						qSize));
+				//Log.log("\telement: "+e+", coeff: "+coeff);
+				
 			}
 			elemCoeffPairs.put(elem, coeff);
+			if (i % 1000 == 0) System.out.println(">>> done "+i+" coeff calculations");
+			i++;
 		}
 		return elemCoeffPairs;
 	}
@@ -632,10 +609,10 @@ public class SFTUtils {
 	 * **********************/
 	
 	protected static class WavFunction extends DirectProdFunction{
-		static long WAV_FUNC_FIXED_SIZE = 20000;
+		static long WAV_FUNC_FIXED_SIZE = 30000;
 		Map<String,Complex> mapping;
 		
-		public WavFunction(long[] G, String wavFilePath) throws FunctionException, IOException {
+		public WavFunction(String wavFilePath,long[] G) throws FunctionException, IOException {
 			super(G);
 			initMap(G[0],wavFilePath);
 		}
@@ -669,25 +646,6 @@ public class SFTUtils {
 		@Override
 		public Complex getValue(long[] elem) {
 			return mapping.get("("+elem[0]+")");
-		}
-	}
-	
-	public static void main(String[] args) {
-		long[] G = new long[]{105840};
-		try {
-			WavFunction func = new WavFunction(G,"matlab\\wav\\y.csv");
-			
-			System.out.println(func.getValue(new long[]{0}));
-			System.out.println(func.getValue(new long[]{1}));
-			System.out.println(func.getValue(new long[]{0}));
-			
-		} catch (FileNotFoundException e) {
-			System.err.println(">>> FileNotFoundException thrown");
-		} catch (FunctionException e) {
-			System.err.println(">>> FunctionException thrown");
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 	}
 }

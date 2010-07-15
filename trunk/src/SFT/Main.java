@@ -5,8 +5,10 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -62,33 +64,40 @@ public class Main {
 		float randSetsCoeff = (float)0.0001;
 		
 		/* wav */
-		long[] G = new long[]{105840};
-		double tau = 0.05; //6.5;
-		double infNorm = 0.95241897260893; // 1.25553298056245;
-		double eucNorm = 0.23300982331162; //0.21671405578766;
+		long[] G = new long[]{30000};
+		int numOfIterations = 2;
+		double tau = 0.015;
+		double infNorm = 1.41421356237310; // infNorm = 1.09773977520164;
+		double eucNorm = 0.36997028087942; // eucNorm = 0.32740776983111
 		
-		float deltaCoeff = (float)0.007;
-		float randSetsCoeff = (float)0.00001;
+		float deltaCoeff = (float)0.001;
+		float randSetsCoeff = (float)0.0000001;
 		
 		/* *************
 		 *  single test
 		 * *************/
 		
 		try {
-			//DirectProdFunction poly = new XMLFourierPolynomial(xmlInput, G);
-			G = new long[]{WavFunction.WAV_FUNC_FIXED_SIZE};
-			DirectProdFunction poly = new WavFunction("matlab\\wav\\y.csv");
+			DirectProdFunction poly = new WavFunction("matlab\\wav\\output.csv",G);
 			
 			SFTUtils.ResultFunction f_tag = new SFTUtils.ResultFunction(G,
-					SFT.getSignificantElements(G, delta_t, tau, poly, infNorm, eucNorm, deltaCoeff, randSetsCoeff));
-			FileWriter f = new FileWriter("matlab\\wav\\output.txt");
+					SFT.getSignificantElements(G, delta_t, tau, poly, infNorm, eucNorm, deltaCoeff, randSetsCoeff,numOfIterations));
+			/*
+			FileOutputStream output = new FileOutputStream("matlab\\wav\\java_output_func_2iters.bin");
+			ObjectOutputStream out = new ObjectOutputStream(output);
+			out.writeObject(f_tag);
+			out.close();
+			System.out.println(">>> wrote function to binary file");
+			*/
+
+			FileWriter f = new FileWriter("matlab\\wav\\java_output_2iters.txt");
 			PrintWriter p = new PrintWriter(f);
-			for(int i=0; i<WavFunction.WAV_FUNC_FIXED_SIZE; i++){
+			for(int i=0; i<G[0]; i++){
 				Complex val = f_tag.getValue(new long[]{i});
 				p.print(val.getRe()+" "+val.getIm()+"\n");
 			}
 			p.close(); f.close();
-			
+			/*
 			SFTUtils.DiffFunction diff = new SFTUtils.DiffFunction(G, poly, f_tag);
 			FileWriter f2 = new FileWriter("matlab\\wav\\diff.txt");
 			PrintWriter p2 = new PrintWriter(f2);
@@ -97,9 +106,7 @@ public class Main {
 				p2.print(val.getRe()+" "+val.getIm()+"\n");
 			}
 			p2.close(); f2.close();
-			
-			//for(FourierPolynomial p: ((XMLFourierPolynomial)poly).getPolynomials().values())
-				//SFT.runMainSFTAlgorithm(G, delta_t, tau, p, infNorm, eucNorm, deltaCoeff, randSetsCoeff);
+			*/
 		} catch (Exception e){
 			System.out.println(">>> exception thrown >>>");
 			e.printStackTrace();
