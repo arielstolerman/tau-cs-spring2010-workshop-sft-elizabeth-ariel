@@ -12,13 +12,23 @@
 % - randSetsCoeff:	a constant coefficient for calculating the random subsets when creating Q, a set of elements for querying
 % Returns a list of elements in G whose Fourier coefficients are tau-significant.
 
-function[L]=get_significant_elements_direct_prod(isLogged,G,delta_t,tau,func,fInfNorm,fEuclideanNorm,deltaCoeff,randSetsCoeff);
+function[L]=get_significant_elements_direct_prod(isLogged,G,tau,func,arg4,arg5,arg6,arg7,arg8,arg9);
 
+% set java path
 %javaaddpath('/specific/a/home/cc/students/cs/arielst1/sft/sft_lib.jar')
 import java.util.*
 import java.io.File
 import SFT.*
 import SFT.SFTUtils.*
+
+% set parameters according to function version call
+% case 1: full call with all parameters
+if nargin == 9
+	numOfIterations = arg4;
+	delta_t = arg5;
+	fInfNorm = arg6;
+	fEuclideanNorm, float deltaCoeff, float randSetsCoeff
+end;
 
 % fit all parameters to java before calling the first part of the algorithm
 G_java = javaArray('java.lang.Long',length(G));
