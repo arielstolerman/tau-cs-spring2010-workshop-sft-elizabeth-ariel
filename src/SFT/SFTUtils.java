@@ -69,12 +69,18 @@ public class SFTUtils {
 	/**
 	 * class for creating a function from the results of the SFT algorithm.
 	 */
-	protected static class ResultFunction extends DirectProdFunction implements Serializable{
+	public static class ResultFunction extends DirectProdFunction implements Serializable{
 		Map<long[],Complex> mapping;
 
 		public ResultFunction(long[] G, Map<long[],Complex> sftRes) throws FunctionException {
 			super(G);
 			mapping = sftRes;
+		}
+		
+		public ResultFunction(long[] G, Map<String,Complex> sftRes, int tmp) throws FunctionException {
+			super(G);
+			mapping = new HashMap<long[],Complex>();
+			for(String elem: sftRes.keySet()) mapping.put(getVectorFromString(elem), sftRes.get(elem));
 		}
 
 		@Override
@@ -86,7 +92,6 @@ public class SFTUtils {
 						SFTUtils.chi(G.length,this.G,alphaVector,elem)));
 			return res;
 		}
-		
 	}
 	
 	/**
@@ -507,6 +512,7 @@ public class SFTUtils {
 	 * Matlab adjustments
 	 * *****************/
 	
+	// classes for holding temporarly the results from the 1st part of the algorithm
 	/**
 	 * A class for holding temporary data between part 1 and part 2 of the SFT algorithm for direct product G.
 	 */
@@ -602,6 +608,45 @@ public class SFTUtils {
 		
 		// create new direct product repository and return it
 		return new MatlabTemporaryRepositoryDirectProd(sets, Q, newQuery);
+	}
+	
+	// classes for holding temporarly the results from the 2nd part of the algorithm
+	
+	protected static class MatlabTemporaryResultDirectProd{
+		Long[][] keys;
+		Complex[] values;
+		
+		public MatlabTemporaryResultDirectProd(Long[][] keys, Complex[] values){
+			this.keys = keys;
+			this.values = values;
+		}
+		
+		public Long[][] getKeys() { return keys; }
+		public Complex[] getValues() { return values; }
+	}
+	
+	protected static class MatlabTemporaryResultFiniteAbelian{
+		Long[] keys;
+		Complex[] values;
+		
+		public MatlabTemporaryResultFiniteAbelian(Long[] keys, Complex[] values){
+			this.keys = keys;
+			this.values = values;
+		}
+		
+		public Long[] getKeys() { return keys; }
+		public Complex[] getValues() { return values; }
+	}
+	
+	protected static MatlabTemporaryResultFiniteAbelian getMatlabFiniteAbelianRes(MatlabTemporaryResultDirectProd tmpRes, Long[][] G){
+		Long[] keys = new Long[tmpRes.getKeys().length];
+		Long[][] tmpKeys = tmpRes.getKeys();
+		
+		for(int i=0; i<keys.length; i++){
+			keys[i] = calcAbelianProd(tmpKeys[i], G);
+		}
+		
+		return new MatlabTemporaryResultFiniteAbelian(keys, tmpRes.getValues());
 	}
 	
 	/* **********************
