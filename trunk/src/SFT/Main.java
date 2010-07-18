@@ -58,7 +58,7 @@ public class Main {
 		
 		// RUN THE SFT ALGORITHM TO APPROXIMATE THE FUNCTION
 		SFTUtils.ResultFunction f_tag = new SFTUtils.ResultFunction(G,
-				SFT.getSignificantElements(G, tau, wavFunc, numOfIterations, ms, ms));
+				SFT.getSignificantElements(G, tau, wavFunc, ms, ms, numOfIterations));
 		
 		/*
 		// writing the result function into a binary file

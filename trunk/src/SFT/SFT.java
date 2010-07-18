@@ -69,7 +69,7 @@ public class SFT {
 	 */
 	public static Map<long[],Complex> getSignificantElements(long[] G, double tau, DirectProdFunction func,
 			long m_A, long m_B) throws SFTException,FunctionException{
-		return getSignificantElements(G,tau,func,DEFAULT_NUM_OF_ITERATIONS,m_A,m_B);
+		return getSignificantElements(G,tau,func,m_A,m_B,DEFAULT_NUM_OF_ITERATIONS);
 	}
 	
 	/**
@@ -103,7 +103,7 @@ public class SFT {
 	 * 				If the creation of the difference function between iterations of the SFT procedure is invalid.
 	 */
 	public static Map<long[],Complex> getSignificantElements(long[] G, double tau, DirectProdFunction func,
-			int numOfIterations, long m_A, long m_B) throws SFTException,FunctionException{
+			long m_A, long m_B, int numOfIterations) throws SFTException,FunctionException{
 		// skip the calculation of m_A and m_B and call the main algorithm directly
 		return runMainSFTAlgorithm(G, tau, func, numOfIterations, m_A, m_B);
 	}
@@ -230,7 +230,7 @@ public class SFT {
 		try{
 			DirectProdFunction dpFunc = new DirectedProdFromAbelianFunc(dpG,func);
 			// call the direct product version of this method
-			Map<long[],Complex> Ltag = getSignificantElements(dpG,tau,dpFunc,numOfIterations,m_A,m_B);
+			Map<long[],Complex> Ltag = getSignificantElements(dpG,tau,dpFunc,m_A,m_B,numOfIterations);
 			// return the finite Abelian representation of the result set
 			return SFTUtils.calcElemCoeffPairsAbelian(Ltag, G);
 		} catch (FunctionException fe){
@@ -299,26 +299,19 @@ public class SFT {
 	/* ************************************************************************
 	 * Matlab interface public functions for Cartesian product of finite groups
 	 * ************************************************************************/
-	/**
-	 * For inner use in the Matlab SFT scripts.
-	 */
-	public static MatlabTemporaryRepositoryDirectProd runMatlabSFTPart1Internal(Long[] G, double tau,
-			long m_A, long m_B, Boolean isLogged) throws SFTException{
-		return runMatlabSFTPart1Internal(G,tau,DEFAULT_NUM_OF_ITERATIONS,m_A,m_B,isLogged);
-	}
 	
 	/**
 	 * For inner use in the Matlab SFT scripts.
 	 */
-	public static MatlabTemporaryRepositoryDirectProd runMatlabSFTPart1Internal(Long[] G, double tau,
-			int numOfIterations, long m_A, long m_B, Boolean isLogged) throws SFTException{
+	public static MatlabTemporaryRepositoryDirectProd runMatlabSFTPart1Internal(Boolean isLogged, Long[] G, double tau,
+			long m_A, long m_B) throws SFTException{
 		// set variables to fit algorithm
 		Log.setLogMode(isLogged);
 		long[] g = new long[G.length];
 		for(int i=0; i<G.length; i++) g[i] = G[i];
 		
 		// run algorithm
-		Set<long[]>[][] sets = runMatlabSFTPart1Internal(g, tau, numOfIterations, m_A, m_B);
+		Set<long[]>[][] sets = runMatlabSFTPart1Internal(g, tau, m_A, m_B);
 		
 		// fit results to Matlab
 		Set<long[]> longQ = sets[sets.length-1][0];
@@ -340,8 +333,8 @@ public class SFT {
 	/**
 	 * For inner use in the Matlab SFT scripts.
 	 */
-	public static MatlabTemporaryRepositoryDirectProd runMatlabSFTPart1Internal(Long[] G, double delta_t, double tau,
-			int numOfIterations, double fInfNorm, double fEuclideanNorm, float deltaCoeff, float randSetsCoeff, Boolean isLogged)
+	public static MatlabTemporaryRepositoryDirectProd runMatlabSFTPart1Internal(Boolean isLogged, Long[] G, double tau,
+			double delta_t, double fInfNorm, double fEuclideanNorm, float deltaCoeff, float randSetsCoeff)
 	throws SFTException{
 		// set variables to fit algorithm
 		Log.setLogMode(isLogged);
@@ -351,7 +344,7 @@ public class SFT {
 		long[] randSetsSizes = getRandomSetsSizes(g,delta_t,tau,fInfNorm,fEuclideanNorm,deltaCoeff,randSetsCoeff);
 		
 		// run algorithm
-		Set<long[]>[][] sets = runMatlabSFTPart1Internal(g, tau, numOfIterations, randSetsSizes[0], randSetsSizes[1]);
+		Set<long[]>[][] sets = runMatlabSFTPart1Internal(g, tau, randSetsSizes[0], randSetsSizes[1]);
 		
 		// fit results to Matlab
 		Set<long[]> longQ = sets[sets.length-1][0];
@@ -373,8 +366,8 @@ public class SFT {
 	/**
 	 * For inner use in the Matlab SFT scripts.
 	 */
-	public static Long[][] runMatlabSFTPart2Internal(Long[] G, double tau,
-			MatlabTemporaryRepositoryDirectProd matlabRep) throws SFTException{
+	public static SFTUtils.MatlabTemporaryResultDirectProd runMatlabSFTPart2Internal(Long[] G, double tau,
+			MatlabTemporaryRepositoryDirectProd matlabRep, int numOfIterations) throws SFTException,FunctionException{
 		// fit parameters to java
 		long[] g = new long[G.length];
 		for(int i=0; i<G.length; i++) g[i] = G[i];
@@ -382,29 +375,28 @@ public class SFT {
 		Map<String,Complex> query = (HashMap<String,Complex>)matlabRep.getQuery();
 
 		// run part 2 and return the results fitted to matlab (Long[] elements)
-		Set<long[]> res = runMatlabSFTPart2Internal(g, tau, sets, query);
-		Long[][] L = new Long[res.size()][];
-		int i=0;
-		for (long[] elem: res){
-			int len = elem.length;
-			Long[] Elem = new Long[len];
-			for (int k=0; k<len; k++) Elem[k] = new Long(elem[k]);
-			L[i++] = Elem;
+		Map<long[],Complex> tmpRes = runMatlabSFTPart2Internal(g, tau, sets, query, numOfIterations);
+		int setSize = tmpRes.keySet().size();
+		Long[][] keys = new Long[setSize][];
+		Complex[] values = new Complex[setSize];
+		int size = G.length;
+		int index = 0;
+		for (long[] elem: tmpRes.keySet()){
+			Long[] e = new Long[size];
+			for (int i=0; i<size; i++) e[i] = new Long(elem[i]);
+			
+			// update results
+			keys[index] = e;
+			values[index] = tmpRes.get(elem);
+			index++;
 		}
-		return L;
+		System.out.println("<<<<<<<<<<<<<<<<<<<< "+values[2]+" >>>>>>>>>>>>>>>>>>>>>>>");
+		return new MatlabTemporaryResultDirectProd(keys, values);
 	}
 	
 	/* ***********************************************************
 	 * Matlab interface public functions for finite Abelian groups
 	 * ***********************************************************/
-	
-	/**
-	 * For inner use in the Matlab SFT scripts.
-	 */
-	public static MatlabTemporaryRepositoryFiniteAbelian runMatlabSFTPart1Internal(Long[][] G, double tau,
-			long m_A, long m_B, Boolean isLogged) throws SFTException{
-		return runMatlabSFTPart1Internal(G,tau,DEFAULT_NUM_OF_ITERATIONS,m_A,m_B,isLogged);
-	}
 	
 	/**
 	 * For inner use in the Matlab SFT scripts.
@@ -416,7 +408,7 @@ public class SFT {
 		Long[] directG = SFTUtils.getDirectProdGFromAbelianG(G);
 		
 		// call the corresponding direct product method
-		MatlabTemporaryRepositoryDirectProd rep = runMatlabSFTPart1Internal(directG,tau,numOfIterations,m_A,m_B,isLogged);
+		MatlabTemporaryRepositoryDirectProd rep = runMatlabSFTPart1Internal(isLogged,directG,tau,m_A,m_B);
 		
 		// create a finite-abelian corresponding repository and return it
 		return SFTUtils.getMatlabFiniteAbelianRep(rep, G);
@@ -433,8 +425,8 @@ public class SFT {
 		Long[] directG = SFTUtils.getDirectProdGFromAbelianG(G);
 		
 		// call the corresponding direct product method
-		MatlabTemporaryRepositoryDirectProd rep = runMatlabSFTPart1Internal(directG,delta_t,tau,
-				numOfIterations,fInfNorm,fEuclideanNorm,deltaCoeff,randSetsCoeff,isLogged);
+		MatlabTemporaryRepositoryDirectProd rep = runMatlabSFTPart1Internal(isLogged,directG,tau,
+				delta_t,fInfNorm,fEuclideanNorm,deltaCoeff,randSetsCoeff);
 		
 		// create a finite-abelian corresponding repository and return it
 		return SFTUtils.getMatlabFiniteAbelianRep(rep, G);
@@ -443,22 +435,17 @@ public class SFT {
 	/**
 	 * For inner use in the Matlab SFT scripts.
 	 */
-	public static Long[] runMatlabSFTPart2Internal(Long[][] G, double tau,
-			MatlabTemporaryRepositoryFiniteAbelian matlabRep) throws SFTException{
+	public static MatlabTemporaryResultFiniteAbelian runMatlabSFTPart2Internal(Long[][] G, double tau,
+			MatlabTemporaryRepositoryFiniteAbelian matlabRep,int numOfIterations) throws SFTException,FunctionException{
 		
 		// adapt parameters to direct product call
 		Long[] directG = SFTUtils.getDirectProdGFromAbelianG(G);
 		MatlabTemporaryRepositoryDirectProd directRep = SFTUtils.getMatlabDirectProdRep(matlabRep, G);
 		
-		// call the corresponding direct product method
-		Long[][] L = runMatlabSFTPart2Internal(directG,tau,directRep);
-		
-		// create a finite-abelian corresponding L and return it
-		Long[] res = new Long[L.length];
-		for (int i=0; i<res.length; i++){
-			res[i] = SFTUtils.calcAbelianProd(L[i], G);
-		}
-		return res;
+		// call the corresponding direct product method, translate into finite Abelian representation and return
+		return SFTUtils.getMatlabFiniteAbelianRes(
+				runMatlabSFTPart2Internal(directG,tau,directRep,numOfIterations),G);
+
 	}
 	
 	/* #########################################################################################
@@ -700,12 +687,14 @@ public class SFT {
 		Log.log("SFT -> getFixedQueriesSFT started");
 		
 		FileWriter f = null; PrintWriter p = null; // TODO remove this shit
+		/*
 		try{
 			f = new FileWriter("matlab\\wav\\est_dist.txt");
 			p = new PrintWriter(f);
 		} catch (IOException ioe){
 			System.err.println("You SUCK!!! IO thrown on writing est_dist.txt");
 		}
+		*/
 		
 		int k = G.length;
 		Set<long[]> A = querySets[0][0];
@@ -803,7 +792,7 @@ public class SFT {
 		Log.log("SFT -> getFixedQueriesSFT completed");
 		
 		try{ //TODO remove this shit also
-			p.close(); f.close();
+			if (f != null && p != null){p.close(); f.close();};
 		} catch (IOException ioe){
 			System.err.println("closing est_dist.txt failed");
 		}
@@ -858,7 +847,7 @@ public class SFT {
 		// compare to threshold and return result
 		double threshold = 5*tau/36;
 		Log.log("\tcalculated est:"+est+((est >= threshold) ? "\t\tPASSED!":""));
-		if (interval[0] == interval[1]) p.println(interval[0]+" "+est);
+		if (interval[0] == interval[1] && p != null) p.println(interval[0]+" "+est);
 		
 		//Log.log("SFT -> distinguish completed");
 		
@@ -891,7 +880,7 @@ public class SFT {
 	 * 				confidence set by the selection of the m_A and m_B values.
 	 */
 	@SuppressWarnings("unchecked")
-	private static Set<long[]>[][] runMatlabSFTPart1Internal(long[] G, double tau, int numOfIterations, long m_A, long m_B)
+	private static Set<long[]>[][] runMatlabSFTPart1Internal(long[] G, double tau, long m_A, long m_B)
 	throws SFTException{
 		Log.log("SFT -> runMatlabSFTPart1Internal - main algorithm part 1 started");
 
@@ -975,20 +964,55 @@ public class SFT {
 	 * 				A map of the elements in G and their tau-significant coefficients in the given function with
 	 * 				confidence set by the selection of the m_A and m_B values.
 	 */
-	private static Set<long[]> runMatlabSFTPart2Internal(long[] G, double tau, Set<long[]>[][] sets,
-			Map<String,Complex> query) throws SFTException{
-		Log.log("SFT -> runMatlabSFTPart1Internal - main algorithm part 2 started");
+	private static Map<long[],Complex> runMatlabSFTPart2Internal(long[] G, double tau, Set<long[]>[][] sets,
+			Map<String,Complex> query_in, int numOfIterations) throws SFTException,FunctionException{	
+		Log.log("SFT -> runMatlabSFTPart2Internal - main algorithm part 2 started");
+
+		Map<long[],Complex> res = new HashMap<long[],Complex>();
+		DirectProdFunction func = new SFTUtils.ResultFunction(G, query_in, 1);
+		DirectProdFunction currFunc = func;
+		Set<long[]> Q = sets[sets.length-1][0];
+		int i;
 		
-		// run getFixedQueriesSFT and return its output, L
-		Set<long[]> L = getFixedQueriesSFT(G,tau,sets,query);
-		
-		String LValues = "";
-		for (long[] e: L){
-			LValues += "\t"+SFTUtils.vectorToString(e)+"\n";
+		for (i=1; i<=numOfIterations; i++){
+			Log.log("\t--- Starting iteration "+i+" out of "+numOfIterations+" ---");
+			// create query
+			Map<String,Complex> query = new HashMap<String,Complex>();
+			for(long[] elem: Q){
+				query.put(SFTUtils.vectorToString(elem), currFunc.getValue(elem));
+			}
+			Log.log("\t\tCreated query of size "+query.size());
+
+			// run getFixedQueriesSFT to get the current iteration's elements with significant coefficients
+			Set<long[]> tmpRes = getFixedQueriesSFT(G,tau,sets,query);
+			Log.log("\t\tcurrent iteration's L size is: "+tmpRes.size());
+
+			// calculate the coefficients for the elements in tmpRes
+			Map<long[],Complex> currRes = SFTUtils.calcElemCoeffPairs(tmpRes, query, G);
+			Log.log("\t\tCalculated coefficients for current iteration L of iteration "+i);
+
+			// add current iteration's results into global result map
+			for(long[] elem:currRes.keySet()) res.put(elem, currRes.get(elem));
+
+			// calculate the difference function
+			currFunc = new SFTUtils.DiffFunction(G, func, currFunc);
+			Log.log("\t\tCreated difference function");
+
+			Log.log("\t--- Done with iteration "+i+" ---");
 		}
-		Log.log("\tfinished calculating L, the list of significant Fourier coefficients for f:\n"+LValues+"\n");
-		
+
+		String LValues;
+		Set<long[]> L = res.keySet();
+		if (L.size() < 3000){
+			LValues = "";
+			for (long[] e: L){
+				LValues += "\t<"+SFTUtils.vectorToString(e)+","+(res.get(e))+">\n";
+			}
+		} else LValues = "L is too large to print.";
+		Log.log("\tfinished calculating L for "+(i-1)+" iterations, the list of significant Fourier coefficients for f:\n"+LValues+"\n");
+		Log.log("\tL is of size "+L.size());
+
 		Log.log("SFT -> runMatlabSFTPart1Internal - main algorithm part 2 completed");
-		return L;
+		return res;
 	}
 }
