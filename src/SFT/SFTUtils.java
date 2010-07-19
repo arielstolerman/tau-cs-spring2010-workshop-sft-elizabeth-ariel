@@ -70,17 +70,11 @@ public class SFTUtils {
 	 * class for creating a function from the results of the SFT algorithm.
 	 */
 	public static class ResultFunction extends DirectProdFunction implements Serializable{
-		Map<long[],Complex> mapping;
+		Map<long[],Complex> mapping; // mapping of elements to their COEFFICIENTS
 
 		public ResultFunction(long[] G, Map<long[],Complex> sftRes) throws FunctionException {
 			super(G);
 			mapping = sftRes;
-		}
-		
-		public ResultFunction(long[] G, Map<String,Complex> sftRes, int tmp) throws FunctionException {
-			super(G);
-			mapping = new HashMap<long[],Complex>();
-			for(String elem: sftRes.keySet()) mapping.put(getVectorFromString(elem), sftRes.get(elem));
 		}
 
 		@Override
@@ -91,6 +85,23 @@ public class SFTUtils {
 						mapping.get(alphaVector),
 						SFTUtils.chi(G.length,this.G,alphaVector,elem)));
 			return res;
+		}
+	}
+	
+	/**
+	 * class for creating a function from a given mapping of elements to their function values
+	 */
+	public static class FullMapFunction extends DirectProdFunction implements Serializable{
+		Map<String,Complex> mapping; // mapping ALL elements in the domain to their VALUES
+		
+		public FullMapFunction(long[] G, Map<String,Complex> map) throws FunctionException{
+			super(G);
+			mapping = map;
+		}
+		
+		@Override
+		public Complex getValue(long[] elem){
+			return mapping.get(vectorToString(elem));
 		}
 	}
 	
