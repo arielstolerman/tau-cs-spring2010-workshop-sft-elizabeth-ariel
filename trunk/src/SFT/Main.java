@@ -49,33 +49,44 @@ public class Main {
 	 */
 	private static void test1() throws Exception{
 		long[] G = new long[]{30000};
-		long ms = 2*SFTUtils.calcLogG(G)[0];
-		int numOfIterations = 2;
-		double tau = 0.015;
+		long ms = SFTUtils.calcLogG(G)[0];
+		int numOfIterations = 10;
+		double tau = 0.1;
+		String filename = "sample06_short";
+		String longFileName = filename+"_ms-"+(ms)+"_iters-"+(numOfIterations)+"_tau-"+(tau);
 		
 		// create function from WAV file (using MATLAB output from WAV to CSV)
-		DirectProdFunction wavFunc = new WavFunction("matlab\\wav\\output.csv",G);
+		DirectProdFunction wavFunc = new WavFunction("matlab\\wav\\"+filename+".csv",G);
 		
 		// RUN THE SFT ALGORITHM TO APPROXIMATE THE FUNCTION
 		SFTUtils.ResultFunction f_tag = new SFTUtils.ResultFunction(G,
 				SFT.getSignificantElements(G, tau, wavFunc, ms, ms, numOfIterations));
 		
-		/*
-		// writing the result function into a binary file
-		FileOutputStream output = new FileOutputStream("matlab\\wav\\java_output_func_2iters.bin");
-		ObjectOutputStream out = new ObjectOutputStream(output);
-		out.writeObject(f_tag);
-		out.close();
-		System.out.println(">>> wrote function to binary file");
-		*/
-		
 		// write result function into txt file to be parsed into WAV in MATLAB
-		FileWriter f = new FileWriter("matlab\\wav\\java_output_2iters.txt");
+		FileWriter f = new FileWriter("matlab\\wav\\"+longFileName+"_java.txt");
 		PrintWriter p = new PrintWriter(f);
 		for(int i=0; i<G[0]; i++){
 			Complex val = f_tag.getValue(new long[]{i});
 			p.print(val.getRe()+" "+val.getIm()+"\n");
 		}
 		p.close(); f.close();
+	}
+	
+	/**
+	 * write function into binary file named "<filename>.bin"
+	 * @param func
+	 * @param filename
+	 */
+	private static void funcToBin(SFTUtils.ResultFunction func, String filename){
+		try{
+		// writing the result function into a binary file
+		FileOutputStream output = new FileOutputStream("matlab\\wav\\"+filename+".bin");
+		ObjectOutputStream out = new ObjectOutputStream(output);
+		out.writeObject(func);
+		out.close();
+		System.out.println(">>> wrote function to binary file.");
+		} catch (IOException ioe){
+			System.err.println(">>> could not write function to binary file.");
+		}
 	}
 }
