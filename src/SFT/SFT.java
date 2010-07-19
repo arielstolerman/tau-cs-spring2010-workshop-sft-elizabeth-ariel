@@ -451,6 +451,7 @@ public class SFT {
 	/* #########################################################################################
 	 * 
 	 * 							Implementation of the SFT algorithm
+	 * 										For JAVA Usage
 	 * 
 	 * #########################################################################################*/
 	
@@ -481,15 +482,38 @@ public class SFT {
 	 * 				A map of the elements in G and their tau-significant coefficients in the given function with
 	 * 				confidence set by the selection of the m_A and m_B values.
 	 */
+	@SuppressWarnings("unchecked")
 	protected static Map<long[],Complex> runMainSFTAlgorithm(long[] G, double tau, DirectProdFunction func,
 			int numOfIterations, long m_A, long m_B) throws SFTException,FunctionException{
 		Log.log("SFT -> runMainSFTAlgorithm - main algorithm started");
-				
-		Set<long[]>[][] sets = generateQueries(G, m_A, m_B);
+		
+		// call part 1
+		Set<long[]>[][] sets = new HashSet[G.length+1][];
+		Set<long[]> Q = new HashSet<long[]>();
+		callPart1(G,tau,m_A,m_B,sets,Q);
+		
+		// call part 2
+		Map<long[],Complex> res = new HashMap<long[],Complex>();
+		callPart2(G,tau,func,numOfIterations,sets,Q,res);
+		
+		Log.log("SFT -> runMainSFTAlgorithm  - main algorithm completed");
+		return res;
+	}
+	
+	/* *****************************************************
+	 * implementation of algorithm 3.9 departed into 2 parts
+	 * for usage both in Java and in Matlab
+	 * *****************************************************/
+	/**
+	 * Algorithm 3.9 part 1
+	 */
+	private static void callPart1(long[] G, double tau, long m_A, long m_B,
+			Set<long[]>[][] sets, Set<long[]> Q){
+		generateQueries(G, m_A, m_B, sets);
 		Log.log("\tgenerated sets A,B1,..,BNt for t in {1,...,k} ");
 		
 		// Build set Q
-		Set<long[]> Q = new HashSet<long[]>();
+		//Q = new HashSet<long[]>();
 		Set<long[]> A = sets[0][0];
 		
 		int qSize = 0;
@@ -531,22 +555,34 @@ public class SFT {
 			String Qsize = Q.size()+"";
 			Log.log("\tcreated Q = {x - y | x in A, y in union(B_t_l), t=1,...,k, l=1,...,log(Nt)} of size "+Qsize+":\n\t"+QValues);
 		} else Log.log("\tQ is to big to print...");
-		
+	}
+	
+	/**
+	 * Algorithm 3.9 part 2
+	 */
+	private static void callPart2(long[] G,double tau,DirectProdFunction func,int numOfIterations,Set<long[]>[][] sets,
+			Set<long[]> Q,Map<long[],Complex> res) throws FunctionException{
 		/*
 		 * Run iterations of the following:
 		 * - estimate the function of the current iteration f_i
 		 * - calculate f_(i+1) = f - f_i
 		 */
 		
-		Map<long[],Complex> res = new HashMap<long[],Complex>();
-		DirectProdFunction currFunc = func;
+		// define result map, accumulates elements and their coefficients along the iterations
+		//res = new HashMap<long[],Complex>();
+		// allow function access to the accumulating result
+		SFTUtils.ResultFunction resFunc = new SFTUtils.ResultFunction(G, res);
+		// allow access to the difference function [ f - resFunc ]
+		// initial value [ f - 0 ] = f
+		SFTUtils.DiffFunction diffFunc = new SFTUtils.DiffFunction(G, func, resFunc);
+		
 		int i;
 		for (i=1; i<=numOfIterations; i++){
 			Log.log("\t--- Starting iteration "+i+" out of "+numOfIterations+" ---");
-			// create query
+			// create query for current iteration
 			Map<String,Complex> query = new HashMap<String,Complex>();
 			for(long[] elem: Q){
-				query.put(SFTUtils.vectorToString(elem), currFunc.getValue(elem));
+				query.put(SFTUtils.vectorToString(elem), diffFunc.getValue(elem)); // diffFunc updates from iteration to iteration
 			}
 			Log.log("\t\tCreated query of size "+query.size());
 
@@ -558,12 +594,9 @@ public class SFT {
 			Map<long[],Complex> currRes = SFTUtils.calcElemCoeffPairs(tmpRes, query, G);
 			Log.log("\t\tCalculated coefficients for current iteration L of iteration "+i);
 			
-			// add current iteration's results into global result map
+			// add current iteration's results into global result map, which will update diffFunc as well
 			for(long[] elem:currRes.keySet()) res.put(elem, currRes.get(elem));
-			
-			// calculate the difference function
-			currFunc = new SFTUtils.DiffFunction(G, func, currFunc);
-			Log.log("\t\tCreated difference function");
+			Log.log("\t\tUpdated difference function");
 			
 			Log.log("\t--- Done with iteration "+i+" ---");
 		}
@@ -578,9 +611,6 @@ public class SFT {
 		} else LValues = "L is too large to print.";
 		Log.log("\tfinished calculating L for "+(i-1)+" iterations, the list of significant Fourier coefficients for f:\n"+LValues+"\n");
 		Log.log("\tL is of size "+L.size());
-		
-		Log.log("SFT -> runMainSFTAlgorithm  - main algorithm completed");
-		return res;
 	}
 	
 	/**
@@ -618,13 +648,14 @@ public class SFT {
 	 * 				create the set of x's to ask their f-value.
 	 */
 	@SuppressWarnings("unchecked")
-	protected static Set<long[]>[][] generateQueries(long[] G, long m_A, long m_B){
+	protected static void generateQueries(long[] G, long m_A, long m_B,
+			Set<long[]>[][] res){
 		Log.log("SFT -> generateQueries started");
 		Log.log("\tm_A is: "+m_A+", m_B is: "+m_B);
 		
 		// generate A,B_1,...,B_Ntl for each t in {1,...,k} and l in {1,...,logN_t}
 		int[] logG = SFTUtils.calcLogG(G);
-		Set<long[]>[][] res = new HashSet[G.length+1][];
+		//Set<long[]>[][] res = new HashSet[G.length+1][];
 		
 		// generate random subset A partial to G with m_A elements
 		res[0] = new HashSet[1];
@@ -665,8 +696,6 @@ public class SFT {
 		
 		Log.log("\tcreated A and and B1,...,BlogN_t for each t in {1,...,k}");
 		Log.log("SFT -> generateQueries completed");
-		
-		return res;
 	}
 	
 	/**
@@ -854,6 +883,13 @@ public class SFT {
 		return est >= threshold;
 	}
 	
+	/* #########################################################################################
+	 * 
+	 * 							Implementation of the SFT algorithm
+	 * 									 For MATLAB Usage
+	 * 
+	 * #########################################################################################*/
+	
 	/* *************************************************************
 	 * The SFT algorithm 3.9 departed into 2 parts for use in Matlab
 	 ***************************************************************/
@@ -884,55 +920,10 @@ public class SFT {
 	throws SFTException{
 		Log.log("SFT -> runMatlabSFTPart1Internal - main algorithm part 1 started");
 
-		// run generateQueries (algorithm 3.10)
-		Set<long[]>[][] sets = generateQueries(G, m_A, m_B);
-		Log.log("\tgenerated sets A,B1,..,BNt for t in {1,...,k} ");
-		
-		// Build set Q
+		// call part 1
+		Set<long[]>[][] sets = new HashSet[G.length+1][];
 		Set<long[]> Q = new HashSet<long[]>();
-		Set<long[]> A = sets[0][0];
-		
-		int qSize = 0;
-		int k = G.length;
-		for (int t=1; t<=k; t++){
-			for (int l=0; l<sets[t].length; l++){
-				qSize += A.size() * sets[t][l].size();
-			}
-		}
-		Log.log("\tstarting to generate set Q of maximum size of "+qSize);
-		
-		long qCalcCounter = 0;
-		for (int t=1; t<=k; t++){
-			Set<long[]>[] tSets = sets[t];
-			for (int l=0; l<tSets.length; l++){
-				Set<long[]> Btl = tSets[l];
-				for(long[] e_a: A){
-					for(long[] e_b: Btl){
-						long[] elem = SFTUtils.subVectorModulo(e_a, e_b, G[t-1],k); // vector subtraction modulo Nt
-						if (!SFTUtils.contains(Q,elem))
-							Q.add(elem);
-						qCalcCounter++;
-						if (qCalcCounter % 10000 == 0)
-							Log.log("\tCalculating Q, already checked "+qCalcCounter+" couples of a in A, b in Btl");
-					}
-				}
-			}
-		}
-		Log.log("\tdone calculating Q, actual size is "+Q.size());
-		
-		if (Q.size() < 3000){
-			String QValues = "";
-			int rowCount = 0;
-			for (Iterator<long[]> j = Q.iterator(); j.hasNext();){
-				rowCount++;
-				QValues += SFTUtils.vectorToString(j.next());
-				QValues += (rowCount % 20 == 0)? "\n\t":" ";
-			}
-			String Qsize = Q.size()+"";
-			Log.log("\tcreated Q = {x - y | x in A, y in union(B_t_l), t=1,...,k, l=1,...,log(Nt)} of size "+Qsize+":\n\t"+QValues);
-		} else Log.log("\tQ is to big to print...");
-		
-		Log.log("SFT -> runMatlabSFTPart1Internal - main algorithm part 1 completed");
+		callPart1(G,tau,m_A,m_B,sets,Q);
 		
 		// put Q as the last set in sets and return A, all B's and Q
 		Set<long[]>[][] res = new HashSet[sets.length+1][];
@@ -967,52 +958,16 @@ public class SFT {
 	private static Map<long[],Complex> runMatlabSFTPart2Internal(long[] G, double tau, Set<long[]>[][] sets,
 			Map<String,Complex> query_in, int numOfIterations) throws SFTException,FunctionException{	
 		Log.log("SFT -> runMatlabSFTPart2Internal - main algorithm part 2 started");
-
-		Map<long[],Complex> res = new HashMap<long[],Complex>();
-		DirectProdFunction func = new SFTUtils.ResultFunction(G, query_in, 1);
-		DirectProdFunction currFunc = func;
-		Set<long[]> Q = sets[sets.length-1][0];
-		int i;
 		
-		for (i=1; i<=numOfIterations; i++){
-			Log.log("\t--- Starting iteration "+i+" out of "+numOfIterations+" ---");
-			// create query
-			Map<String,Complex> query = new HashMap<String,Complex>();
-			for(long[] elem: Q){
-				query.put(SFTUtils.vectorToString(elem), currFunc.getValue(elem));
-			}
-			Log.log("\t\tCreated query of size "+query.size());
-
-			// run getFixedQueriesSFT to get the current iteration's elements with significant coefficients
-			Set<long[]> tmpRes = getFixedQueriesSFT(G,tau,sets,query);
-			Log.log("\t\tcurrent iteration's L size is: "+tmpRes.size());
-
-			// calculate the coefficients for the elements in tmpRes
-			Map<long[],Complex> currRes = SFTUtils.calcElemCoeffPairs(tmpRes, query, G);
-			Log.log("\t\tCalculated coefficients for current iteration L of iteration "+i);
-
-			// add current iteration's results into global result map
-			for(long[] elem:currRes.keySet()) res.put(elem, currRes.get(elem));
-
-			// calculate the difference function
-			currFunc = new SFTUtils.DiffFunction(G, func, currFunc);
-			Log.log("\t\tCreated difference function");
-
-			Log.log("\t--- Done with iteration "+i+" ---");
-		}
-
-		String LValues;
-		Set<long[]> L = res.keySet();
-		if (L.size() < 3000){
-			LValues = "";
-			for (long[] e: L){
-				LValues += "\t<"+SFTUtils.vectorToString(e)+","+(res.get(e))+">\n";
-			}
-		} else LValues = "L is too large to print.";
-		Log.log("\tfinished calculating L for "+(i-1)+" iterations, the list of significant Fourier coefficients for f:\n"+LValues+"\n");
-		Log.log("\tL is of size "+L.size());
-
-		Log.log("SFT -> runMatlabSFTPart1Internal - main algorithm part 2 completed");
+		// create func
+		DirectProdFunction func = new SFTUtils.ResultFunction(G, query_in, 1);
+		Set<long[]> Q = sets[sets.length-1][0];
+		
+		// call part 2
+		Map<long[],Complex> res = new HashMap<long[],Complex>();
+		callPart2(G,tau,func,numOfIterations,sets,Q,res);
+		
+		Log.log("SFT -> runMainSFTAlgorithm  - main algorithm completed");
 		return res;
 	}
 }
