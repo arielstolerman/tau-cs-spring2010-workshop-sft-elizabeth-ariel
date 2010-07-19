@@ -69,6 +69,7 @@ public class SFT {
 	 */
 	public static Map<long[],Complex> getSignificantElements(long[] G, double tau, DirectProdFunction func,
 			long m_A, long m_B) throws SFTException,FunctionException{
+		SFTUtils.checkParameters(G, tau, m_A, m_B);
 		return getSignificantElements(G,tau,func,m_A,m_B,DEFAULT_NUM_OF_ITERATIONS);
 	}
 	
@@ -104,6 +105,7 @@ public class SFT {
 	 */
 	public static Map<long[],Complex> getSignificantElements(long[] G, double tau, DirectProdFunction func,
 			long m_A, long m_B, int numOfIterations) throws SFTException,FunctionException{
+		SFTUtils.checkParameters(G, tau, m_A, m_B, numOfIterations);
 		// skip the calculation of m_A and m_B and call the main algorithm directly
 		return runMainSFTAlgorithm(G, tau, func, numOfIterations, m_A, m_B);
 	}
@@ -149,8 +151,9 @@ public class SFT {
 	public static Map<long[],Complex> getSignificantElements(long[] G, double tau, DirectProdFunction func,
 			int numOfIterations, double delta, double fInfNorm, double fEuclideanNorm, float deltaCoeff, float randSetsCoeff)
 			throws SFTException,FunctionException{
+		SFTUtils.checkParameters(G, delta, tau, fInfNorm, fEuclideanNorm, deltaCoeff, randSetsCoeff, numOfIterations);
 		// first calculate m_A and m_B as described in algorithms 3.9 and 3.10
-		long[] randSetsSizes = getRandomSetsSizes(G,delta,tau,fInfNorm,fEuclideanNorm,deltaCoeff,fEuclideanNorm);
+		long[] randSetsSizes = getRandomSetsSizes(G,delta,tau,fInfNorm,fEuclideanNorm,deltaCoeff,randSetsCoeff);
 		// call main algorithm
 		return runMainSFTAlgorithm(G, tau, func, numOfIterations, randSetsSizes[0], randSetsSizes[1]);
 	}
@@ -310,6 +313,8 @@ public class SFT {
 		long[] g = new long[G.length];
 		for(int i=0; i<G.length; i++) g[i] = G[i];
 		
+		SFTUtils.checkParameters(g, tau, m_A, m_B);
+		
 		// run algorithm
 		Set<long[]>[][] sets = runMatlabSFTPart1Internal(g, tau, m_A, m_B);
 		
@@ -340,6 +345,8 @@ public class SFT {
 		Log.setLogMode(isLogged);
 		long[] g = new long[G.length];
 		for(int i=0; i<G.length; i++) g[i] = G[i];
+		
+		SFTUtils.checkParameters(g, delta_t, tau, fInfNorm, fEuclideanNorm, deltaCoeff, randSetsCoeff, 1);
 		
 		long[] randSetsSizes = getRandomSetsSizes(g,delta_t,tau,fInfNorm,fEuclideanNorm,deltaCoeff,randSetsCoeff);
 		
@@ -373,12 +380,14 @@ public class SFT {
 		for(int i=0; i<G.length; i++) g[i] = G[i].longValue();
 		Set<long[]>[][] sets = matlabRep.getSets();
 		Map<String,Complex> query = matlabRep.getQuery();
+		
+		SFTUtils.checkParameters(g, tau, numOfIterations);
 
 		// run part 2 and return the results fitted to matlab (Long[] elements)
 		Map<long[],Complex> tmpRes = runMatlabSFTPart2Internal(g, tau, sets, query, numOfIterations);
 		int setSize = tmpRes.keySet().size();
 		Long[][] keys = new Long[setSize][];
-		Complex[] values = new Complex[setSize];
+		Double[][] values = new Double[setSize][2];
 		int size = G.length;
 		int index = 0;
 		for (long[] elem: tmpRes.keySet()){
@@ -387,10 +396,11 @@ public class SFT {
 			
 			// update results
 			keys[index] = e;
-			values[index] = tmpRes.get(elem);
+			Complex val = tmpRes.get(elem);
+			values[index][0] = new Double(val.getRe());
+			values[index][1] = new Double(val.getIm());
 			index++;
 		}
-		System.out.println("<<<<<<<<<<<<<<<<<<<< "+values[2]+" >>>>>>>>>>>>>>>>>>>>>>>");
 		return new MatlabTemporaryResultDirectProd(keys, values);
 	}
 	
@@ -652,6 +662,7 @@ public class SFT {
 			Set<long[]>[][] res){
 		Log.log("SFT -> generateQueries started");
 		Log.log("\tm_A is: "+m_A+", m_B is: "+m_B);
+		//System.exit(-1);
 		
 		// generate A,B_1,...,B_Ntl for each t in {1,...,k} and l in {1,...,logN_t}
 		int[] logG = SFTUtils.calcLogG(G);
