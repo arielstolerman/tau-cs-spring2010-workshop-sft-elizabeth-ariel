@@ -317,8 +317,8 @@ public class SFT {
 		Set<long[]> longQ = sets[sets.length-1][0];
 		Long[][] Q = new Long[longQ.size()][];
 		int i=0;
+		int len = G.length;
 		for (long[] elem: longQ){
-			int len = elem.length;
 			Long[] Elem = new Long[len];
 			for (int k=0; k<len; k++) Elem[k] = new Long(elem[k]);
 			Q[i++] = Elem;
@@ -370,9 +370,9 @@ public class SFT {
 			MatlabTemporaryRepositoryDirectProd matlabRep, int numOfIterations) throws SFTException,FunctionException{
 		// fit parameters to java
 		long[] g = new long[G.length];
-		for(int i=0; i<G.length; i++) g[i] = G[i];
+		for(int i=0; i<G.length; i++) g[i] = G[i].longValue();
 		Set<long[]>[][] sets = matlabRep.getSets();
-		Map<String,Complex> query = (HashMap<String,Complex>)matlabRep.getQuery();
+		Map<String,Complex> query = matlabRep.getQuery();
 
 		// run part 2 and return the results fitted to matlab (Long[] elements)
 		Map<long[],Complex> tmpRes = runMatlabSFTPart2Internal(g, tau, sets, query, numOfIterations);
@@ -875,7 +875,7 @@ public class SFT {
 		
 		// compare to threshold and return result
 		double threshold = 5*tau/36;
-		Log.log("\tcalculated est:"+est+((est >= threshold) ? "\t\tPASSED!":""));
+		Log.log("\test for interval ["+interval[0]+","+interval[1]+"]:"+est+((est >= threshold) ? "\t\tPASSED!":""));
 		if (interval[0] == interval[1] && p != null) p.println(interval[0]+" "+est);
 		
 		//Log.log("SFT -> distinguish completed");
@@ -960,7 +960,7 @@ public class SFT {
 		Log.log("SFT -> runMatlabSFTPart2Internal - main algorithm part 2 started");
 		
 		// create func
-		DirectProdFunction func = new SFTUtils.ResultFunction(G, query_in, 1);
+		DirectProdFunction func = new SFTUtils.FullMapFunction(G, query_in);
 		Set<long[]> Q = sets[sets.length-1][0];
 		
 		// call part 2
