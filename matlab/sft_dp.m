@@ -11,17 +11,17 @@
 %	 				This is an optimization for the original SFT algorithm to enable catching significant coefficients
 %	 				with greater precision.
 % Result:
-% Returns a mapping of the elements in G and their tau-significant coefficients in the given function with delta-confidence.
-% The result is a matrix where each row of size n is an element (first n-1 coordinates) and its coefficient (the last coordinate).
+% Returns a mapping of the elements in G and their tau-significant coefficients in the given function with confidence set by the values m_A and m_B.
+% L - a vector of the tau-significant elements.
+% coeffs - a vector of their corresponding coefficients (s.t. the coefficient of L(i) is coeffs(i)).
 
-function[res]=sft_dp_full(isLogged,G,tau,func,m_A,m_B,numOfIterations);
+function[L,coeffs]=sft_dp_full(isLogged,G,tau,func,m_A,m_B,numOfIterations);
 
 if nargin == 6;
 	numOfIterations = 1;
 end;
 
 % set java path
-%javaaddpath('/specific/a/home/cc/students/cs/arielst1/sft/sft_lib.jar')
 import java.util.*
 import java.io.File
 import SFT.*
@@ -70,21 +70,15 @@ rep.setQuery(query);
 % each row is an element (vector) in L, the set of significant elements
 jres=sft.runMatlabSFTPart2Internal(G_java,tau,rep,numOfIterations);
 
-% remove this:
-res = jres;
-% end remove
-
-%jkeys = jres.getKeys;
-%jvalues = jres.getValues;
-%res = zeros(size+1,jkeys.length); % the additional coordinate is for the result function value
-%for ind=1:jkeys.length;
-	%xLong=jkeys(ind);
-	%x=zeros(1,size+1);
-  	%for j=1:size;
-    	%x(j)=xLong(j).longValue;
-  	%end
-	%val = jvalues(ind);
-  	%x(size+1)=(val.getRe()) + i*(val.getIm());
-	%res(ind:(ind+size-1)) = x;
-%end
-%res = transpose(res);
+jkeys = jres.getKeys;
+jvalues = jres.getValues;
+L = zeros(jkeys.length,size);	% for holding the significant elements
+coeffs = zeros(jkeys.length,1);	% for holding their coefficients
+for ind=1:jkeys.length;
+	xLong=jkeys(ind);
+  	for j=1:size;
+    	L(ind,j)=xLong(j).longValue;
+  	end
+	val = jvalues(ind);
+  	coeffs(ind) = complex(val(1).doubleValue,val(2).doubleValue);
+end

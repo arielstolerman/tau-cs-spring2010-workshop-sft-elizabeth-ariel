@@ -149,28 +149,15 @@ public class SFTUtils {
 				(Math.log(N)/Math.log(2)) );
 	}
 	
-	/**
-	 * parameters check - default parameters
-	 * @param G
-	 * @param delta
-	 * @param tau
-	 * @throws SFTException
-	 */
+	/* ****************
+	 * Parameters check
+	 * ****************/
+	
 	protected static void checkParameters(long[] G, double delta, double tau, double fInfNorm,
-			double fEuclideanNorm, float deltaCoeff, float randSetsCoeff) throws SFTException{
-		if (G == null || G.length < 1){
-			throw new SFTException("G must be bigger than 0.");
-		}
-		for (int i=0; i<G.length; i++){
-			if (G[i] <= 0){
-				throw new SFTException("all Ns must be positive. G["+i+"] is "+G[i]); 
-			}
-		}
+			double fEuclideanNorm, float deltaCoeff, float randSetsCoeff, int numOfIterations) throws SFTException{
+		checkParameters(G, tau, numOfIterations);
 		if (delta <= 0 || delta >= 1){
 			throw new SFTException("delta must be in (0,1).");
-		}
-		if (tau <= 0){
-			throw new SFTException("tau must be positive.");
 		}
 		if (fInfNorm < 0){
 			throw new SFTException("The infinity norm of the function must be positive.");
@@ -183,24 +170,39 @@ public class SFTUtils {
 		}
 	}
 	
-	/**
-	 * parameters check - norms
-	 * @param fInfNorm
-	 * @param fEuclideanNorm
-	 * @throws SFTException
-	 */
-	protected static void checkNorms(double fInfNorm, double fEuclideanNorm) throws SFTException{
-		
+	protected static void checkParameters(long[] G, double tau, long m_A, long m_B, int numOfIterations) throws SFTException{
+		checkParameters(G, tau, numOfIterations);
+		checkParameters(m_A, m_B);
 	}
 	
-	/**
-	 * parameters check - constants
-	 * @param deltaCoeff
-	 * @param randSetsCoeff
-	 * @throws SFTException
-	 */
-	protected static void checkConstants(float deltaCoeff, float randSetsCoeff) throws SFTException{
-		
+	protected static void checkParameters(long[] G, double tau, long m_A, long m_B) throws SFTException{
+		checkParameters(G, tau);
+		checkParameters(m_A, m_B);
+	}
+	
+	protected static void checkParameters(long[] G, double tau, int numOfIterations) throws SFTException{
+		checkParameters(G, tau);
+		if (numOfIterations <= 0){
+			throw new SFTException("number of iterations given must be positive.");
+		}
+	}
+	
+	protected static void checkParameters(long[] G, double tau) throws SFTException{
+		if (G == null || G.length < 1){
+			throw new SFTException("G must be bigger than 0.");
+		}
+		for (int i=0; i<G.length; i++){
+			if (G[i] <= 0){
+				throw new SFTException("all Ns must be positive. G["+i+"] is "+G[i]); 
+			}
+		}
+		if (tau <= 0){
+			throw new SFTException("tau must be positive.");
+		}
+	}
+	
+	protected static void checkParameters(long m_A, long m_B) throws SFTException{
+		if (m_A <= 0 || m_B <= 0) throw new SFTException("m_A and m_B must be greater than 0.");
 	}
 	
 	/* ***************************
@@ -625,28 +627,28 @@ public class SFTUtils {
 	
 	protected static class MatlabTemporaryResultDirectProd{
 		Long[][] keys;
-		Complex[] values;
+		Double[][] values;
 		
-		public MatlabTemporaryResultDirectProd(Long[][] keys, Complex[] values){
+		public MatlabTemporaryResultDirectProd(Long[][] keys, Double[][] values){
 			this.keys = keys;
 			this.values = values;
 		}
 		
 		public Long[][] getKeys() { return keys; }
-		public Complex[] getValues() { return values; }
+		public Double[][] getValues() { return values; }
 	}
 	
 	protected static class MatlabTemporaryResultFiniteAbelian{
 		Long[] keys;
-		Complex[] values;
+		Double[][] values;
 		
-		public MatlabTemporaryResultFiniteAbelian(Long[] keys, Complex[] values){
+		public MatlabTemporaryResultFiniteAbelian(Long[] keys, Double[][] values){
 			this.keys = keys;
 			this.values = values;
 		}
 		
 		public Long[] getKeys() { return keys; }
-		public Complex[] getValues() { return values; }
+		public Double[][] getValues() { return values; }
 	}
 	
 	protected static MatlabTemporaryResultFiniteAbelian getMatlabFiniteAbelianRes(MatlabTemporaryResultDirectProd tmpRes, Long[][] G){
