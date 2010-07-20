@@ -156,7 +156,8 @@ public class SFTUtils {
 	 * ****************/
 	
 	protected static void checkParameters(long[] G, double delta, double tau, double fInfNorm,
-			double fEuclideanNorm, float deltaCoeff, float randSetsCoeff, int numOfIterations) throws SFTException{
+			double fEuclideanNorm, float deltaCoeff, float maCoeff, float mbCoeff, float etaCoeff, int numOfIterations)
+	throws SFTException{
 		checkParameters(G, tau, numOfIterations);
 		if (delta <= 0 || delta >= 1){
 			throw new SFTException("delta must be in (0,1).");
@@ -167,8 +168,8 @@ public class SFTUtils {
 		if (fEuclideanNorm < 0){
 			throw new SFTException("The Euclidean norm of the function must be positive.");
 		}
-		if (deltaCoeff <= 0 || randSetsCoeff <= 0){
-			throw new SFTException("The coefficients must be positive.");
+		if (deltaCoeff <= 0 || maCoeff <= 0 || mbCoeff <= 0 || etaCoeff <= 0){
+			throw new SFTException("All coefficients must be positive.");
 		}
 	}
 	

@@ -4,16 +4,16 @@
 % - L, coeffs - as described in the original SFT script, only this is an intersection of results from numOfRec reccurences.
 % - sizes - a vector of the size of L (and coeffs) in each reccurence.
 
-function[L,coeffs,sizes]=sft_dp_full_rec(isLogged,G,tau,func,numOfIterations,delta_t,fInfNorm,fEuclideanNorm,deltaCoeff,randSetsCoeff,numOfRec)
+function[L,coeffs,sizes]=sft_dp_full_rec(isLogged,G,tau,func,numOfIterations,delta_t,fInfNorm,fEuclideanNorm,deltaCoeff,maCoeff,mbCoeff,etaCoeff,numOfRec)
 
 % hold the size of each result
 sizes = zeros(1,numOfRec);
 
-[L,coeffs]=sft_dp_full(isLogged,G,tau,func,numOfIterations,delta_t,fInfNorm,fEuclideanNorm,deltaCoeff,randSetsCoeff);
+[L,coeffs]=sft_dp_full(isLogged,G,tau,func,numOfIterations,delta_t,fInfNorm,fEuclideanNorm,deltaCoeff,maCoeff,mbCoeff,etaCoeff);
 sizes(1) = size(L,1);
 % run numOfRec - 1 more times
 for i=2:numOfRec
-    [tmpL,tmpCoeffs]=sft_dp_full(isLogged,G,tau,func,numOfIterations,delta_t,fInfNorm,fEuclideanNorm,deltaCoeff,randSetsCoeff);
+    [tmpL,tmpCoeffs]=sft_dp_full(isLogged,G,tau,func,numOfIterations,delta_t,fInfNorm,fEuclideanNorm,deltaCoeff,maCoeff,mbCoeff,etaCoeff);
     indToRemove = []; % vector to hold indices of elements to be removed from L
     ind = 1;
     for j=1:size(L,1)

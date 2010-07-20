@@ -48,8 +48,8 @@ public class Main {
 	public static void main(String[] args) throws Exception{
 		//test1();
 		//test2();
-		//test3();
-		test4();
+		test3();
+		//test4();
 	}
 	
 	/*
@@ -140,10 +140,12 @@ public class Main {
 		double eucNorm = 0.46955366451643;
 		double delta_t = 0.2;
 		float deltaCoeff = (float)0.001;
-		float randSetsCoeff = (float)0.0000002;
+		float maCoeff = (float)0.0000002;
+		float mbCoeff = (float)0.0000002;
+		float etaCoeff = (float)1;
 		String filename = "sample06_short";
 		String longFileName = filename+"_delta-"+(delta_t)+"_iters-"+(numOfIterations)+"_tau-"+(tau)+
-		"_d-coeff-"+deltaCoeff+"_sets-coeff-"+randSetsCoeff;
+		"_d-coeff-"+deltaCoeff+"_maCoeff-"+maCoeff+"_mbCoeff-"+mbCoeff+"_etaCoeff-"+etaCoeff;
 		
 		// create function from WAV file (using MATLAB output from WAV to CSV)
 		DirectProdFunction wavFunc = new WavFunction("matlab\\wav\\"+filename+".csv",G);
@@ -151,7 +153,7 @@ public class Main {
 		// RUN THE SFT ALGORITHM TO APPROXIMATE THE FUNCTION
 		SFTUtils.ResultFunction f_tag = new SFTUtils.ResultFunction(G,
 				SFT.getSignificantElements(G, tau, wavFunc, numOfIterations, delta_t,
-						infNorm, eucNorm, deltaCoeff, randSetsCoeff));
+						infNorm, eucNorm, deltaCoeff, maCoeff, mbCoeff, etaCoeff));
 		
 		// write result function into txt file to be parsed into WAV in MATLAB
 		FileWriter f = new FileWriter("matlab\\wav\\"+longFileName+"_java.txt");

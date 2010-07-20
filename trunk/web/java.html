@@ -24,8 +24,8 @@
 				</center></b>
 				
 				<h3>Summary</h3>
-				The Java SFT library allows users to use the public SFT methods for calculating a list of elements whose Fourier
-				coefficients are significant. The library includes two packages:
+				The Java SFT library allows users to use the public SFT methods for calculating a list of elements with significant Fourier
+				coefficients, and an approximation of these coefficients. The library includes two public packages:
 				<ul>
 					<li>
 						<b>SFT</b>: main package, includes the SFT implementation.
@@ -35,7 +35,7 @@
 						SFT methods input, for the function-query (see the paper for details).
 					</li>
 				</ul>
-				The SFT main package allows the user to call the SFT calculation in 4 variations:
+				The SFT main package allows the user to call the SFT calculation in 6 variations:
 				<ul>
 					<li>
 						<b>Function domain</b>: input function is either Cartesian product of finite groups (Z<sub>N1</sub> x ... x Z<sub>Nk</sub>)
@@ -43,10 +43,26 @@
 						corresponding generators g<sub>j</sub>'s.
 					</li>
 					<li>
-						<b>Optional algorithm constants</b>: the algorithm uses two optional user-defined constants for calculating
-						the confidence parameter &delta; and the size of the random subsets from which a relatively small group Q of elements
-						in the domain G is generated (and its values are to be queried from the given query-access). The user may input these
-						constants, otherwise they are given a default value.
+						<b>Random subsets calculation method</b>: as detailed in the paper, the approximation is based on a set of elements in G, Q, which is
+						defined as {x-y | x in A, y in Btl, t=1,...,k, l=1,...,log(Nt)}, where A and Btl are randomly generated sets of elements in G.
+						Set A is of defined to be of size m<sub>A</sub> and sets Btl are defined to be of maximum size of m<sub>B</sub>.<br>
+						The user is given two options to determine m<sub>A</sub> and m<sub>B</sub>: either give these variables directly or the more precise
+						way by giving the algorithm all parameters needed to calculate m<sub>A</sub> and m<sub>B</sub> as described in the paper (p. 57):<br>
+						<center>
+						m<sub>A</sub> = &Theta;((||f||<sub>&infin;</sub>/&eta;)<sup>2</sup> * ln(1/&delta;)),
+						m<sub>B</sub> = &Theta;((||f||<sub>&infin;</sub>/&eta;)<sup>2</sup> * ln(||f||<sub>&infin;</sub>/&delta;&gamma;))<br>
+						
+						where &delta; = &delta;'/&Theta;(1/&tau; * (||f||<sub>2</sub><sup>2</sup>/&tau;)<sup>1.5</sup> * log|G|),
+						&eta; = &Theta;(min{&gamma;, &radic;&gamma;, &gamma;/||f||<sub>&infin;</sub>})
+						</center><br>
+						The second option usage requires: &delta;', ||f||<sub>2</sub>, ||f||<sub>&infin;</sub>, the constant for the tight-bound in &delta; calculation,
+						the constants for the tight-bounds in m<sub>A</sub> and m<sub>B</sub> calculation and the constant for the tight-bound in &eta; calculation.
+					</li>
+					<li>
+						<b>Number of iterations</b>: the simpler method, the one using a given m<sub>A</sub> and m<sub>B</sub>, has an optional <i>numOfIterations</i>
+						parameter. This parameter is for a suggested improvement for the percision of the SFT output. If the given number of iterations is bigger than 1,
+						each iteration i reruns the SFT significant elements calculation over the same generated Q, over the difference function &fnof;-&fnof;<sub>i-1</sub>:
+						the difference between the given function and the output function of the previous iteration.
 					</li>
 				</ul>
 				

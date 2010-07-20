@@ -19,9 +19,10 @@ import SFT.SFTUtils.*;
 
 /**
  * An implementation of the SFT algorithm for finding the list of elements whose Fourier
- * coefficients are significant for a given function &fnof;: G &rarr; C, where G is a Cartesian product of
- * finite groups (i.e. Z<sub>N1</sub> x ... x Z<sub>Nk</sub>) described by a list of N<sub>j</sub>'s or an
- * Abelian group described by a list of N<sub>j</sub>'s and the corresponding generators g<sub>j</sub>'s.<br>
+ * coefficients are significant (and their coefficients) for a given function &fnof;: G &rarr; C, where G is a
+ * Cartesian product of finite groups (i.e. Z<sub>N1</sub> x ... x Z<sub>Nk</sub>) described by a list of
+ * N<sub>j</sub>'s or an Abelian group described by a list of N<sub>j</sub>'s and the corresponding generators
+ * g<sub>j</sub>'s.<br>
  * <br>
  * The implementation is based on the SFT algorithm described in "Learning Noisy Characters, Multiplication Codes, 
  * And Cryptographic Hardcore Predicates" (Adi Akavia, 2008, page 52).<br>
@@ -86,15 +87,15 @@ public class SFT {
 	 * @param func
 	 * 				The given function over G -> C whose elements and their significant coefficients are returned.
 	 * 				Used for query access.
+	 * @param m_A
+	 * 				The size of the group A (for constructing the group Q).
+	 * @param m_B
+	 * 				The size of the groups Btl (for constructing the group Q).
 	 * @param numOfIterations
 	 * 				The number of SFT procedure iterations to run. Each iteration is ran with the difference function
 	 * 				of the given function and the output of the previous SFT iteration.
 	 * 				This is an optimization for the original SFT algorithm to enable catching significant coefficients
 	 * 				with greater precision.
-	 * @param m_A
-	 * 				The size of the group A (for constructing the group Q).
-	 * @param m_B
-	 * 				The size of the groups Btl (for constructing the group Q).
 	 * @return
 	 * 				A map of the elements in G and their tau-significant coefficients in the given function with
 	 * 				confidence set by the selection of the m_A and m_B values.
@@ -115,9 +116,9 @@ public class SFT {
 	 * delta-confidence.
 	 * The algorithm includes a calculation of the error-bound, based on the delta-input and a some constant.
 	 * This implementation allows the user (who knows the algorithm) to state this constant.
-	 * The algorithm also includes a calculation of randomly generated sets of elements in G,
-	 * of sizes defined as m_A and m_B in the paper, that uses some constant. This implementation allows the user
-	 * (who knows the algorithm) to state this constant as well.
+	 * The algorithm also includes calculations of randomly generated sets of elements in G,
+	 * of sizes defined as m_A and m_B in the paper, that use some constants. This implementation allows the user
+	 * (who knows the algorithm) to state these constants as well.
 	 * @param G
 	 * 				The values N1,...,Nk describing the group G = Z_N1 x ... x Z_Nk.
 	 * @param tau
@@ -138,8 +139,12 @@ public class SFT {
 	 * 				The Euclidean norm of the function.
 	 * @param deltaCoeff
 	 * 				A constant coefficient for the algorithm's calculation of delta.
-	 * @param randSetsCoeff
-	 * 				A constant coefficient for the algorithm's calculation of delta.
+	 * @param maCoeff
+	 * 				A constant coefficient for the algorithm's calculation of m_A.
+	 * @param mbCoeff
+	 * 				A constant coefficient for the algorithm's calculation of m_B.
+	 * @param etaCoeff
+	 * 				A constant coefficient for the algorithm's calculation of eta (appears in m_A and m_B calculation).
 	 * @return
 	 * 				A map of the elements in G and their tau-significant coefficients in the given function with
 	 * 				delta-confidence.
@@ -149,11 +154,12 @@ public class SFT {
 	 * 				If the creation of the difference function between iterations of the SFT procedure is invalid.
 	 */
 	public static Map<long[],Complex> getSignificantElements(long[] G, double tau, DirectProdFunction func,
-			int numOfIterations, double delta, double fInfNorm, double fEuclideanNorm, float deltaCoeff, float randSetsCoeff)
+			int numOfIterations, double delta, double fInfNorm, double fEuclideanNorm,
+			float deltaCoeff, float maCoeff, float mbCoeff, float etaCoeff)
 			throws SFTException,FunctionException{
-		SFTUtils.checkParameters(G, delta, tau, fInfNorm, fEuclideanNorm, deltaCoeff, randSetsCoeff, numOfIterations);
+		SFTUtils.checkParameters(G, delta, tau, fInfNorm, fEuclideanNorm, deltaCoeff, maCoeff, mbCoeff, etaCoeff, numOfIterations);
 		// first calculate m_A and m_B as described in algorithms 3.9 and 3.10
-		long[] randSetsSizes = getRandomSetsSizes(G,delta,tau,fInfNorm,fEuclideanNorm,deltaCoeff,randSetsCoeff);
+		long[] randSetsSizes = getRandomSetsSizes(G,delta,tau,fInfNorm,fEuclideanNorm,deltaCoeff,maCoeff,mbCoeff,etaCoeff);
 		// call main algorithm
 		return runMainSFTAlgorithm(G, tau, func, numOfIterations, randSetsSizes[0], randSetsSizes[1]);
 	}
@@ -247,9 +253,9 @@ public class SFT {
 	 * delta-confidence.
 	 * The algorithm includes a calculation of the error-bound, based on the delta-input and a some constant.
 	 * This implementation allows the user (who knows the algorithm) to state this constant.
-	 * The algorithm also includes a calculation of randomly generated sets of elements in G,
-	 * of sizes defined as m_A and m_B in the paper, that uses some constant. This implementation allows the user
-	 * (who knows the algorithm) to state this constant as well.
+	 * The algorithm also includes calculations of randomly generated sets of elements in G,
+	 * of sizes defined as m_A and m_B in the paper, that use some constants. This implementation allows the user
+	 * (who knows the algorithm) to state these constants as well.
 	 * @param G
 	 * 				The values (g1,N1),...,(gk,Nk) describing the Abelian group G where gj are the
 	 * 				corresponding generators for Nj.
@@ -271,8 +277,12 @@ public class SFT {
 	 * 				The Euclidean norm of the function.
 	 * @param deltaCoeff
 	 * 				A constant coefficient for the algorithm's calculation of delta.
-	 * @param randSetsCoeff
-	 * 				A constant coefficient for the algorithm's calculation of delta.
+	 * @param maCoeff
+	 * 				A constant coefficient for the algorithm's calculation of m_A.
+	 * @param mbCoeff
+	 * 				A constant coefficient for the algorithm's calculation of m_B.
+	 * @param etaCoeff
+	 * 				A constant coefficient for the algorithm's calculation of eta (appears in m_A and m_B calculation).
 	 * @return
 	 * 				A map of the elements in G and their tau-significant coefficients in the given function with
 	 * 				delta-confidence.
@@ -282,7 +292,8 @@ public class SFT {
 	 * 				If the creation of the difference function between iterations of the SFT procedure is invalid.
 	 */
 	public static Map<Long,Complex> getSignificantElements(long[][] G, double tau, FiniteAbelianFunction func,
-			int numOfIterations, double delta, double fInfNorm, double fEuclideanNorm, float deltaCoeff, float randSetsCoeff)
+			int numOfIterations, double delta, double fInfNorm, double fEuclideanNorm,
+			float deltaCoeff, float maCoeff, float mbCoeff, float etaCoeff)
 			throws SFTException{
 		// create parameters for the direct product version
 		long[] dpG = SFTUtils.getGFromAbelianFunc(func);
@@ -290,7 +301,7 @@ public class SFT {
 			DirectProdFunction dpFunc = new DirectedProdFromAbelianFunc(dpG,func);
 			// call the direct product version of this method
 			Map<long[],Complex> Ltag =
-				getSignificantElements(dpG,tau,dpFunc,numOfIterations,delta,fInfNorm,fEuclideanNorm,deltaCoeff,randSetsCoeff);
+				getSignificantElements(dpG,tau,dpFunc,numOfIterations,delta,fInfNorm,fEuclideanNorm,deltaCoeff,maCoeff,mbCoeff,etaCoeff);
 			// return the finite Abelian representation of the result set
 			return SFTUtils.calcElemCoeffPairsAbelian(Ltag, G);
 		} catch (FunctionException fe){
@@ -339,16 +350,17 @@ public class SFT {
 	 * For inner use in the Matlab SFT scripts.
 	 */
 	public static MatlabTemporaryRepositoryDirectProd runMatlabSFTPart1Internal(Boolean isLogged, Long[] G, double tau,
-			double delta_t, double fInfNorm, double fEuclideanNorm, float deltaCoeff, float randSetsCoeff)
+			double delta_t, double fInfNorm, double fEuclideanNorm,
+			float deltaCoeff, float maCoeff, float mbCoeff, float etaCoeff)
 	throws SFTException{
 		// set variables to fit algorithm
 		Log.setLogMode(isLogged);
 		long[] g = new long[G.length];
 		for(int i=0; i<G.length; i++) g[i] = G[i];
 		
-		SFTUtils.checkParameters(g, delta_t, tau, fInfNorm, fEuclideanNorm, deltaCoeff, randSetsCoeff, 1);
+		SFTUtils.checkParameters(g, delta_t, tau, fInfNorm, fEuclideanNorm, deltaCoeff, maCoeff, mbCoeff, etaCoeff, 1);
 		
-		long[] randSetsSizes = getRandomSetsSizes(g,delta_t,tau,fInfNorm,fEuclideanNorm,deltaCoeff,randSetsCoeff);
+		long[] randSetsSizes = getRandomSetsSizes(g,delta_t,tau,fInfNorm,fEuclideanNorm,deltaCoeff,maCoeff,mbCoeff,etaCoeff);
 		
 		// run algorithm
 		Set<long[]>[][] sets = runMatlabSFTPart1Internal(g, tau, randSetsSizes[0], randSetsSizes[1]);
@@ -428,7 +440,8 @@ public class SFT {
 	 * For inner use in the Matlab SFT scripts.
 	 */
 	public static MatlabTemporaryRepositoryFiniteAbelian runMatlabSFTPart1Internal(Boolean isLogged, Long[][] G, double tau,
-			double delta_t, double fInfNorm, double fEuclideanNorm, float deltaCoeff, float randSetsCoeff)
+			double delta_t, double fInfNorm, double fEuclideanNorm,
+			float deltaCoeff, float maCoeff, float mbCoeff, float etaCoeff)
 	throws SFTException{
 		
 		// adapt parameters to direct product call
@@ -436,7 +449,7 @@ public class SFT {
 		
 		// call the corresponding direct product method
 		MatlabTemporaryRepositoryDirectProd rep = runMatlabSFTPart1Internal(isLogged,directG,tau,
-				delta_t,fInfNorm,fEuclideanNorm,deltaCoeff,randSetsCoeff);
+				delta_t,fInfNorm,fEuclideanNorm,deltaCoeff,maCoeff,mbCoeff,etaCoeff);
 		
 		// create a finite-abelian corresponding repository and return it
 		return SFTUtils.getMatlabFiniteAbelianRep(rep, G);
@@ -631,7 +644,7 @@ public class SFT {
 	 * Calculates m_A and m_B as described in algorithm 3.10 (generate queries)
 	 */
 	protected static long[] getRandomSetsSizes(long[] G, double delta_t, double tau, double fInfNorm, double fEuclideanNorm,
-			double deltaCoeff, double randSetsCoeff){
+			double deltaCoeff, double maCoeff, double mbCoeff, double etaCoeff){
 		Log.log("\tcalculating m_A, m_B started");
 		
 		double gamma = tau/36;
@@ -640,10 +653,10 @@ public class SFT {
 		for (int i=0; i<k; i++) sizeOfG *= G[i];
 		double delta = SFTUtils.calcDelta(delta_t,deltaCoeff,fEuclideanNorm,tau,sizeOfG);
 		
-		double eta = Math.min(Math.min(gamma, Math.sqrt(gamma)),(gamma/fInfNorm));
+		double eta = etaCoeff * Math.min(Math.min(gamma, Math.sqrt(gamma)),(gamma/fInfNorm));
 		double tmpCoeff = Math.pow(fInfNorm/eta, 2);
-		long m_A = (long) (randSetsCoeff * Math.ceil(tmpCoeff*Math.log(1.0/delta)));
-		long m_B = (long) (randSetsCoeff * Math.ceil(tmpCoeff*Math.log(fInfNorm/(delta*gamma))));
+		long m_A = (long) (maCoeff * Math.ceil(tmpCoeff*Math.log(1.0/delta)));
+		long m_B = (long) (mbCoeff * Math.ceil(tmpCoeff*Math.log(fInfNorm/(delta*gamma))));
 		
 		Log.log("\tcalculating m_A, m_B finished");
 		return new long[]{m_A, m_B};
