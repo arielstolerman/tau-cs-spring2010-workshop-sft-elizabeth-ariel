@@ -411,8 +411,8 @@ public class SFT {
 	/**
 	 * For inner use in the Matlab SFT scripts.
 	 */
-	public static MatlabTemporaryRepositoryFiniteAbelian runMatlabSFTPart1Internal(Long[][] G, double tau,
-			int numOfIterations, long m_A, long m_B, Boolean isLogged) throws SFTException{
+	public static MatlabTemporaryRepositoryFiniteAbelian runMatlabSFTPart1Internal(Boolean isLogged, Long[][] G,
+			double tau, long m_A, long m_B) throws SFTException{
 		
 		// adapt parameters to direct product call
 		Long[] directG = SFTUtils.getDirectProdGFromAbelianG(G);
@@ -427,8 +427,8 @@ public class SFT {
 	/**
 	 * For inner use in the Matlab SFT scripts.
 	 */
-	public static MatlabTemporaryRepositoryFiniteAbelian runMatlabSFTPart1Internal(Long[][] G, double delta_t, double tau,
-			int numOfIterations, double fInfNorm, double fEuclideanNorm, float deltaCoeff, float randSetsCoeff, Boolean isLogged)
+	public static MatlabTemporaryRepositoryFiniteAbelian runMatlabSFTPart1Internal(Boolean isLogged, Long[][] G, double tau,
+			double delta_t, double fInfNorm, double fEuclideanNorm, float deltaCoeff, float randSetsCoeff)
 	throws SFTException{
 		
 		// adapt parameters to direct product call

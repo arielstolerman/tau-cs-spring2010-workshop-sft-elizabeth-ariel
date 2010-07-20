@@ -53,7 +53,6 @@ query=javaObject('java.util.HashMap');
 
 % calculate function values on Q's elements
 utils = SFT.SFTUtils(); 
-size = size(G,2);
 for i=1:q.length;
   xLong=q(i);
   x=xLong.longValue;
