@@ -17,7 +17,7 @@
 % L - a vector of the tau-significant elements.
 % coeffs - a vector of their corresponding coefficients (s.t. the coefficient of L(i) is coeffs(i)).
 
-function[L,coeffs]=sft_dp(isLogged,G,tau,func,m_A,m_B,numOfIterations);
+function[L,coeffs]=sft_fa(isLogged,G,tau,func,m_A,m_B,numOfIterations);
 
 % set java path
 import java.util.*
