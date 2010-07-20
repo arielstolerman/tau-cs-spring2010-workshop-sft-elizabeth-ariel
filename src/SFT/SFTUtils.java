@@ -207,6 +207,19 @@ public class SFTUtils {
 		if (m_A <= 0 || m_B <= 0) throw new SFTException("m_A and m_B must be greater than 0.");
 	}
 	
+	protected static void checkParameters(long m_A, long m_B, long[] G) throws SFTException{
+		long prod = 1;
+		for (int i=0; i<G.length; i++) prod *= G[i];
+		if (m_A > prod || m_B > prod) throw new SFTException("m_A and/or m_B are too large.");
+	}
+	
+	protected static void checkParameters(Set<long[]> Q, long[] G) throws SFTException{
+		long prod = 1;
+		for (int i=0; i<G.length; i++) prod *= G[i];
+		if (Q.size() > prod) throw new SFTException("Q is of size "+Q.size()+", which is bigger than "+
+				"the number of elements in G. Please provide different parameters for Q's calculation.");
+	}
+	
 	/* ***************************
 	 * finite Abelian adaptation
 	 *****************************/

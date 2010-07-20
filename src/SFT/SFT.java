@@ -500,7 +500,11 @@ public class SFT {
 		// call part 1
 		Set<long[]>[][] sets = new HashSet[G.length+1][];
 		Set<long[]> Q = new HashSet<long[]>();
+		// check that m_A and m_B are not to large
+		SFTUtils.checkParameters(m_A, m_B,G);
 		callPart1(G,tau,m_A,m_B,sets,Q);
+		// check that Q is not too large
+		SFTUtils.checkParameters(Q, G);
 		
 		// call part 2
 		Map<long[],Complex> res = new HashMap<long[],Complex>();
@@ -662,7 +666,6 @@ public class SFT {
 			Set<long[]>[][] res){
 		Log.log("SFT -> generateQueries started");
 		Log.log("\tm_A is: "+m_A+", m_B is: "+m_B);
-		//System.exit(-1);
 		
 		// generate A,B_1,...,B_Ntl for each t in {1,...,k} and l in {1,...,logN_t}
 		int[] logG = SFTUtils.calcLogG(G);
@@ -934,7 +937,11 @@ public class SFT {
 		// call part 1
 		Set<long[]>[][] sets = new HashSet[G.length+1][];
 		Set<long[]> Q = new HashSet<long[]>();
+		// check that m_A and m_B are not too large
+		SFTUtils.checkParameters(m_A, m_B,G);
 		callPart1(G,tau,m_A,m_B,sets,Q);
+		// check that Q is not too large
+		SFTUtils.checkParameters(Q, G);
 		
 		// put Q as the last set in sets and return A, all B's and Q
 		Set<long[]>[][] res = new HashSet[sets.length+1][];
