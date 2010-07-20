@@ -13,13 +13,15 @@
 % @param fInfNorm		The infinity norm of the function.
 % @param fEuclideanNorm	The Euclidean norm of the function.
 % @param deltaCoeff		A constant coefficient for the algorithm's calculation of delta.
-% @param randSetsCoeff	A constant coefficient for the algorithm's calculation of the random sets A, Btl (t=1,...,k, l=1,...,log2(Nt)).
+% @param maCoeff		A constant coefficient for the algorithm's calculation of m_A.
+% @param mbCoeff		A constant coefficient for the algorithm's calculation of m_B.
+% @param etaCoeff		A constant coefficient for the algorithm's calculation of eta (appears in m_A and m_B calculation).
 % Result:
 % Returns a mapping of the elements in G and their tau-significant coefficients in the given function with delta-confidence.
 % L - a vector of the tau-significant elements.
 % coeffs - a vector of their corresponding coefficients (s.t. the coefficient of L(i) is coeffs(i)).
 
-function[L,coeffs]=sft_dp_full(isLogged,G,tau,func,numOfIterations,delta_t,fInfNorm,fEuclideanNorm,deltaCoeff,randSetsCoeff);
+function[L,coeffs]=sft_dp_full(isLogged,G,tau,func,numOfIterations,delta_t,fInfNorm,fEuclideanNorm,deltaCoeff,maCoeff,mbCoeff,etaCoeff);
 
 % set java path
 import java.util.*
@@ -41,7 +43,7 @@ sft = SFT.SFT();
 % PART 1
 % ======
 % call part 1 - create a set Q of elements (vectors) in G to be queried
-rep = sft.runMatlabSFTPart1Internal(isLogged_java,G_java,tau,delta_t,fInfNorm,fEuclideanNorm,deltaCoeff,randSetsCoeff);
+rep = sft.runMatlabSFTPart1Internal(isLogged_java,G_java,tau,delta_t,fInfNorm,fEuclideanNorm,deltaCoeff,maCoeff,mbCoeff,etaCoeff);
 
 % create query
 q = rep.getQ;
