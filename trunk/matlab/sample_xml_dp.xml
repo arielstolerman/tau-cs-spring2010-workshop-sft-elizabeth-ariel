@@ -21,7 +21,7 @@
 			<recoeff>0.01</recoeff>
 			<imcoeff>0.01</imcoeff>
 			<alpha>
-				<coord index="0">52</coord>
+				<coord index="0">552</coord>
 				<coord index="1">49</coord>
 			</alpha>
 		</term>
@@ -29,7 +29,7 @@
 			<recoeff>0.07</recoeff>
 			<imcoeff>0.09</imcoeff>
 			<alpha>
-				<coord index="0">259</coord>
+				<coord index="0">759</coord>
 				<coord index="1">29</coord>
 			</alpha>
 		</term>

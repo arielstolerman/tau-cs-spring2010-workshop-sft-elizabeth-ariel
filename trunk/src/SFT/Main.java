@@ -25,7 +25,12 @@ import javax.sound.sampled.AudioSystem;
 import com.sun.media.format.WavAudioFormat;
 import com.sun.media.multiplexer.audio.WAVMux;
 
-import Function.*;
+import Function.DirectProdFunction;
+import Function.Function;
+import Function.FunctionException;
+import Function.FiniteAbelianFunction;
+import Function.FourierPolynomial;
+import Function.XMLFourierPolynomial;
 import SFT.*;
 import SFT.SFTUtils.DirectedProdFromAbelianFunc;
 import SFT.SFTUtils.MatlabTemporaryRepositoryDirectProd;
@@ -43,7 +48,8 @@ public class Main {
 	public static void main(String[] args) throws Exception{
 		//test1();
 		//test2();
-		test3();
+		//test3();
+		test4();
 	}
 	
 	/*
@@ -155,6 +161,57 @@ public class Main {
 			p.print(val.getRe()+" "+val.getIm()+"\n");
 		}
 		p.close(); f.close();
+	}
+	
+	// XML function
+	public static void test4() throws Exception{
+		long[] G = new long[]{1000,1000};
+		int numOfIterations = 1;
+		double tau = 50000;
+		int[] logs = SFTUtils.calcLogG(G);
+		long ms = (long)(0.3*logs[0]*logs[1]);
+		String filename = "sample_xml_dp";
+		
+		// create function from XML file
+		DirectProdFunction p = new XMLFourierPolynomial(new File("matlab\\"+filename+".xml"), G);
+		
+		// RUN THE SFT ALGORITHM TO APPROXIMATE THE FUNCTION
+		// run n times and save ONLY the intersection of L from all iterations
+		int n = 20;
+		int[] sizes = new int[n];
+		SFTUtils.ResultFunction f = new SFTUtils.ResultFunction(G,
+				SFT.getSignificantElements(G,tau,p,ms,ms,numOfIterations));
+		Map<long[],Complex> map = f.getMapping();
+		sizes[0] = map.size(); 
+			
+		for (int i=1; i<n; i++){
+			f = new SFTUtils.ResultFunction(G,SFT.getSignificantElements(G,tau,p,ms,ms,numOfIterations));
+			Map<long[],Complex> tempMap = f.getMapping();
+			
+			Set<long[]> toRemove = new HashSet<long[]>();
+			for(long[] elem: map.keySet()){
+				String e = SFTUtils.vectorToString(elem);
+				boolean removeElem = true;
+				for (long[] t: tempMap.keySet()){
+					if (SFTUtils.vectorToString(t).equals(e)){
+						removeElem = false;
+						break;
+					}
+				}
+				if (removeElem) toRemove.add(elem);
+			}
+			for(long[] elem: toRemove) map.remove(elem);
+			sizes[i] = map.size();
+		}
+		
+		System.out.println("<<< Final mapping after "+n+" runs of SFT >>>");
+		for(long[] elem: map.keySet()){
+			System.out.println(SFTUtils.vectorToString(elem)+": "+map.get(elem));
+		}
+		System.out.println("<<< sizes >>>");
+		for(int i=0; i<n; i++){
+			System.out.println("sizes["+i+"]: "+sizes[i]);
+		}
 	}
 	
 	/**
