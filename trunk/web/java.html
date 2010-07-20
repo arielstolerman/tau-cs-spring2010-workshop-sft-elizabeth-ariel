@@ -62,7 +62,8 @@
 						<b>Number of iterations</b>: the simpler method, the one using a given m<sub>A</sub> and m<sub>B</sub>, has an optional <i>numOfIterations</i>
 						parameter. This parameter is for a suggested improvement for the percision of the SFT output. If the given number of iterations is bigger than 1,
 						each iteration i reruns the SFT significant elements calculation over the same generated Q, over the difference function &fnof;-&fnof;<sub>i-1</sub>:
-						the difference between the given function and the output function of the previous iteration.
+						the difference between the given function and the output function of the previous iteration.<br>
+						The more complex method must accept this parameter (not an option).
 					</li>
 				</ul>
 				
@@ -104,8 +105,6 @@
 					</li>
 				</ul>
 				
-				<br>
-				
 				<h3>Usage</h3>
 				In order to use the SFT library in your Java project, follow these steps:
 				<ul>
@@ -120,6 +119,103 @@
 						documentation to understand how to describe your function as a SFT-suitable input.
 					</li>
 				</ul>
+				
+				<br>
+				
+				<b>Usage remark</b>:<br>
+				We found that many times close elements to the significant elements are also included in the output of the SFT, with coefficients
+				that may make them significant even if they aren't so in the real function. One way to handle it and make the percision better is
+				to run the SFT procedure several times, and to take the elements in the <b>INTERSECTION</b> of the result of all the recurrences.
+				This method helps to eliminate at least some of the falsly caught non-significant elements.<br>
+				This method is demonstrated in the example below.<br>
+				
+				<br>
+				
+				<b>Example</b>:<br>
+				This example demonstrates how to use the SFT in java, using a XMLFourierPolynomial input function generated from:
+				<a href="sample.xml" target=_new>sample.xml</a>. The code will use this XML function as over G = Z<sub>1000</sub> x Z<sub>1000</sub>.
+				The code also runs more than one reccurence to remove non-significant elements that are falsly caught in the first recurrence (as described
+				above).<br>
+				<b>Remark</b>: The SFT algorithm works best with consentrated functions (the domain is in [-1,1]), where usually &tau; is in (0,1), as oppose to
+				this example.<br>
+				<p id="id_code">
+					import ...<br>
+					import SFT.*;<br>
+					import Function.*;<br>
+					<br>
+					public static MyClass{<br>
+					
+					&nbsp;&nbsp;public static void main(String[] args) throws Exception{<br>
+					&nbsp;&nbsp;&nbsp;&nbsp;long[] G = new long[]{1000,1000};<br>
+					&nbsp;&nbsp;&nbsp;&nbsp;int numOfIterations = 1;<br>
+					&nbsp;&nbsp;&nbsp;&nbsp;double tau = 60000;<br>
+					&nbsp;&nbsp;&nbsp;&nbsp;int[] logs = SFTUtils.calcLogG(G);<br>
+					&nbsp;&nbsp;&nbsp;&nbsp;long ms = (long)(0.3*logs[0]*logs[1]);<br>
+					&nbsp;&nbsp;&nbsp;&nbsp;String filename = "sample.xml";<br>
+					<br>
+					&nbsp;&nbsp;&nbsp;&nbsp;<font id="id_code_note">// create function from XML file</font><br>
+					&nbsp;&nbsp;&nbsp;&nbsp;DirectProdFunction p = new XMLFourierPolynomial(new File(filename), G);<br>
+		
+					&nbsp;&nbsp;&nbsp;&nbsp;<font id="id_code_note">// RUN THE SFT ALGORITHM TO APPROXIMATE THE FUNCTION<br>
+					&nbsp;&nbsp;&nbsp;&nbsp;// run n times and save ONLY the intersection of L from all iterations</font><br>
+					&nbsp;&nbsp;&nbsp;&nbsp;int n = 10;<br>
+					&nbsp;&nbsp;&nbsp;&nbsp;int[] sizes = new int[n];<br>
+					&nbsp;&nbsp;&nbsp;&nbsp;SFTUtils.ResultFunction f = new SFTUtils.ResultFunction(G,<br>
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SFT.getSignificantElements(G,tau,p,ms,ms,numOfIterations));<br>
+					&nbsp;&nbsp;&nbsp;&nbsp;Map<long[],Complex> map = f.getMapping();<br>
+					&nbsp;&nbsp;&nbsp;&nbsp;sizes[0] = map.size();<br>
+					<br>
+					&nbsp;&nbsp;&nbsp;&nbsp;for (int i=1; i&lt;n; i++){<br>
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;f = new SFTUtils.ResultFunction(G,SFT.getSignificantElements(<br>
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;G,tau,p,ms,ms,numOfIterations));<br>
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Map<long[],Complex> tempMap = f.getMapping();<br>
+					<br>
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Set<long[]> toRemove = new HashSet<long[]>();<br>
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for(long[] elem: map.keySet()){<br>
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;String e = SFTUtils.vectorToString(elem);<br>
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;boolean removeElem = true;<br>
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for (long[] t: tempMap.keySet()){<br>
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (SFTUtils.vectorToString(t).equals(e)){<br>
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;removeElem = false;<br>
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;break;<br>
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (removeElem) toRemove.add(elem);<br>
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for(long[] elem: toRemove) map.remove(elem);<br>
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sizes[i] = map.size();<br>
+					&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+					<br>
+					&nbsp;&nbsp;System.out.println("Final mapping after "+n+" runs of SFT:");<br>
+					&nbsp;&nbsp;for(long[] elem: map.keySet()){<br>
+					&nbsp;&nbsp;&nbsp;&nbsp;System.out.println(SFTUtils.vectorToString(elem)+": "+map.get(elem));<br>
+					&nbsp;&nbsp;}<br>
+					&nbsp;&nbsp;System.out.println("sizes:");<br>
+					&nbsp;&nbsp;for(int i=0; i<n; i++){<br>
+					&nbsp;&nbsp;&nbsp;&nbsp;System.out.println("sizes["+i+"]: "+sizes[i]);<br>
+					&nbsp;&nbsp;}<br>
+					}<br>
+				</p>
+				The output of the above is:<br>
+				<p id="id_code">
+					Final mapping after 10 runs of SFT:<br>
+					(142,80): 17.786865805928297+120.74309990674391i<br>
+					(230,100): 102.01249369183276+129.72226158706908i<br>
+					sizes:<br>
+					sizes[0]: 5<br>
+					sizes[1]: 2<br>
+					sizes[2]: 2<br>
+					sizes[3]: 2<br>
+					sizes[4]: 2<br>
+					sizes[5]: 2<br>
+					sizes[6]: 2<br>
+					sizes[7]: 2<br>
+					sizes[8]: 2<br>
+					sizes[9]: 2<br>
+				</p>
+				As it can be seen, the output is very close to the real elements and their coefficients:
+				(142,80) with coefficient 19+120i, and (230,100) with coefficient 101+130i.<br>
+				<br>
 				
 				<b>Tools and Downloads:</b><br>
 				<ul>

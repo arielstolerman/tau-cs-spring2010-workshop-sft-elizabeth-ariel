@@ -6,6 +6,9 @@ function[] = make_wav_from_sft(L,coeffs,N,name)
 % calculate all values for 0,...,N-1
 t = zeros(N,2);
 for i=1:N
+    if (mod(i,100) == 0)
+        fprintf(1,'done %d out of %d calculations\n',i,N)
+    end
     tmp = func_from_sft(L,coeffs,i,N);
     t(i,1) = real(tmp);
     t(i,2) = imag(tmp);

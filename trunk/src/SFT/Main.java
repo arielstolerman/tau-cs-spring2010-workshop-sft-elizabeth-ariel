@@ -48,8 +48,8 @@ public class Main {
 	public static void main(String[] args) throws Exception{
 		//test1();
 		//test2();
-		test3();
-		//test4();
+		//test3();
+		test4();
 	}
 	
 	/*
@@ -169,17 +169,17 @@ public class Main {
 	public static void test4() throws Exception{
 		long[] G = new long[]{1000,1000};
 		int numOfIterations = 1;
-		double tau = 50000;
+		double tau = 60000;
 		int[] logs = SFTUtils.calcLogG(G);
 		long ms = (long)(0.3*logs[0]*logs[1]);
-		String filename = "sample_xml_dp";
+		String filename = "sample";
 		
 		// create function from XML file
-		DirectProdFunction p = new XMLFourierPolynomial(new File("matlab\\"+filename+".xml"), G);
+		DirectProdFunction p = new XMLFourierPolynomial(new File("web\\"+filename+".xml"), G);
 		
 		// RUN THE SFT ALGORITHM TO APPROXIMATE THE FUNCTION
 		// run n times and save ONLY the intersection of L from all iterations
-		int n = 20;
+		int n = 10;
 		int[] sizes = new int[n];
 		SFTUtils.ResultFunction f = new SFTUtils.ResultFunction(G,
 				SFT.getSignificantElements(G,tau,p,ms,ms,numOfIterations));
@@ -206,11 +206,11 @@ public class Main {
 			sizes[i] = map.size();
 		}
 		
-		System.out.println("<<< Final mapping after "+n+" runs of SFT >>>");
+		System.out.println("Final mapping after "+n+" runs of SFT:");
 		for(long[] elem: map.keySet()){
 			System.out.println(SFTUtils.vectorToString(elem)+": "+map.get(elem));
 		}
-		System.out.println("<<< sizes >>>");
+		System.out.println("sizes:");
 		for(int i=0; i<n; i++){
 			System.out.println("sizes["+i+"]: "+sizes[i]);
 		}

@@ -36,14 +36,99 @@
 						<b>Download</b>: <a href="sft_matlab_pkg.zip">download the environment files and scripts</a>.
 					</li>
 					<li>
-						<b>Matlab environment setup</b>: set the environment in order to be able to use the scripts, as described in the example below.
+						<b>Matlab environment setup</b>: set the environment in order to be able to use the scripts, as described below.
 					</li>
 					<li>
 						<b>Use</b>: write your Matlab code and use the SFT methods just as any other Matlab script.
 					</li>
 				</ul>
-				<b>Example</b>:<br>
-				This code example demonstrates how to use the Matlab SFT package including the environment setup.
+				
+				<br>
+				
+				<b>Package Contents</b>:<br>
+				To better understand the package scripts and description, first read the Java usage page and the SFT javadoc.
+				The main scripts include a detailed documentation (inputs and output description).
+				<ul>
+					<li>
+						<b>sft_setenv.m</b>: this script has to be ran every time you open Matlab and want to use the SFT package.
+						It simply adds the JAR file to Matlab's Java path.<br>
+						After you download and place the JAR file where you want, <b>you must change the JAR path in this script</b> in
+						order for it to work.
+					</li>
+					<li>
+						<b>sft_dp.m</b>: for running the SFT on a function over a Cartesian product of finite groups with
+						given m<sub>A</sub> and m<sub>B</sub>.
+					</li>
+					<li>
+						<b>sft_dp_rec.m</b>: for running the SFT on a function over a Cartesian product of finite groups with
+						given m<sub>A</sub> and m<sub>B</sub>. Allows running more than one reccurence, and results with the intersection
+						of all the recurrences.
+					</li>
+					<li>
+						<b>sft_dp_full.m</b>: for running the SFT on a function over a Cartesian product of finite groups with
+						all the parameters for calculating m<sub>A</sub> and m<sub>B</sub> as described in the paper.
+					</li>
+					<li>
+						<b>sft_dp_full_rec.m</b>: for running the SFT on a function over a Cartesian product of finite groups with
+						all the parameters for calculating m<sub>A</sub> and m<sub>B</sub> as described in the paper. Allows running more
+						than one reccurence, and results with the intersection of all the recurrences.
+					</li>
+					<li>
+						<b>sft_fa.m</b>: for running the SFT on a function over a finite Abelian group with
+						given m<sub>A</sub> and m<sub>B</sub>.
+					</li>
+					<li>
+						<b>sft_fa_full.m</b>: for running the SFT on a function over a finite Abelian group with
+						all the parameters for calculating m<sub>A</sub> and m<sub>B</sub> as described in the paper.
+					</li>
+					<li>
+						<b>func_from_sft.m</b>: for usage in the wav-creation scripts. Given L,coeffs - the output of the SFT, G - a WAV
+						function domain (i.e. Z<sub>N</sub> for some positive N) and x, it calculates the output-function's value in x.
+					</li>
+					<li>
+						<b>wav_func_script.m</b>: if you want to give a WAV file as an input function for the SFT methods you need to:
+						<ul><li>
+							Read the WAV file into a variable <b>m</b>: <i>m = wavread('filepath');</i>
+						</li>
+						<li>
+							Define a function that uses this script: <i>func = @(x,G)wav_func_script(x,m);</i><br>
+							Note that G here has no meaning, but func must be defined like so to be a valid input for the SFT scripts.
+						</li></ul>
+						<i>func</i> can be used as an input function.
+					</li>
+					<li>
+						<b>make_wav_from_sft.m</b>: given L,coeffs - the output of the SFT, G - a WAV function domain (i.e. Z<sub>N</sub> for some positive N)
+						and a name (string), this script creates a WAV file with the given name, generated from the given SFT output.
+					</li>
+					<li>
+						<b>make_wav_from_sft_departed.m</b>: given the <b>sft_dp_rec.m</b> parameters, m - a wavread output, sizeOfInterval -
+						the size of the intervals to depart the function's domain into, and name - a name for the output WAV, this script
+						divides the given WAVREAD output (in m) into size(m)/sizeOfInterval intervals. It then runs the SFT on parts of m,
+						and eventually it creates from all the SFT outputs approximated WAV parts and concatenates them into one fully-lengthed WAV file.
+					</li>
+				</ul>
+				
+				<br>
+				
+				<b>Examples</b>:<br>
+				<b><a href="sft_matlab_examples.zip">DOWNLOAD EXAMPLES</a></b><br>
+				The examples zip file above includes two WAV samples and some WAV outputs created using the SFT scripts with varying parameters:
+				<ul>
+					<b>orchestra.wav</b>:
+					<li>
+						<i>sft_orchestra_1.wav</i>: used <b>sft_dp</b> with tau = 0.03, m_A = m_B = 40.
+					</li>
+					<li>
+						<i>sft_orchestra_2.wav</i>: used <b>sft_dp</b> with tau = 0.01, m_A = m_B = 50.
+					</li>
+					<b>guitar.wav</b>:
+					<li>
+						<i>sft_guitar_1.wav</i>: used <b>make_wav_from_sft_departed</b> with tau = 0.01, m_A = m_B = 30, number of reccurences = 5 and intervals
+						of size 30,000.
+					</li>
+				</ul>
+				
+				This code example (included in the examples zip file) demonstrates how to use the Matlab SFT package including the environment setup.
 				The following will describe the example for a function over a direct-product of finite groups domain:<br>
 				<li>
 				<b>Step #1</b>: extract the zip file into your home directory and edit <i>sft_setenv.m</i>. Here the files are
@@ -59,29 +144,34 @@
 				</li>
 				<li>
 				<b>Step #3</b>: run Matlab, set the environment and start working.<br>
-				The example below shows a simple usage in Matlab prompt, that uses an example Matlab-function script (included
-				in the package). 
+				The example below shows a simple usage in Matlab prompt, that uses an example Matlab-function script.
 				<p id="id_code">
 					&gt;&gt; sft_setenv		<font id="id_code_note">% setting up the environment</font><br>
 					&gt;&gt; <font id="id_code_note">% set parameters</font><br>
 					&gt;&gt; G = 10^10; <br>
 					&gt;&gt; delta_t = 0.01; <br>
 					&gt;&gt; tau = 200; <br>
-					&gt;&gt; func = @(x,G)example_direct_prod(x,G); <br>
+					&gt;&gt; func = @(x,G)test(x,G); <br>
+					&gt;&gt; numOfIterations = 1; <br>
 					&gt;&gt; fInfNorm = 28.41; <br>
-					&gt;&gt; fEuclideanNorm = 20; <br>
+					&gt;&gt; fEucNorm = 20; <br>
 					&gt;&gt; deltaCoeff = 1; <br>
-					&gt;&gt; randSetsCoeff = 0.0001; <br>
+					&gt;&gt; maCoeff = 0.0001; <br>
+					&gt;&gt; mbCoeff = 0.0001; <br>
+					&gt;&gt; etaCoeff = 1; <br>
 					&gt;&gt; isLogged = true; <br>
 					&gt;&gt; <font id="id_code_note"><b>% RUN THE SFT ALGORITHM</b></font><br>
-					&gt;&gt; L = get_significant_elements_direct_prod(G,delta_t,tau,func,fInfNorm,fEuclideanNorm,<br>
-						deltaCoeff,randSetsCoeff,isLogged); <br><br>
+					&gt;&gt; [L,coeffs] = sft_dp_full(isLogged,G,delta_t,tau,func,numOfIterations,fInfNorm,<br>
+						fEucNorm,deltaCoeff,maCoeff,mbCoeff,etaCoeff); <br><br>
 					... <i>printing out SFT run log</i><br><br>
 					&gt;&gt; L<br>
 					L = <br>
 					&nbsp;230<br>
-					&nbsp;1492<br> 
-					
+					&nbsp;1492<br>
+					&gt;&gt; coeffs<br>
+					coeffs = <br>
+					&nbsp;7.45894795692530 +10.71743484383209i<br>
+					&nbsp;10.74807983709623 + 7.47732998509190i<br> 					
 				</p>
 				</li>
 				 
