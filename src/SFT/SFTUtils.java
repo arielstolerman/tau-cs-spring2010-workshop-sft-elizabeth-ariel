@@ -86,6 +86,8 @@ public class SFTUtils {
 						SFTUtils.chi(G.length,this.G,alphaVector,elem)));
 			return res;
 		}
+		
+		protected Map<long[],Complex> getMapping() {return mapping;}
 	}
 	
 	/**
