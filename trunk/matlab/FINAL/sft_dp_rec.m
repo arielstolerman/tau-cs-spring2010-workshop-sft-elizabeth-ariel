@@ -1,5 +1,9 @@
-% runs the SFT algorithm numOfRec times and returns the intersection of the
-% results.
+% runs the SFT algorithm (the sft_dp.m version) for numOfRec times and returns the intersection of the
+% results. Using this script instead of running only one reccurence of the SFT clears noise and false-significant elements.
+% Returns:
+% - L, coeffs - as described in the original SFT script, only this is an intersection of results from numOfRec reccurences.
+% - sizes - a vector of the size of L (and coeffs) in each reccurence.
+
 function[L,coeffs,sizes]=sft_dp_rec(isLogged,G,tau,func,m_A,m_B,numOfIterations,numOfRec)
 
 % hold the size of each result

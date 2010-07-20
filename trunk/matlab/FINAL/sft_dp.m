@@ -1,11 +1,12 @@
-% The SFT algorithm implementation for MATLAB over direct group-product domain.
+% The SFT algorithm implementation for MATLAB over direct group-product domain(i.e. Z_N1 x ... x Z_Nk).
 % Parameters:
-% @param isLogged:		A flag to indicate weather to log the algorithm actions or not
+% @param isLogged:		A flag to indicate weather to log the algorithm actions or not.
 % @param G			The values N1,...,Nk describing the group G = Z_N1 x ... x Z_Nk.
 % @param tau	 		The threshold such that all tau-significant elements are returned. 
-% @param func			The given function over G -> C whose Fourier coefficients (elements) are returned. Used for query access.
+% @param func			The given function over G -> C whose tau-significant elements and thier Fourier coefficients are returned. Used for query access.
+%					func should be a MATLAB function with parameters x (a vector in G) and G (a vector of N's).
 % @param m_A			The size of the group A (for constructing the group Q).
-% @param m_B			The size of the groups Btl (for constructing the group Q).
+% @param m_B			The size of the groups Btl (t=1,...,k, l=1,...,log2(Nt), for constructing the group Q).
 % @param numOfIterations	The number of SFT procedure iterations to run. Each iteration is ran with the difference function
 %	 				of the given function and the output of the previous SFT iteration.
 %	 				This is an optimization for the original SFT algorithm to enable catching significant coefficients
