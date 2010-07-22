@@ -406,7 +406,7 @@ public class SFTUtils {
 		
 		// for each element alpha in L, calculate sum_(x in query's domain) [ f(x) * cojugate(chi_alpha[x]) ]
 		int i = 0;
-		for(long[] elem: L){ //TODO problem here with calculation of coefficient
+		for(long[] elem: L){
 			Complex coeff = new Complex(0,0);
 			for (String e:query.keySet()){
 				long[] vec = getVectorFromString(e);
