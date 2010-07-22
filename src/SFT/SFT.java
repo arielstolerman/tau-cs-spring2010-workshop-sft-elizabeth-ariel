@@ -742,16 +742,6 @@ public class SFT {
 	protected static Set<long[]> getFixedQueriesSFT(long[] G, double tau, Set<long[]>[][] querySets, Map<String,Complex> query){
 		Log.log("SFT -> getFixedQueriesSFT started");
 		
-		FileWriter f = null; PrintWriter p = null; // TODO remove this shit
-		/*
-		try{
-			f = new FileWriter("matlab\\wav\\est_dist.txt");
-			p = new PrintWriter(f);
-		} catch (IOException ioe){
-			System.err.println("You SUCK!!! IO thrown on writing est_dist.txt");
-		}
-		*/
-		
 		int k = G.length;
 		Set<long[]> A = querySets[0][0];
 		Set<long[]> prefixes = new HashSet<long[]>();
@@ -801,10 +791,10 @@ public class SFT {
 						//String vec = (prefixVector == null) ? "empty string" : SFTUtils.vectorToString(prefixVector); 
 						//Debug.log("\tcalling distinguish for prefix "+vec+", t="+t+", l="+(l+1)+":");
 						//Debug.log("\tsub-interval ["+a+","+middle+"]:");
-						if (distinguish(prefixVector, k, G, N, subInterval1, tau, A, B_t_lplus1, query, p))
+						if (distinguish(prefixVector, k, G, N, subInterval1, tau, A, B_t_lplus1, query))
 							tmpCandidate.addInterval(subInterval1);
 						//Debug.log("\tsub-interval ["+middle+","+b+"]:");
-						if (distinguish(prefixVector, k, G, N, subInterval2, tau, A, B_t_lplus1, query, p))
+						if (distinguish(prefixVector, k, G, N, subInterval2, tau, A, B_t_lplus1, query))
 							tmpCandidate.addInterval(subInterval2);
 					}
 					candidate = tmpCandidate; // update candidate_i to candidate_(i+1)
@@ -847,11 +837,6 @@ public class SFT {
 		Log.log("\tDone creating L");
 		Log.log("SFT -> getFixedQueriesSFT completed");
 		
-		try{ //TODO remove this shit also
-			if (f != null && p != null){p.close(); f.close();};
-		} catch (IOException ioe){
-			System.err.println("closing est_dist.txt failed");
-		}
 		return prefixes;
 	}
 	
@@ -875,7 +860,7 @@ public class SFT {
 	 * 			Decision whether to keep or discard the interval {a,b} 
 	 */
 	protected static boolean distinguish(long[] prefixVector, int k, long[] G, long N, long[] interval, double tau,
-			Set<long[]> A, Set<long[]> B, Map<String,Complex> query, PrintWriter p){
+			Set<long[]> A, Set<long[]> B, Map<String,Complex> query){
 		//Debug.log("SFT -> distinguish started");
 		
 		double est = 0;
@@ -903,7 +888,6 @@ public class SFT {
 		// compare to threshold and return result
 		double threshold = 5*tau/36;
 		Log.log("\test for interval ["+interval[0]+","+interval[1]+"]:"+est+((est >= threshold) ? "\t\tPASSED!":""));
-		if (interval[0] == interval[1] && p != null) p.println(interval[0]+" "+est);
 		
 		//Log.log("SFT -> distinguish completed");
 		
