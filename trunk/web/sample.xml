@@ -7,6 +7,8 @@
 			<alpha>
 				<coord index="0">230</coord>
 				<coord index="1">100</coord>
+				<coord index="2">20</coord>
+				<coord index="3">20</coord>
 			</alpha>
 		</term>
 		<term>
@@ -15,6 +17,8 @@
 			<alpha>
 				<coord index="0">142</coord>
 				<coord index="1">80</coord>
+				<coord index="2">500</coord>
+				<coord index="3">791</coord>
 			</alpha>
 		</term>
 		<term>
@@ -23,6 +27,8 @@
 			<alpha>
 				<coord index="0">552</coord>
 				<coord index="1">49</coord>
+				<coord index="2">303</coord>
+				<coord index="3">2</coord>
 			</alpha>
 		</term>
 		<term>
@@ -31,6 +37,8 @@
 			<alpha>
 				<coord index="0">759</coord>
 				<coord index="1">29</coord>
+				<coord index="2">111</coord>
+				<coord index="3">822</coord>
 			</alpha>
 		</term>
 	</function>
