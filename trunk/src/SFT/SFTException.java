@@ -13,8 +13,8 @@ package SFT;
 
 @SuppressWarnings("serial")
 /**
- * @author Elizabeth Firman and Ariel Stolerman
  * This Exceptions are thrown by class SFT on illegal parameters.
+ * @author Elizabeth Firman and Ariel Stolerman
  */
 public class SFTException extends Exception{
 	
