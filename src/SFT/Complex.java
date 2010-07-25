@@ -14,8 +14,8 @@ package SFT;
 import java.io.Serializable;
 
 /**
+ * This class is an implementation for representing Complex numbers.
  * @author Elizabeth Firman and Ariel Stolerman
- * This class is an implementaiton for representing Complex numbers.
  */
 public class Complex implements Serializable{
 	// class members

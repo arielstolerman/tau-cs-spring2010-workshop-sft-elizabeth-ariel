@@ -13,8 +13,8 @@ package Function;
 
 @SuppressWarnings("serial")
 /**
- * @author Elizabeth Firman and Ariel Stolerman
  * This Exceptions are thrown by class Function on illegal construction or redefinition of N.
+ * @author Elizabeth Firman and Ariel Stolerman
  */
 public class FunctionException extends Exception {
 
