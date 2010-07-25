@@ -138,12 +138,14 @@
 				above).<br>
 				<b>Remark</b>: The SFT algorithm works best with consentrated functions (the domain is in [-1,1]), where usually &tau; is in (0,1), as oppose to
 				this example.<br>
+				<a href="Test.java" target="_new">Download Java code example</a>
 				<p id="id_code">
-					import ...<br>
 					import SFT.*;<br>
 					import Function.*;<br>
+					import java.io.*;<br>
+					import java.util.*;<br>
 					<br>
-					public static MyClass{<br>
+					public class Test{<br>
 					
 					&nbsp;&nbsp;public static void main(String[] args) throws Exception{<br>
 					&nbsp;&nbsp;&nbsp;&nbsp;long[] G = new long[]{1000,1000};<br>
@@ -162,15 +164,15 @@
 					&nbsp;&nbsp;&nbsp;&nbsp;int[] sizes = new int[n];<br>
 					&nbsp;&nbsp;&nbsp;&nbsp;SFTUtils.ResultFunction f = new SFTUtils.ResultFunction(G,<br>
 					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SFT.getSignificantElements(G,tau,p,ms,ms,numOfIterations));<br>
-					&nbsp;&nbsp;&nbsp;&nbsp;Map<long[],Complex> map = f.getMapping();<br>
+					&nbsp;&nbsp;&nbsp;&nbsp;Map&lt;long[],Complex&gt; map = f.getMapping();<br>
 					&nbsp;&nbsp;&nbsp;&nbsp;sizes[0] = map.size();<br>
 					<br>
 					&nbsp;&nbsp;&nbsp;&nbsp;for (int i=1; i&lt;n; i++){<br>
 					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;f = new SFTUtils.ResultFunction(G,SFT.getSignificantElements(<br>
 					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;G,tau,p,ms,ms,numOfIterations));<br>
-					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Map<long[],Complex> tempMap = f.getMapping();<br>
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Map&lt;long[],Complex&gt; tempMap = f.getMapping();<br>
 					<br>
-					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Set<long[]> toRemove = new HashSet<long[]>();<br>
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Set&lt;long[]&gt; toRemove = new HashSet<long[]>();<br>
 					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for(long[] elem: map.keySet()){<br>
 					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;String e = SFTUtils.vectorToString(elem);<br>
 					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;boolean removeElem = true;<br>
@@ -191,7 +193,7 @@
 					&nbsp;&nbsp;&nbsp;&nbsp;System.out.println(SFTUtils.vectorToString(elem)+": "+map.get(elem));<br>
 					&nbsp;&nbsp;}<br>
 					&nbsp;&nbsp;System.out.println("sizes:");<br>
-					&nbsp;&nbsp;for(int i=0; i<n; i++){<br>
+					&nbsp;&nbsp;for(int i=0; i&lt;n; i++){<br>
 					&nbsp;&nbsp;&nbsp;&nbsp;System.out.println("sizes["+i+"]: "+sizes[i]);<br>
 					&nbsp;&nbsp;}<br>
 					}<br>
