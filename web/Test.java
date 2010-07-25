@@ -6,18 +6,19 @@ import java.util.*;
 public class Test {
 
 	public static void main(String[] args) throws Exception{
-		long[] G = new long[]{1000,1000};
+		long[] G = new long[]{1000,1000,1000,1000};
 		int numOfIterations = 1;
 		double tau = 60000;
 		int[] logs = SFTUtils.calcLogG(G);
-		long ms = (long)(0.3*logs[0]*logs[1]);
+		long ms = (long)(0.001*logs[0]*logs[1]*logs[2]*logs[3]);
 		String filename = "sample.xml";
+		// maximum Q size for given ms: 3,750 which is 3.75E-7 % of G size
 
 		// create function from XML file
 		DirectProdFunction p = new XMLFourierPolynomial(new File(filename), G);
 		// RUN THE SFT ALGORITHM TO APPROXIMATE THE FUNCTION
 		// run n times and save ONLY the intersection of L from all iterations
-		int n = 10;
+		int n = 5;
 		int[] sizes = new int[n];
 		SFTUtils.ResultFunction f = new SFTUtils.ResultFunction(G,
 				SFT.getSignificantElements(G,tau,p,ms,ms,numOfIterations));

@@ -133,7 +133,7 @@
 				
 				<b>Example</b>:<br>
 				This example demonstrates how to use the SFT in java, using a XMLFourierPolynomial input function generated from:
-				<a href="sample.xml" target=_new>sample.xml</a>. The code will use this XML function as over G = Z<sub>1000</sub> x Z<sub>1000</sub>.
+				<a href="sample.xml" target=_new>sample.xml</a>. The code will use this XML function as over G = (Z<sub>1000</sub>)<sup>4</sup>.
 				The code also runs more than one reccurence to remove non-significant elements that are falsly caught in the first recurrence (as described
 				above).<br>
 				<b>Remark</b>: The SFT algorithm works best with consentrated functions (the domain is in [-1,1]), where usually &tau; is in (0,1), as oppose to
@@ -148,19 +148,20 @@
 					public class Test{<br>
 					
 					&nbsp;&nbsp;public static void main(String[] args) throws Exception{<br>
-					&nbsp;&nbsp;&nbsp;&nbsp;long[] G = new long[]{1000,1000};<br>
+					&nbsp;&nbsp;&nbsp;&nbsp;long[] G = new long[]{1000,1000,1000,1000};<br>
 					&nbsp;&nbsp;&nbsp;&nbsp;int numOfIterations = 1;<br>
 					&nbsp;&nbsp;&nbsp;&nbsp;double tau = 60000;<br>
 					&nbsp;&nbsp;&nbsp;&nbsp;int[] logs = SFTUtils.calcLogG(G);<br>
-					&nbsp;&nbsp;&nbsp;&nbsp;long ms = (long)(0.3*logs[0]*logs[1]);<br>
+					&nbsp;&nbsp;&nbsp;&nbsp;long ms = (long)(0.001*logs[0]*logs[1]*logs[2]*logs[3]);<br>
 					&nbsp;&nbsp;&nbsp;&nbsp;String filename = "sample.xml";<br>
+					&nbsp;&nbsp;&nbsp;&nbsp;<font id="id_code_note">// maximum Q size for given ms: 3,750 which is 3.75E-7 % of G size</font><br>
 					<br>
 					&nbsp;&nbsp;&nbsp;&nbsp;<font id="id_code_note">// create function from XML file</font><br>
 					&nbsp;&nbsp;&nbsp;&nbsp;DirectProdFunction p = new XMLFourierPolynomial(new File(filename), G);<br>
 		
 					&nbsp;&nbsp;&nbsp;&nbsp;<font id="id_code_note">// RUN THE SFT ALGORITHM TO APPROXIMATE THE FUNCTION<br>
 					&nbsp;&nbsp;&nbsp;&nbsp;// run n times and save ONLY the intersection of L from all iterations</font><br>
-					&nbsp;&nbsp;&nbsp;&nbsp;int n = 10;<br>
+					&nbsp;&nbsp;&nbsp;&nbsp;int n = 5;<br>
 					&nbsp;&nbsp;&nbsp;&nbsp;int[] sizes = new int[n];<br>
 					&nbsp;&nbsp;&nbsp;&nbsp;SFTUtils.ResultFunction f = new SFTUtils.ResultFunction(G,<br>
 					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SFT.getSignificantElements(G,tau,p,ms,ms,numOfIterations));<br>
@@ -200,20 +201,15 @@
 				</p>
 				The output of the above is:<br>
 				<p id="id_code">
-					Final mapping after 10 runs of SFT:<br>
-					(142,80): 17.786865805928297+120.74309990674391i<br>
-					(230,100): 102.01249369183276+129.72226158706908i<br>
+					Final mapping after 5 runs of SFT:<br>
+					(142,80,500,791): 18.945525568717027+119.9090518841956i<br>
+					(230,100,20,20): 100.97599755751442+129.92403040879023i<br>
 					sizes:<br>
 					sizes[0]: 5<br>
-					sizes[1]: 2<br>
-					sizes[2]: 2<br>
+					sizes[1]: 3<br>
+					sizes[2]: 3<br>
 					sizes[3]: 2<br>
 					sizes[4]: 2<br>
-					sizes[5]: 2<br>
-					sizes[6]: 2<br>
-					sizes[7]: 2<br>
-					sizes[8]: 2<br>
-					sizes[9]: 2<br>
 				</p>
 				As it can be seen, the output is very close to the real elements and their coefficients:
 				(142,80) with coefficient 19+120i, and (230,100) with coefficient 101+130i.<br>
