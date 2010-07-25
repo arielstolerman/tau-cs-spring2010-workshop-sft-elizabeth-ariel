@@ -44,7 +44,7 @@ public class SFTUtils {
 	/**
 	 * Class for calculating a difference function for two given functions f1, f2 s.t. DiffFunction(x) = f1(x) - f2(x) 
 	 */
-	protected static class DiffFunction extends DirectProdFunction{
+	public static class DiffFunction extends DirectProdFunction{
 		DirectProdFunction f1,f2;
 
 		public DiffFunction(long[] G, DirectProdFunction f1, DirectProdFunction f2) throws FunctionException {
@@ -87,7 +87,7 @@ public class SFTUtils {
 			return res;
 		}
 		
-		protected Map<long[],Complex> getMapping() {return mapping;}
+		public Map<long[],Complex> getMapping() {return mapping;}
 	}
 	
 	/**
@@ -313,7 +313,7 @@ public class SFTUtils {
 	 * @param G		an integer array describing the group Z_N1 X ... X Z_Nk
 	 * @return		an integer array of log_2(Ni), rounded up, for i in {1,...,k}
 	 */
-	protected static int[] calcLogG(long[] G){
+	public static int[] calcLogG(long[] G){
 		int[] res= new int[G.length];
 		for (int i=0; i<G.length; i++){
 			res[i]=(int)Math.ceil(Math.log(G[i])/Math.log(2));
@@ -325,7 +325,7 @@ public class SFTUtils {
 	 * @param N		describing Z_N
 	 * @return		log_2(N), rounded up
 	 */
-	protected static int calcLogN(long N){
+	public static int calcLogN(long N){
 		return (int)Math.ceil(Math.log(N)/Math.log(2));
 	}
 	
