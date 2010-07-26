@@ -72,7 +72,8 @@ rep.setQuery(query);
 jres=sft.runMatlabSFTPart2Internal(G_java,tau,rep,numOfIterations);
 
 jkeys = jres.getKeys;
-jvalues = jres.getValues;
+jrandSet = jres.getRandSet;
+randSetSize = jrandSet.size;
 L = zeros(jkeys.length,size);	% for holding the significant elements
 coeffs = zeros(jkeys.length,1);	% for holding their coefficients
 for ind=1:jkeys.length;
@@ -80,6 +81,24 @@ for ind=1:jkeys.length;
   	for j=1:size;
     	L(ind,j)=xLong(j).longValue;
   	end
+	x = L(ind,1:size);
 	val = jvalues(ind);
-  	coeffs(ind) = complex(val(1).doubleValue,val(2).doubleValue);
+	% calculate the coefficient over the random set of elements jrandSet
+	coeffTmp = complex(0,0);
+	for k=1:randSetSize
+		yLong=jrandSet(k);
+		y = 0;
+		for j=1:size;
+			y(j) = yLong(j).longValue;
+		end
+		term = 2*pi./G;
+		chi = 1;
+		for j=1:size
+			tmpTerm = term(j)*y(j)*x(j);
+			chi = chi*complex(cos(tmpTerm),sin(tmpTerm));
+		end
+		chi = conj(chi);
+		coeffTmp = coeffTmp + func(x,G)*chi./randSetSize;
+	end
+  	coeffs(ind) = coeffTmp;
 end

@@ -1,0 +1,12 @@
+﻿<?xml version="1.0"?>
+<functions runid="1">
+	<function id="1">
+		<term>
+			<recoeff>1</recoeff>
+			<imcoeff>1</imcoeff>
+			<alpha>
+				<coord index="0">27182</coord>
+			</alpha>
+		</term>
+	</function>
+</functions>
