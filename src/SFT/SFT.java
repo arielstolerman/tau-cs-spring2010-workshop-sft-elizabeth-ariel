@@ -36,6 +36,19 @@ public class SFT {
 	 * default values
 	 * **************/
 	protected static final int DEFAULT_NUM_OF_ITERATIONS = 1;
+	protected static final int SIZE_OF_APPROX_SET = 2000;
+	
+	/**
+	 * The last phase of the algorithm is to approximate the coefficients of the set L. In this phase a set of
+	 * uniformly distributed random elements in the domain G is generated and over that set the approximation
+	 * of the coefficients for all elements in L is calculated. 
+	 * @return
+	 * 			The size of the randomly generated set of elements on which the coefficients of all elements
+	 * 			in L are calculated.
+	 */
+	public static int getSizeOfApproxSet(){
+		return SIZE_OF_APPROX_SET;
+	} 
 	
 	/* *******************************************************************
 	 * Interface public functions for direct product G (Z_N1 x ... x Z_Nk)
@@ -399,21 +412,26 @@ public class SFT {
 		Map<long[],Complex> tmpRes = runMatlabSFTPart2Internal(g, tau, sets, query, numOfIterations);
 		int setSize = tmpRes.keySet().size();
 		Long[][] keys = new Long[setSize][];
-		Double[][] values = new Double[setSize][2];
+		Long[][] randSet = new Long[SIZE_OF_APPROX_SET][];
+		// create keys
 		int size = G.length;
 		int index = 0;
 		for (long[] elem: tmpRes.keySet()){
 			Long[] e = new Long[size];
 			for (int i=0; i<size; i++) e[i] = new Long(elem[i]);
-			
-			// update results
 			keys[index] = e;
-			Complex val = tmpRes.get(elem);
-			values[index][0] = new Double(val.getRe());
-			values[index][1] = new Double(val.getIm());
 			index++;
 		}
-		return new MatlabTemporaryResultDirectProd(keys, values);
+		// create random set for coefficients calculation
+		Set<long[]> tmpRandSet = SFTUtils.getRandomSetForCoeffCalc(g);
+		index = 0;
+		for(long[] elem: tmpRandSet){
+			Long[] e = new Long[size];
+			for (int i=0; i<size; i++) e[i] = new Long(elem[i]);
+			randSet[index] = e;
+			index++;
+		}
+		return new MatlabTemporaryResultDirectProd(keys, randSet);
 	}
 	
 	/* ***********************************************************
@@ -521,7 +539,7 @@ public class SFT {
 		
 		// call part 2
 		Map<long[],Complex> res = new HashMap<long[],Complex>();
-		callPart2(G,tau,func,numOfIterations,sets,Q,res);
+		callPart2(G,tau,func,numOfIterations,sets,Q,res,false);
 		
 		Log.log("SFT -> runMainSFTAlgorithm  - main algorithm completed");
 		return res;
@@ -588,7 +606,7 @@ public class SFT {
 	 * Algorithm 3.9 part 2
 	 */
 	private static void callPart2(long[] G,double tau,DirectProdFunction func,int numOfIterations,Set<long[]>[][] sets,
-			Set<long[]> Q,Map<long[],Complex> res) throws FunctionException{
+			Set<long[]> Q,Map<long[],Complex> res, boolean isMatlab) throws FunctionException{
 		/*
 		 * Run iterations of the following:
 		 * - estimate the function of the current iteration f_i
@@ -617,14 +635,15 @@ public class SFT {
 			Set<long[]> tmpRes = getFixedQueriesSFT(G,tau,sets,query);
 			Log.log("\t\tcurrent iteration's L size is: "+tmpRes.size());
 
-			// calculate the coefficients for the elements in tmpRes
-			Map<long[],Complex> currRes = SFTUtils.calcElemCoeffPairs(tmpRes, query, G);
-			Log.log("\t\tCalculated coefficients for current iteration L of iteration "+i);
+			// calculate the coefficients for the elements in tmpRes - only if NOT running from Matlab
+			if (!isMatlab){
+				Map<long[],Complex> currRes = SFTUtils.calcElemCoeffPairs(tmpRes, func, G);
+				Log.log("\t\tCalculated coefficients for current iteration L of iteration "+i);
 			
-			// add current iteration's results into global result map, which will update diffFunc as well
-			for(long[] elem:currRes.keySet()) res.put(elem, currRes.get(elem));
-			Log.log("\t\tUpdated difference function");
-			
+				// add current iteration's results into global result map, which will update diffFunc as well
+				for(long[] elem:currRes.keySet()) res.put(elem, currRes.get(elem));
+				Log.log("\t\tUpdated difference function");
+			}
 			Log.log("\t--- Done with iteration "+i+" ---");
 		}
 		
@@ -864,7 +883,8 @@ public class SFT {
 		//Debug.log("SFT -> distinguish started");
 		
 		double est = 0;
-		long v = (long)-Math.floor((interval[0]+interval[1])/2);
+		//long v = (long)-Math.floor((interval[0]+interval[1])/2);
+		double v = -(interval[0]+interval[1])/2;
 		int tIndex = (prefixVector == null)?0:prefixVector.length;
 		
 		// calculate est(a,b)
@@ -980,7 +1000,7 @@ public class SFT {
 		
 		// call part 2
 		Map<long[],Complex> res = new HashMap<long[],Complex>();
-		callPart2(G,tau,func,numOfIterations,sets,Q,res);
+		callPart2(G,tau,func,numOfIterations,sets,Q,res,true);
 		
 		Log.log("SFT -> runMainSFTAlgorithm  - main algorithm completed");
 		return res;

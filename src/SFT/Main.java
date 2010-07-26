@@ -46,10 +46,59 @@ public class Main {
 	 * @param args
 	 */
 	public static void main(String[] args) throws Exception{
-		//test1();
+		test1();
 		//test2();
 		//test3();
-		test4();
+		//test4();
+		/*
+		long[] G = new long[]{1000000};
+		int numOfIterations = 1;
+		double tau = 10;
+		int[] logs = SFTUtils.calcLogG(G);
+		long ms = (long)(0.1*logs[0]);
+		String filename = "sample.xml";
+		// maximum Q size for given ms: 3,750 which is 3.75E-7 % of G size
+
+		// create function from XML file
+		DirectProdFunction p = new XMLFourierPolynomial(new File(filename), G);
+		// RUN THE SFT ALGORITHM TO APPROXIMATE THE FUNCTION
+		// run n times and save ONLY the intersection of L from all iterations
+		int n = 1;
+		int[] sizes = new int[n];
+		SFTUtils.ResultFunction f = new SFTUtils.ResultFunction(G,
+				SFT.getSignificantElements(G,tau,p,ms,ms,numOfIterations));
+		Map<long[],Complex> map = f.getMapping();
+		sizes[0] = map.size();
+
+		for (int i=1; i<n; i++){
+			f = new SFTUtils.ResultFunction(G,SFT.getSignificantElements(
+					G,tau,p,ms,ms,numOfIterations));
+			Map<long[],Complex> tempMap = f.getMapping();
+
+			Set<long[]> toRemove = new HashSet<long[]>();
+			for(long[] elem: map.keySet()){
+				String e = SFTUtils.vectorToString(elem);
+				boolean removeElem = true;
+				for (long[] t: tempMap.keySet()){
+					if (SFTUtils.vectorToString(t).equals(e)){
+						removeElem = false;
+						break;
+					}
+				}
+				if (removeElem) toRemove.add(elem);
+			}
+			for(long[] elem: toRemove) map.remove(elem);
+			sizes[i] = map.size();
+		}
+
+		System.out.println("Final mapping after "+n+" runs of SFT:");
+		for(long[] elem: map.keySet()){
+			System.out.println(SFTUtils.vectorToString(elem)+": "+map.get(elem));
+		}
+		System.out.println("sizes:");
+		for(int i=0; i<n; i++){
+			System.out.println("sizes["+i+"]: "+sizes[i]);
+		}*/
 	}
 	
 	/*
@@ -57,21 +106,21 @@ public class Main {
 	 */
 	private static void test1() throws Exception{
 		long[] G = new long[]{30000};
-		long ms = SFTUtils.calcLogG(G)[0];
+		long ms = 30;
 		int numOfIterations = 1;
-		double tau = 0.01;
-		String filename = "sample06_short";
-		String longFileName = filename+"_ms-"+(ms)+"_iters-"+(numOfIterations)+"_tau-"+(tau);
+		double tau = 0.04;
+		String filename = "matlab\\FINAL\\samples\\orchestra_short\\orchestra_short";
+		String longFileName = filename+"_tau-"+(tau)+"_ma-"+ms+"_mb-"+ms+"_iters-"+numOfIterations+"_recs-1_FIX";
 		
 		// create function from WAV file (using MATLAB output from WAV to CSV)
-		DirectProdFunction wavFunc = new WavFunction("matlab\\wav\\"+filename+".csv",G);
+		DirectProdFunction wavFunc = new WavFunction(filename+".csv",G);
 		
 		// RUN THE SFT ALGORITHM TO APPROXIMATE THE FUNCTION
 		SFTUtils.ResultFunction f_tag = new SFTUtils.ResultFunction(G,
 				SFT.getSignificantElements(G, tau, wavFunc, ms, ms, numOfIterations));
 		
 		// write result function into txt file to be parsed into WAV in MATLAB
-		FileWriter f = new FileWriter("matlab\\wav\\"+longFileName+"_java.txt");
+		FileWriter f = new FileWriter(longFileName+".txt");
 		PrintWriter p = new PrintWriter(f);
 		for(int i=0; i<G[0]; i++){
 			Complex val = f_tag.getValue(new long[]{i});
