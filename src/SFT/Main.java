@@ -46,17 +46,17 @@ public class Main {
 	 * @param args
 	 */
 	public static void main(String[] args) throws Exception{
-		test1();
+		//test1();
 		//test2();
 		//test3();
 		//test4();
-		/*
-		long[] G = new long[]{1000000};
+		
+		long[] G = new long[]{1000, 1000, 1000, 1000};
 		int numOfIterations = 1;
-		double tau = 10;
+		double tau = 50000;
 		int[] logs = SFTUtils.calcLogG(G);
-		long ms = (long)(0.1*logs[0]);
-		String filename = "sample.xml";
+		long ms = 10;
+		String filename = "web\\sample.xml";
 		// maximum Q size for given ms: 3,750 which is 3.75E-7 % of G size
 
 		// create function from XML file
@@ -98,7 +98,7 @@ public class Main {
 		System.out.println("sizes:");
 		for(int i=0; i<n; i++){
 			System.out.println("sizes["+i+"]: "+sizes[i]);
-		}*/
+		}
 	}
 	
 	/*
@@ -160,13 +160,13 @@ public class Main {
 		
 		Map<long[],Complex> mapping = new HashMap<long[],Complex>();
 		Long[][] keys = res.getKeys();
-		Double[][] vals = res.getValues();
+		Long[][] randSet = res.getRandSet();
 		int size = G.length;
 		for(int i=0; i<keys.length; i++){
 			long[] elem = new long[size];
 			for(int j=0; j<size; j++) elem[j] = keys[i][j].longValue();
-			Complex val = new Complex(vals[i][0],vals[i][1]);
-			mapping.put(elem, val);
+			//Complex val = new Complex(vals[i][0],vals[i][1]);
+			//mapping.put(elem, val);
 		}
 		
 		SFTUtils.ResultFunction f_tag = new SFTUtils.ResultFunction(g,mapping);

@@ -636,14 +636,13 @@ public class SFT {
 			Log.log("\t\tcurrent iteration's L size is: "+tmpRes.size());
 
 			// calculate the coefficients for the elements in tmpRes - only if NOT running from Matlab
-			if (!isMatlab){
-				Map<long[],Complex> currRes = SFTUtils.calcElemCoeffPairs(tmpRes, func, G);
-				Log.log("\t\tCalculated coefficients for current iteration L of iteration "+i);
+			Map<long[],Complex> currRes = SFTUtils.calcElemCoeffPairs(tmpRes, func, G, isMatlab);
+			Log.log("\t\tCalculated coefficients for current iteration L of iteration "+i);
+
+			// add current iteration's results into global result map, which will update diffFunc as well
+			for(long[] elem:currRes.keySet()) res.put(elem, currRes.get(elem));
+			Log.log("\t\tUpdated difference function");
 			
-				// add current iteration's results into global result map, which will update diffFunc as well
-				for(long[] elem:currRes.keySet()) res.put(elem, currRes.get(elem));
-				Log.log("\t\tUpdated difference function");
-			}
 			Log.log("\t--- Done with iteration "+i+" ---");
 		}
 		
