@@ -25,55 +25,30 @@ import java.io.File
 import SFT.*
 import SFT.SFTUtils.*
 
-% fit all parameters to java before calling the first part of the algorithm
-G_java = javaArray('java.lang.Long[]',size(G,2));
-for i=1:size(G,2);
-	tmp = javaArray('java.lang.Long',2);
-	tmp(1) = javaObject('java.lang.Long',G(1,i));
-	tmp(2) = javaObject('java.lang.Long',G(2,i));
-	G_java(i) = tmp;
+% calculate the corresponding direct product G and function
+dim = size(G,2);
+dpG = zeros(dim);
+for i=1:dim
+	dpG(i) = G(2,i);
 end
-isLogged_java = javaObject('java.lang.Boolean',isLogged);	
 
-% create a static object in order to allow calls to the SFT algorithm methods
-sft = SFT.SFT();
+% instead of the given 2nd argument G, which is to be given a direct product G, the function will always use the finite Abelian G
+dpfunc = @(x,nonce)dp_func_res_from_fa_func(G,func,x);
+[dpL,dpCoeffs] = sft_dp(isLogged,dpG,tau,dpfunc,m_A,m_B,numOfIterations);
 
-% ======
-% PART 1
-% ======
-% call part 1 - create a set Q of elements (vectors) in G to be queried
-rep = sft.runMatlabSFTPart1Internal(isLogged_java,G_java,tau,m_A,m_B);
-
-% create query
-q = rep.getQ;
-query=javaObject('java.util.HashMap');
-
-% calculate function values on Q's elements
-utils = SFT.SFTUtils(); 
-for i=1:q.length;
-  xLong=q(i);
-  x=xLong.longValue;
-  y=func(x,G);
-  yComplex = Complex(real(y),imag(y));
-  query.put(xLong.toString,yComplex);
+% calculate the corresponding finite Abelian L
+L = zeros(size(dpL,1),1);
+for i=1:size(dpL,1)
+	x = dpL(i);
+	fax = 1;
+	for j=1:dim
+		gj = G(1,j);
+		Nj = G(2,j);
+		xj = x(j);
+		fax = fax*mod(gj*xj,Nj);
+	end
+	L(i) = fax;
 end
-% update temporary repository
-rep.setQuery(query);
 
-% ======
-% PART 2
-% ======
-% call part 2 - create an array of Long[] from which will create a final matlab matrix where
-% each row is an element (vector) in L, the set of significant elements
-jres=sft.runMatlabSFTPart2Internal(G_java,tau,rep,numOfIterations);
-
-jkeys = jres.getKeys;
-jvalues = jres.getValues;
-L = zeros(jkeys.length,1);		% for holding the significant elements
-coeffs = zeros(jkeys.length,1);	% for holding their coefficients
-for ind=1:jkeys.length;
-	xLong=jkeys(ind);
-    L(ind)=xLong.longValue;
-	val = jvalues(ind);
-  	coeffs(ind) = complex(val(1).doubleValue,val(2).doubleValue);
-end
+% coefficients remain the same
+coeffs = dpCoeffs;
