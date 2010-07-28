@@ -50,7 +50,19 @@ public class Main {
 		//test2();
 		//test3();
 		//test4();
-		test5();
+		//test5();
+		Set<long[]> L = new HashSet<long[]>(); L.add(new long[]{3});
+		long[] G = new long[]{8};
+		DirectProdFunction func = new WavFunction("matlab\\FINAL\\samples\\a.csv",G);
+		for (int i=0; i<G[0]; i++){
+			System.out.println("a("+i+") = "+func.getValue(new long[]{i}));
+		}
+		Set<long[]> randSet = new HashSet<long[]>();
+		for (int i=0;i<8;i++) randSet.add(new long[]{i});
+		Map<long[],Complex> res = SFTUtils.calcElemCoeffPairs(L, func, G, false, randSet);
+		for(long[] elem: res.keySet()){
+			System.out.println("Element: "+SFTUtils.vectorToString(elem)+"\tCoeff: "+res.get(elem));
+		}
 	}
 		
 	
@@ -86,13 +98,13 @@ public class Main {
 	 * Testing on wav file using Matlab's methods
 	 */
 	private static void test2() throws Exception{
-		double[] taus = new double[]{0.01};
-		for(int index=0; index<taus.length; index++){
-			Long[] G = new Long[]{new Long(235200)};
-			long[] g = new long[]{235200};
-			double tau = taus[index];
-			long ma = 50;
-			long mb = 50;
+		long[] gs = new long[]{235200};
+		for(int index=1; index<=gs.length; index++){
+			Long[] G = new Long[]{new Long(gs[index-1])};
+			long[] g = new long[]{gs[index-1]};
+			double tau = 0.02;
+			long ma = 40;
+			long mb = 40;
 			int numOfIterations = 1;
 			String filename = "orchestra";
 			String longFileName = filename+"_tau-"+(tau)+"_ma-"+(ma)+"_mb-"+(mb)+"_iters-"+(numOfIterations);
