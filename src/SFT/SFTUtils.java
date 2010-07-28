@@ -342,6 +342,7 @@ public class SFTUtils {
 		for(int i=0; i<t; i++){
 			ans = Complex.mulComplex(ans, chi(G[i],v[i],y[i]));
 		}
+		
 		return ans;
 	}
 	
@@ -728,15 +729,22 @@ public class SFTUtils {
 	
 	protected static class MatlabTemporaryResultFiniteAbelian{
 		Long[] keys;
+		Long[][] keysDirectProd; // still needs direct product representation to calculate the coefficients in Matlab
 		Long[] randSet;
+		Long[][] randSetDirectProd;
 		
-		public MatlabTemporaryResultFiniteAbelian(Long[] keys, Long[] randSet){
+		public MatlabTemporaryResultFiniteAbelian(Long[] keys, Long[][] keysDirectProd, Long[] randSet,
+				Long[][] randSetDirectProd){
 			this.keys = keys;
+			this.keysDirectProd = keysDirectProd;
 			this.randSet = randSet;
+			this.randSetDirectProd = randSetDirectProd;
 		}
 		
 		public Long[] getKeys() { return keys; }
-		public Long[] getRandSet() { return randSet; }
+		public Long[][] getKeysDirectProd() { return keysDirectProd; }
+		//public Long[] getRandSet() { return randSet; }
+		public Long[][] getRandSetDirectProd() { return randSetDirectProd; }
 	}
 	
 	protected static MatlabTemporaryResultFiniteAbelian getMatlabFiniteAbelianRes(MatlabTemporaryResultDirectProd tmpRes, Long[][] G){
@@ -754,7 +762,7 @@ public class SFTUtils {
 			randSet[i] = calcAbelianProd(tmpRandSet[i], G);
 		}
 		
-		return new MatlabTemporaryResultFiniteAbelian(keys, randSet);
+		return new MatlabTemporaryResultFiniteAbelian(keys, tmpKeys, randSet, tmpRandSet);
 	}
 	
 	/* **********************
