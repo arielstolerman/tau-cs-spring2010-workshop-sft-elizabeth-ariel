@@ -445,6 +445,42 @@ public class SFTUtils {
 		return elemCoeffPairs;
 	}
 	
+	/**
+	 * Same as above, only receives the random set to calculate the coefficients over.
+	 * for testing purposes.
+	 */
+	protected static Map<long[],Complex> calcElemCoeffPairs(Set<long[]> L, DirectProdFunction func, long[] G,
+			boolean isMatlab, Set<long[]> randSet){
+		Map<long[],Complex> elemCoeffPairs = new HashMap<long[],Complex>();
+		if (isMatlab){
+			// return map with L its keys and no values
+			for (long[] e: L) elemCoeffPairs.put(e,null);
+		} else {
+			Map<String,Complex> query = new HashMap<String,Complex>();
+			for (long[] e: randSet){
+				String eStr = vectorToString(e);
+				query.put(eStr, func.getValue(e));
+			}
+
+			int qSize = query.size();
+			// for each element alpha in L, calculate sum_(x in query's domain) [ f(x) * cojugate(chi_alpha[x]) ]
+			int i = 0;
+			for(long[] elem: L){
+				Complex coeff = new Complex(0,0);
+				for (String e:query.keySet()){
+					long[] vec = getVectorFromString(e);
+					coeff.addComplex(Complex.divComplex(
+							Complex.mulComplex(query.get(e),chi(G.length,G,vec,elem).getConjugate()),
+							qSize));
+				}
+				elemCoeffPairs.put(elem, coeff);
+				if (i % 1000 == 0) System.out.println(">>> done "+i+" coeff calculations");
+				i++;
+			}
+		}
+		return elemCoeffPairs;
+	}
+	
 	protected static Set<long[]> getRandomSetForCoeffCalc(long[] G){
 		Set<long[]> res = new HashSet<long[]>();
 		Random[] rand = new Random[G.length];

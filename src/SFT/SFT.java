@@ -618,7 +618,7 @@ public class SFT {
 		// allow function access to the accumulating result
 		SFTUtils.ResultFunction resFunc = new SFTUtils.ResultFunction(G, res);
 		// allow access to the difference function [ f - resFunc ]
-		// initial value [ f - 0 ] = f
+		// initial value [ f - 0 ] = f, since res is initially an empty map
 		SFTUtils.DiffFunction diffFunc = new SFTUtils.DiffFunction(G, func, resFunc);
 		
 		int i;
