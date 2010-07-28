@@ -115,10 +115,6 @@ for iter=1:numOfIterations
 			L(ind,j)=xLong(j).longValue;
 		end
 		x = L(ind,1:dim);
-		if (min(x) <= 0 || max(x-G) >= 0)
-			fprintf(1,'>>>>>>>> PROBLEM with applying func on x since x is:\n');
-			x
-		end
 
 		% calculate the coefficient over the random set of elements jrandSet
 		coeffTmp = complex(0,0);
@@ -130,11 +126,11 @@ for iter=1:numOfIterations
 			end
 			chi = 1;
 			for j=1:dim
-				term = 2*pi./G(j)*y(j)*x(j);
+				term = 2*pi*(y(j)./G(j))*x(j);
 				chi = chi*complex(cos(term),sin(term));
 			end
 			chi = conj(chi);
-			coeffTmp = coeffTmp + (func(x,G)*chi)./randSetSize;
+			coeffTmp = coeffTmp + (func(y,G)*chi)./randSetSize;
 		end
 		coeffs(ind) = coeffTmp;
 	end

@@ -45,42 +45,131 @@ sft = SFT.SFT();
 % call part 1 - create a set Q of elements (vectors) in G to be queried
 rep = sft.runMatlabSFTPart1Internal(isLogged_java,G_java,tau,delta_t,fInfNorm,fEuclideanNorm,deltaCoeff,maCoeff,mbCoeff,etaCoeff);
 
-% create query
-q = rep.getQ;
-query=javaObject('java.util.HashMap');
-
-% calculate function values on Q's elements
-utils = SFT.SFTUtils(); 
-size = length(G);
-for i=1:q.length;
-  xLong=q(i);
-  x=zeros(1, size);
-  for j=1:size;
-      x(j)=xLong(j).longValue;
-  end
-  y=func(x,G);
-  yComplex = Complex(real(y),imag(y));
-  query.put(utils.vectorToString(xLong),yComplex);
-end
-% update temporary repository
-rep.setQuery(query);
-
 % ======
 % PART 2
 % ======
-% call part 2 - create an array of Long[] from which will create a final matlab matrix where
-% each row is an element (vector) in L, the set of significant elements
-jres=sft.runMatlabSFTPart2Internal(G_java,tau,rep,numOfIterations);
+%  run numOfIterations iterations. In each iteration i:
+% - calculate Q's values for function f_i
+% - run Java part 2 of the SFT to get the list of significant elements and a random set to estimate the coefficients for those elements over it
+% - calculate the coefficients for the given elements
+% - calculate the next iteration function f_(i+1) = f - g_i, where f is the original input function and g_i is the SFT estimation for the i iteration
+% The output: the union of all elements received from all iterations (and their coefficients).
 
-jkeys = jres.getKeys;
-jvalues = jres.getValues;
-L = zeros(jkeys.length,size);	% for holding the significant elements
-coeffs = zeros(jkeys.length,1);	% for holding their coefficients
-for ind=1:jkeys.length;
-	xLong=jkeys(ind);
-  	for j=1:size;
-    	L(ind,j)=xLong(j).longValue;
-  	end
-	val = jvalues(ind);
-  	coeffs(ind) = complex(val(1).doubleValue,val(2).doubleValue);
-end
+% initialize first iteration's function and result L,coeffs
+currFunc = func;
+dim = length(G);
+resL = zeros(1,dim);	% for holding the significant elements
+resCoeffs = zeros(1,1);	% for holding their coefficients
+
+% run iterations
+for iter=1:numOfIterations
+	if (isLogged)
+		fprintf(1,'>>>>>>> MATLAB: starting iteration %d out of %d\n',iter,numOfIterations)
+	end
+	
+	% create query
+	q = rep.getQ;
+	query=javaObject('java.util.HashMap');
+
+	% calculate current iteration's function values on Q's elements
+	utils = SFT.SFTUtils(); 
+	for i=1:q.length;
+	  xLong=q(i);
+	  x=zeros(1, dim);
+	  for j=1:dim;
+		  x(j)=xLong(j).longValue;
+	  end
+	  y=currFunc(x,G);
+	  yComplex = Complex(real(y),imag(y));
+	  query.put(utils.vectorToString(xLong),yComplex);
+	end
+	% update temporary repository
+	rep.setQuery(query);
+
+	% call part 2 - create an array of Long[] from which will create a final matlab matrix where
+	% each row is an element (vector) in L, the set of significant elements
+	jres=sft.runMatlabSFTPart2Internal(G_java,tau,rep,1);
+	
+	% if no new elements caught for this iteration (and it is not the first iteration), break
+	if (iter > 1 && jres.getKeys.length == 0)
+		if (isLogged)
+			fprintf(1,'>>>>>>> MATLAB: iteration %d finished with 0 new elements, breaking calculation.\n',iter)
+		end
+		break;
+	end
+
+	jkeys = jres.getKeys;
+	jrandSet = jres.getRandSet;
+	randSetSize = jrandSet.length;
+	L = zeros(jkeys.length,dim);	% for holding the significant elements
+	coeffs = zeros(jkeys.length,1);	% for holding their coefficients
+	if (isLogged)
+		fprintf(1,'>>>>>>> MATLAB: starting coefficients calculation in iteration %d\n',iter);
+	end
+	for ind=1:jkeys.length;
+		if (isLogged && mod(ind,100) == 0)
+			fprintf(1,'Done %d coefficients calculations...\n',ind);
+		end
+		
+		xLong=jkeys(ind);
+		for j=1:dim;
+			L(ind,j)=xLong(j).longValue;
+		end
+		x = L(ind,1:dim);
+
+		% calculate the coefficient over the random set of elements jrandSet
+		coeffTmp = complex(0,0);
+		for k=1:randSetSize
+			yLong=jrandSet(k);
+			y = zeros(dim);
+			for j=1:dim;
+				y(j) = yLong(j).longValue;
+			end
+			chi = 1;
+			for j=1:dim
+				term = 2*pi*(y(j)./G(j))*x(j);
+				chi = chi*complex(cos(term),sin(term));
+			end
+			chi = conj(chi);
+			coeffTmp = coeffTmp + (func(y,G)*chi)./randSetSize;
+		end
+		coeffs(ind) = coeffTmp;
+	end
+	
+	% initialize result L,coeffs if this is the first iteration
+	if (iter == 1)
+		resL = L;
+		resCoeffs = coeffs;
+	% otherwise only update resL and resCoeffs
+	else
+		tmpResL = resL;
+		tmpResCoeffs = resCoeffs;
+		sizeOfRes = size(resL,1);
+		sizeOfCurr = size(L,1);
+		ind = sizeOfRes + 1; % index to start adding new elements from
+		for i=1:sizeOfCurr
+			isContained = false;
+			for j=1:sizeOfRes
+				if (min(L(i) == resL(j)))
+					isContained = true;
+					break;
+				end
+			end
+			if (~isContained)
+				% add element and coeff to final result
+				tmpResL(ind,1:dim) = L(i,:);
+				tmpResCoeffs(ind) = coeffs(i);
+				ind = ind + 1;
+			end
+		end
+		resL = tmpResL;
+		resCoeffs = tmpResCoeffs;
+	end
+	
+	% update function for next iteration
+	currFunc = @(x,G)(func(x,G) - func_from_sft(resL,resCoeffs,x,G));
+	
+	if (isLogged)
+		fprintf(1,'>>>>>>> MATLAB: finished iteration %d out of %d.\n',iter,numOfIterations)
+	end
+end % iteration
