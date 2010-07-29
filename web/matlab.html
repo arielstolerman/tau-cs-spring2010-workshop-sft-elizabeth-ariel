@@ -50,40 +50,35 @@
 				The main scripts include a detailed documentation (inputs and output description).
 				<ul>
 					<li>
-						<u>sft_setenv.m</u>: this script has to be ran every time you open Matlab and want to use the SFT package.
+						<b><u>sft_setenv.m</u></b>: this script has to be ran every time you open Matlab and want to use the SFT package.
 						It simply adds the JAR file to Matlab's Java path.<br>
-						After you download and place the JAR file where you want, <b>you must change the JAR path in this script</b> in
-						order for it to work.
+						After you download and place the JAR file where you want, <font color="red"><b>you must change the JAR path in this script</b></font>
+						in order for it to work.
 					</li>
 					<li>
-						<u>sft_dp.m</u>: for running the SFT on a function over a Cartesian product of finite groups with
+						<b><u>sft_dp.m</u></b>: for running the SFT on a function over a Cartesian product of finite groups with
 						given m<sub>A</sub> and m<sub>B</sub>.
 					</li>
 					<li>
-						<u>sft_dp_rec.m</u>: for running the SFT on a function over a Cartesian product of finite groups with
-						given m<sub>A</sub> and m<sub>B</sub>. Allows running more than one reccurence, and results with the intersection
-						of all the recurrences.
-					</li>
-					<li>
-						<u>sft_dp_full.m</u>: for running the SFT on a function over a Cartesian product of finite groups with
+						<b><u>sft_dp_full.m</u></b>: for running the SFT on a function over a Cartesian product of finite groups with
 						all the parameters for calculating m<sub>A</sub> and m<sub>B</sub> as described in the paper.
 					</li>
 					<li>
-						<u>sft_dp_full_rec.m</u>: for running the SFT on a function over a Cartesian product of finite groups with
-						all the parameters for calculating m<sub>A</sub> and m<sub>B</sub> as described in the paper. Allows running more
-						than one reccurence, and results with the intersection of all the recurrences.
-					</li>
-					<li>
-						<u>sft_fa.m</u>: for running the SFT on a function over a finite Abelian group with
+						<b><u>sft_fa.m</u></b>: for running the SFT on a function over a finite Abelian group with
 						given m<sub>A</sub> and m<sub>B</sub>.
 					</li>
 					<li>
-						<u>sft_fa_full.m</u>: for running the SFT on a function over a finite Abelian group with
+						<b><u>sft_fa_full.m</u></b>: for running the SFT on a function over a finite Abelian group with
 						all the parameters for calculating m<sub>A</sub> and m<sub>B</sub> as described in the paper.
+					</li>
+					<li>
+						<u>dp_func_res_from_fa_func.m</u>: given a finite Abelian domain representation G, a function over this domain
+						and an element x in the corresponding direct product domain, returns the function's value over the corresponding
+						finite Abelian element. Used in the sft_fa.m and sft_fa_full.m scripts.
 					</li>
 					<li>
 						<u>func_from_sft.m</u>: for usage in the wav-creation scripts. Given L,coeffs - the output of the SFT, G - a WAV
-						function domain (i.e. Z<sub>N</sub> for some positive N) and x, it calculates the output-function's value in x.
+						function domain (i.e. positive N representing Z<sub>N</sub>) and x, it calculates the output-function's value in x.
 					</li>
 					<li>
 						<u>wav_func_script.m</u>: if you want to give a WAV file as an input function for the SFT methods you need to:
@@ -98,13 +93,13 @@
 						<i>func</i> can be used as an input function.
 					</li>
 					<li>
-						<u>make_wav_from_sft.m</u>: given L,coeffs - the output of the SFT, G - a WAV function domain (i.e. Z<sub>N</sub> for some positive N)
+						<u>make_wav_from_sft.m</u>: given L,coeffs - the output of the SFT, G - a WAV function domain (i.e. positive N representing Z<sub>N</sub>)
 						and a name (string), this script creates a WAV file with the given name, generated from the given SFT output. Since the SFT ouput is
 						only an approximated function, some values may be over 1 or below -1, and so a normalization of the output is applied. This causes
 						the resulted WAV to be amplified by some 0 &lt; a &lt; 1.
 					</li>
 					<li>
-						<u>make_wav_from_sft_departed.m</u>: given the <b>sft_dp_rec.m</b> parameters, m - a wavread output, sizeOfInterval -
+						<u>make_wav_from_sft_departed.m</u>: given the <b>sft_dp.m</b> parameters, m - a wavread output, sizeOfInterval -
 						the size of the intervals to divide the function's domain into, and name - a name for the output WAV, this script
 						divides the given WAVREAD output (in m) into size(m)/sizeOfInterval intervals. It then runs the SFT on parts of m,
 						and eventually it creates from all the SFT outputs approximated WAV parts and concatenates them into one fully-lengthed WAV file. <br>
@@ -119,30 +114,30 @@
 				<b><a href="sft_matlab_examples.zip">DOWNLOAD EXAMPLES</a></b><br>
 				The examples zip file above includes 3 WAV samples and some WAV outputs created using the SFT scripts with varying parameters. It also includes
 				an example for a matlab written function and a runner script - the example given below in details. Note that all parameters given to the SFT for
-				generating a WAV output for the 3 WAV files, are detailed in the output file name (e.g. <i>orchestra_tau-0.01_ma-50_mb-50_iters-1_recs-1.wav</i>).<br>
+				generating a WAV output for the 3 WAV files, are detailed in the output file name (e.g. <i>orchestra_tau-0.01_ma-50_mb-50_iters-1.wav</i>).<br>
 				Testing details on the WAV files:
 				<ul>
 					<li>
 						<b>guitar.wav</b> (8.73 secs, G = Z<sub>384,860</sub>): tested dividing the original file into intervals of length 30,000,
-						running the SFT on each interval separately and combining the results together to create a continuing output in the original length.<br>
+						running the SFT on each interval separately and combining the results together to create a continuing output in the original length.
+						Also tested with the same parameters only without division to subintervals.<br>
 						This method gives better percision for each interval, but when concatenting the outputs together the points of connection are noticable.
+						Comparing the undivided with the divided, it can be heard that the notes are sharper in the divided and more dimmed in the undivided.
 					</li>
 					<li>
-						<b>orchestra.wav</b> (5.33 secs, G = Z<sub>235,200</sub>): tested twice using sft_dp.m - once with m<sub>A</sub>, m<sub>B</sub> = 40 and
-						&tau; = 0.03 and once with m<sub>A</sub>, m<sub>B</sub> = 50 and &tau; = 0.01. In both cases the number of iterations and reccurences
-						was 1.<br>
-						The results show that the noise increases when the threshold (&tau;) decreases, and percision increases when the size of m<sub>A</sub>
-						and m<sub>B</sub> (affecting the sampling domain Q) increases.
+						<b>orchestra.wav</b> (5.33 secs, G = Z<sub>235,200</sub>): tested several times using sft_dp.m with varying &tau;, m<sub>A</sub> and
+						m<sub>B</sub> (but with number of iterations being 1 in all examples).<br>
+						The results show that as the threshold &tau; decreases, the output sounds more like the original but also the noise increases and covers
+						it more and more. Also, as the size of m<sub>A</sub> and m<sub>B</sub> increases, the percision increases.
 					</li>
 					<li>
 						<b>orchestra_short.wav</b> (0.68 secs, G = Z<sub>30,000</sub>): since this sample is short it was easier to test and create output WAV files
-						from the approximated functions generated from the SFT outputs. This sample contains 12 results, generated on varying threshold (&tau;),
-						m<sub>A</sub> and m<sub>B</sub>, number of iterations and number of recurrences. the sft_dp.m is mostly used, but there are also some results
-						created by using sft_dp_full.m.
+						from the approximated functions generated from the SFT outputs. This sample contains outputs generated using varying threshold (&tau;),
+						m<sub>A</sub> and m<sub>B</sub> and number of iterations. There is also an output generated using sft_dp_full.m.
 					</li>
 				</ul>
 				
-				This code example (included in the examples zip file under <i>basic</i>) demonstrates how to use the Matlab SFT package including the environment setup.
+				This code example (included in the examples zip file) demonstrates how to use the Matlab SFT package including the environment setup.
 				The following will describe the example for a function over a direct-product of finite groups domain:<br>
 				<li>
 				<b>Step #1</b>: extract the zip file into your home directory and edit <i>sft_setenv.m</i>. Here the files are
@@ -188,6 +183,25 @@
 					&nbsp;10.74807983709623 + 7.47732998509190i<br> 					
 				</p>
 				</li>
+				
+				Another code example for creating an SFT output WAV file:
+				<p id="id_code">
+					&gt;&gt; <font id="id_code_note">% set variables and run SFT</font><br>
+					&gt;&gt; m = wavread('orchestra_short.wav');<br>
+					&gt;&gt; isLogged = true;<br>
+					&gt;&gt; G = size(m,1);<br>
+					&gt;&gt; tau = 0.05;<br>
+					&gt;&gt; func = @(x,G)wav_func_script(x,m);<br>
+					&gt;&gt; ma = 30;<br>
+					&gt;&gt; mb = 30;<br>
+					&gt;&gt; numOfIterations = 1;<br>
+					&gt;&gt; [L,coeffs] = sft_dp(isLogged,G,tau,func,ma,mb,numOfIterations)<br><br>
+					... <i>printing out SFT run log</i><br><br>
+					&gt;&gt; <font id="id_code_note">% create WAV file from the output</font><br>
+					&gt;&gt; name = 'orchestra_short_tau-0.05_ma-30_mb-30_iters-1';<br>
+					&gt;&gt; make_wav_from_sft(L,coeffs,G,name);<br>
+				</p>
+				This creates a WAV file named "orchestra_short_tau-0.05_ma-30_mb-30_iters-1.wav" in the working directory.
 				 
 				<br>
 				<br>
