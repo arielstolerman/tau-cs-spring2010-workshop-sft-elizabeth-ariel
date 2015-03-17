@@ -1,0 +1,2 @@
+Implementation of the SFT algorithm, allowing learning functions over finite groups.
+This project is part of a workshop in learning and coding theory, Computer-Science school, Tel-Aviv University Spring 2010.
